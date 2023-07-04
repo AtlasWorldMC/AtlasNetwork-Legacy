@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.0'
+}
+
+group = 'fr.atlasworld'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    //Terminal
+    implementation "org.jline:jline:3.22.0"
+
+    //Logging
+    implementation "ch.qos.logback:logback-classic:1.4.7"
+    implementation "org.slf4j:slf4j-api:2.0.7"
+
+    //Utilities
+    implementation "com.google.code.gson:gson:2.10.1"
+    implementation "com.google.guava:guava:31.1-jre"
+    implementation "org.jetbrains:annotations:24.0.0"
+}
+
+compileJava {
+    options.encoding = "UTF-8"
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': "${project_main_class}"
+    }
+    archiveClassifier.set('')
+}
+
+//Only build shadowJar
+build.dependsOn(shadowJar)
+jar.enabled = false
+
+tasks.register('run', JavaExec) {
+    dependsOn build
+    doFirst {
+        File runDir = new File("./run")
+        if (!runDir.exists()) {
+            runDir.mkdirs()
+        }
+        workingDir = runDir
+    }
+    mainClass.set("${project_main_class}")
+    classpath = files(shadowJar.archiveFile)
+    args '-devEnv' // program arguments go here
+}
