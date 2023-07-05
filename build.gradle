@@ -11,8 +11,8 @@ repositories {
 }
 
 dependencies {
-    //Terminal
-    implementation "org.jline:jline:3.22.0"
+    //Database
+    implementation "org.mongodb:mongodb-driver-sync:4.10.1"
 
     //Logging
     implementation "ch.qos.logback:logback-classic:1.4.7"

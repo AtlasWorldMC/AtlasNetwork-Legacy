@@ -1,8 +1,14 @@
 package fr.atlasworld.network;
 
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Filters;
 import fr.atlasworld.network.file.FileManager;
-import fr.atlasworld.network.setup.WizardSetup;
 import fr.atlasworld.network.utils.LaunchArgs;
+import fr.atlasworld.network.utils.Settings;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,13 +23,9 @@ public class AtlasNetwork {
 
         //Load configuration
         if (launchArgs.isForceConfig()) {
-            AtlasNetwork.logger.warn("AtlasNetwork launched with argument '{}' overwriting already existent configuration.", LaunchArgs.FORCE_CONFIG);
+            AtlasNetwork.logger.warn("AtlasNetwork launched with argument '{}' overriding already existent configuration.", LaunchArgs.FORCE_CONFIG);
             FileManager.getSettingsFile().delete();
         }
 
-        if (!FileManager.getSettingsFile().exists()) {
-            AtlasNetwork.logger.info("Opening wizard setup..");
-            WizardSetup.init();
-        }
     }
 }

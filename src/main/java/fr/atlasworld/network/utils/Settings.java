@@ -3,25 +3,17 @@ package fr.atlasworld.network.utils;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.file.loader.GsonFileLoader;
 
+import java.util.List;
+
 public class Settings {
-    private final boolean primaryNode;
-    private final String nodeName;
     private final String socketHost;
     private final int socketPort;
+    private final DatabaseSettings database;
 
-    private Settings(boolean primaryNode, String nodeName, String socketHost, int socketPort) {
-        this.primaryNode = primaryNode;
-        this.nodeName = nodeName;
+    public Settings(String socketHost, int socketPort, DatabaseSettings database) {
         this.socketHost = socketHost;
         this.socketPort = socketPort;
-    }
-
-    public boolean isPrimaryNode() {
-        return primaryNode;
-    }
-
-    public String getNodeName() {
-        return nodeName;
+        this.database = database;
     }
 
     public String getSocketHost() {
@@ -32,13 +24,27 @@ public class Settings {
         return socketPort;
     }
 
+    public DatabaseSettings getDatabase() {
+        return database;
+    }
+
     //Static fields
     private static Settings settings;
 
     public static Settings getSettings() {
         if (settings == null) {
-            settings = new GsonFileLoader<Settings>(FileManager.getSettingsFile(), Settings.class).load();
+            GsonFileLoader<Settings> settingsLoader = new GsonFileLoader<>(FileManager.getSettingsFile(), Settings.class);
+            if (!FileManager.getSettingsFile().isFile()) {
+                settingsLoader.save(new Settings("0.0.0.0", 27767,
+                        new DatabaseSettings("user", "password", "0.0.0.0",
+                                27017)));
+            }
+
+            settings = settingsLoader.load();
         }
         return settings;
+    }
+
+    public record DatabaseSettings(String username, String password, String host, int port) {
     }
 }
