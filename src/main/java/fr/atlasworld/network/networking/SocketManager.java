@@ -1,0 +1,114 @@
+package fr.atlasworld.network.networking;
+
+import fr.atlasworld.network.AtlasNetwork;
+import fr.atlasworld.network.networking.auth.AuthManager;
+import fr.atlasworld.network.networking.client.SessionManager;
+import fr.atlasworld.network.networking.handler.AuthHandler;
+import fr.atlasworld.network.networking.handler.EventHandler;
+import fr.atlasworld.network.networking.handler.PacketExecutor;
+import fr.atlasworld.network.networking.packet.PacketManager;
+import fr.atlasworld.network.utils.Settings;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.jetbrains.annotations.NotNull;
+
+public class SocketManager {
+    private boolean connected = false;
+    private final ServerBootstrap bootstrap;
+    private final int port;
+    private final String host;
+    private final NioEventLoopGroup bossGroup, workerGroup;
+    private Channel serverChannel;
+
+    private SocketManager(Settings settings) {
+        this.bootstrap = new ServerBootstrap();
+        this.port = settings.getSocketPort();
+        this.host = settings.getSocketHost();
+
+        this.bossGroup = new NioEventLoopGroup();
+        this.workerGroup = new NioEventLoopGroup();
+
+        //Setup Bootstrap
+        this.bootstrap
+                .channel(NioServerSocketChannel.class)
+                .group(bossGroup, workerGroup)
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(@NotNull SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast("auth", new AuthHandler(AuthManager.getManager(), SessionManager.getManager()));
+                        ch.pipeline().addLast("packet_exe", new PacketExecutor(PacketManager.getManager(), SessionManager.getManager()));
+                        ch.pipeline().addLast("event", new EventHandler(AuthManager.getManager(), SessionManager.getManager()));
+                    }
+                });
+    }
+
+    public ChannelFuture bind() {
+        return this.bootstrap
+                .bind(this.host, this.port)
+                .addListener((ChannelFuture future) -> {
+                    if (!future.isSuccess()) {
+                        this.connected = false;
+                        AtlasNetwork.logger.error("Could not bind to {}:{}", this.host, this.port, future.cause());
+                        return;
+                    }
+
+                    AtlasNetwork.logger.info("Successfully bound to {}:{}", this.host, this.port);
+
+                    this.connected = true;
+                    this.serverChannel = future.channel();
+
+                    this.serverChannel.closeFuture().addListener(closeFuture -> {
+                        this.connected = false;
+                        this.serverChannel = null;
+                        AtlasNetwork.logger.warn("Socket stopped!");
+                    });
+                });
+    }
+
+    public void unbind() {
+        if (!this.connected) {
+            AtlasNetwork.logger.warn("Unbind method triggered while socket is not connected!");
+            return;
+        }
+
+        try {
+            this.serverChannel.close().sync();
+            this.bossGroup.shutdownGracefully();
+            this.workerGroup.shutdownGracefully();
+        } catch (InterruptedException e) {
+            AtlasNetwork.logger.error("Unable to close socket", e);
+        }
+    }
+
+    public boolean isConnected() {
+        return connected;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public String getHost() {
+        return host;
+    }
+
+    public Channel getServerChannel() {
+        return serverChannel;
+    }
+
+
+    //Static fields
+    private static SocketManager manager;
+
+    public static SocketManager getManager() {
+        if (manager == null) {
+            manager = new SocketManager(Settings.getSettings());
+        }
+        return manager;
+    }
+}

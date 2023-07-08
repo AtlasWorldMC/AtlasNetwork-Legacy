@@ -11,6 +11,9 @@ repositories {
 }
 
 dependencies {
+    //Networking
+    implementation "io.netty:netty-all:4.1.94.Final"
+
     //Database
     implementation "org.mongodb:mongodb-driver-sync:4.10.1"
 

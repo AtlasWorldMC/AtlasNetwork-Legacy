@@ -3,9 +3,6 @@ package fr.atlasworld.network.database;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import fr.atlasworld.network.utils.Settings;
-import org.bson.Document;
-
-import java.lang.reflect.Type;
 
 public class DatabaseManager {
     private final MongoClient client;
