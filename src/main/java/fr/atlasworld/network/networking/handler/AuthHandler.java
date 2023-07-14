@@ -76,6 +76,8 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
             return;
         }
 
+        buf.readerIndex(0);
+
         //Pass the data to the other handlers in the pipeline
         super.channelRead(ctx, buf);
     }

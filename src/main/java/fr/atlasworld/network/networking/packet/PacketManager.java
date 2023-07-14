@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PacketManager {
-    public final List<NetworkPacket> registeredPackets;
+    private final List<NetworkPacket> registeredPackets;
 
     private PacketManager(List<NetworkPacket> registeredPackets) {
         this.registeredPackets = registeredPackets;
@@ -25,7 +25,7 @@ public class PacketManager {
     }
 
     //Static fields
-    public static PacketManager manager;
+    private static PacketManager manager;
 
     public static PacketManager getManager() {
         if (manager == null) {

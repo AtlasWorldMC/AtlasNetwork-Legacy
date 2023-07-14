@@ -2,6 +2,8 @@ package fr.atlasworld.network;
 
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.networking.SocketManager;
+import fr.atlasworld.network.networking.packet.HelloWorldPacket;
+import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.utils.LaunchArgs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +23,8 @@ public class AtlasNetwork {
             FileManager.getSettingsFile().delete();
         }
 
+        registerPackets(PacketManager.getManager());
+
         //Boot up Socket
         AtlasNetwork.logger.info("Starting socket...");
         SocketManager socketManager = SocketManager.getManager();
@@ -29,4 +33,8 @@ public class AtlasNetwork {
         AtlasNetwork.logger.info("Network initialized and waiting for connections..");
     }
 
+
+    private static void registerPackets(PacketManager manager) {
+        manager.registerPacket(new HelloWorldPacket());
+    }
 }

@@ -30,6 +30,11 @@ public class SimpleHandler extends ChannelInboundHandlerAdapter {
             } else {
                 NetworkClient.logger.info("Authentification failed: " + buf.readString());
             }
+
+            PacketByteBuf helloWorldBuf = new PacketByteBuf(Unpooled.buffer())
+                    .writeString("hello_world");
+
+            ctx.channel().writeAndFlush(helloWorldBuf.getParent());
         }
     }
 
