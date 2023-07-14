@@ -1,4 +1,10 @@
 package fr.atlasworld.network.networking.auth;
 
-public record AuthResult(boolean successful, String message, String token, String userId) {
+import fr.atlasworld.network.networking.PacketByteBuf;
+import io.netty.buffer.ByteBuf;
+
+public record AuthResult(boolean success, String message) {
+    public PacketByteBuf toByteBuf(ByteBuf parent) {
+        return new PacketByteBuf(parent).writeBoolean(success).writeString(message);
+    }
 }

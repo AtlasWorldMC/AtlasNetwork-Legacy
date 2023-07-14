@@ -1,7 +1,7 @@
 package fr.atlasworld.network.networking.packet;
 
-import fr.atlasworld.network.networking.Client;
 import fr.atlasworld.network.networking.PacketByteBuf;
+import fr.atlasworld.network.networking.entities.Client;
 
 public interface NetworkPacket {
     String getIdentifier();

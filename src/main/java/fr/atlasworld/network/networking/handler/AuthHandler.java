@@ -1,11 +1,11 @@
 package fr.atlasworld.network.networking.handler;
 
 import fr.atlasworld.network.AtlasNetwork;
+import fr.atlasworld.network.networking.NetworkErrors;
 import fr.atlasworld.network.networking.PacketByteBuf;
-import fr.atlasworld.network.networking.auth.AuthManager;
-import fr.atlasworld.network.networking.auth.AuthResponses;
 import fr.atlasworld.network.networking.auth.AuthResult;
-import fr.atlasworld.network.networking.client.SessionManager;
+import fr.atlasworld.network.networking.auth.AuthentificationManager;
+import fr.atlasworld.network.networking.session.SessionManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,64 +13,70 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 public class AuthHandler extends ChannelInboundHandlerAdapter {
-    private final AuthManager authManager;
+    private final AuthentificationManager authManager;
     private final SessionManager sessionManager;
 
-    public AuthHandler(AuthManager authManager, SessionManager sessionManager) {
+    public AuthHandler(AuthentificationManager authManager, SessionManager sessionManager) {
         this.authManager = authManager;
         this.sessionManager = sessionManager;
     }
 
     @Override
     public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
+        AtlasNetwork.logger.info("Packet received!");
         PacketByteBuf buf = new PacketByteBuf((ByteBuf) msg);
 
         String token = buf.readString();
 
         //Check for an authenticate packet
         if (token.equals("authenticate")) {
-            int authMethodId = buf.readInt();
-            AuthResult result = this.authManager.authenticate(ctx.channel(), authMethodId, buf);
+            if (this.sessionManager.hasSession(ctx.channel())) {
+                this.sessionManager.deleteSession(ctx.channel());
+                AtlasNetwork.logger.info("{} sent a authentification packet when already authenticated.", ctx.channel().remoteAddress());
+            }
 
-            if (result.successful()) {
-                this.sessionManager.createSession(ctx.channel(), result.userId());
+            AuthResult result = this.authManager.authenticate(ctx.channel(), buf);
+
+            if (result.success()) {
+                this.sessionManager.createSession(ctx.channel());
+                AtlasNetwork.logger.info("Authentification successful for {}", ctx.channel().remoteAddress());
+            } else {
+                AtlasNetwork.logger.error("Authentification failed for {}", ctx.channel().remoteAddress());
             }
 
             //Build response
             PacketByteBuf response = new PacketByteBuf(Unpooled.buffer())
                     .writeString("authenticate_response")
-                    .writeBoolean(result.successful())
-                    .writeString(result.message())
-                    .writeString(result.token());
+                    .writeByteBuf(result.toByteBuf(Unpooled.buffer()));
 
             //Send response, and free memory once sent
-            ctx.channel().writeAndFlush(response.getParent()).addListener(future -> {
-                buf.release();
-                response.release();
-            });
+            ctx.channel().writeAndFlush(response.getParent());
+
+            //Clear memory
+            buf.release();
+            response.release();
 
             return;
         }
 
-        //Validate token
-        if (!this.authManager.validate(ctx.channel(), token)) {
-            AtlasNetwork.logger.error("{} sent a packet with a invalid session token!", ctx.channel().remoteAddress());
 
-            //Build response
+        if (!this.sessionManager.hasSession(ctx.channel())) {
+            AtlasNetwork.logger.error("{} sent a packet without being authenticated!", ctx.channel().remoteAddress());
+
             PacketByteBuf response = new PacketByteBuf(Unpooled.buffer())
-                    .writeString("authentication_error")
-                    .writeString(AuthResponses.INVALID_OR_MISSING_TOKEN);
+                    .writeString("request_fail")
+                    .writeString(NetworkErrors.NOT_AUTHED);
 
-            //Send response, and free memory once sent
-            ctx.channel().writeAndFlush(response.getParent()).addListener(future -> {
-                buf.release();
-                response.release();
-            });
+            ctx.channel().writeAndFlush(response.getParent());
+
+            //Clear memory
+            buf.release();
+            response.release();
 
             return;
         }
 
         //Pass the data to the other handlers in the pipeline
-        super.channelRead(ctx, msg);
+        super.channelRead(ctx, buf);
     }
 }

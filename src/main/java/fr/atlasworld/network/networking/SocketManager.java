@@ -1,8 +1,8 @@
 package fr.atlasworld.network.networking;
 
 import fr.atlasworld.network.AtlasNetwork;
-import fr.atlasworld.network.networking.auth.AuthManager;
-import fr.atlasworld.network.networking.client.SessionManager;
+import fr.atlasworld.network.networking.auth.AuthentificationManager;
+import fr.atlasworld.network.networking.session.SessionManager;
 import fr.atlasworld.network.networking.handler.AuthHandler;
 import fr.atlasworld.network.networking.handler.EventHandler;
 import fr.atlasworld.network.networking.handler.PacketExecutor;
@@ -40,9 +40,9 @@ public class SocketManager {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(@NotNull SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast("auth", new AuthHandler(AuthManager.getManager(), SessionManager.getManager()));
-                        ch.pipeline().addLast("packet_exe", new PacketExecutor(PacketManager.getManager(), SessionManager.getManager()));
-                        ch.pipeline().addLast("event", new EventHandler(AuthManager.getManager(), SessionManager.getManager()));
+                        ch.pipeline().addLast(new AuthHandler(AuthentificationManager.getManager(), SessionManager.getManager()));
+                        ch.pipeline().addLast(new PacketExecutor(PacketManager.getManager(), SessionManager.getManager()));
+                        ch.pipeline().addLast(new EventHandler());
                     }
                 });
     }

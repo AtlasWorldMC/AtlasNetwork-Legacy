@@ -214,6 +214,16 @@ public class PacketByteBuf {
         return UUID.fromString(this.readString());
     }
 
+    public PacketByteBuf writeByteBuf(ByteBuf buf) {
+        this.parent.writeBytes(buf);
+        return this;
+    }
+
+    public PacketByteBuf writeByteBuf(PacketByteBuf buf) {
+        this.parent.writeBytes(buf.getParent());
+        return this;
+    }
+
     public void release() {
         this.parent.release();
     }
@@ -228,6 +238,24 @@ public class PacketByteBuf {
 
     public PacketByteBuf capacity(int capacity) {
         this.parent.capacity(capacity);
+        return this;
+    }
+
+    public int readerIndex() {
+        return this.parent.readerIndex();
+    }
+
+    public PacketByteBuf readerIndex(int index) {
+        this.parent.readerIndex(index);
+        return this;
+    }
+
+    public int writerIndex() {
+        return this.parent.writerIndex();
+    }
+
+    public PacketByteBuf writerIndex(int index) {
+        this.parent.writerIndex(index);
         return this;
     }
 

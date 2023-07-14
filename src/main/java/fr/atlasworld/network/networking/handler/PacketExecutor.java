@@ -3,7 +3,7 @@ package fr.atlasworld.network.networking.handler;
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.NetworkErrors;
 import fr.atlasworld.network.networking.PacketByteBuf;
-import fr.atlasworld.network.networking.client.SessionManager;
+import fr.atlasworld.network.networking.session.SessionManager;
 import fr.atlasworld.network.networking.packet.NetworkPacket;
 import fr.atlasworld.network.networking.packet.PacketManager;
 import io.netty.buffer.Unpooled;
@@ -22,6 +22,7 @@ public class PacketExecutor extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
+        AtlasNetwork.logger.info("Packet received!");
         PacketByteBuf buf = (PacketByteBuf) msg;
 
         String packetId = buf.readString();
@@ -43,6 +44,6 @@ public class PacketExecutor extends ChannelInboundHandlerAdapter {
             return;
         }
 
-        packet.execute(this.sessionManager.getClientForSessions(ctx.channel()), buf);
+        packet.execute(this.sessionManager.getSession(ctx.channel()), buf);
     }
 }

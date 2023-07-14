@@ -26,5 +26,7 @@ public class AtlasNetwork {
         SocketManager socketManager = SocketManager.getManager();
 
         socketManager.bind().sync();
+        AtlasNetwork.logger.info("Network initialized and waiting for connections..");
     }
+
 }

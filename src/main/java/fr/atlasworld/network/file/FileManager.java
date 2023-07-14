@@ -1,7 +1,5 @@
 package fr.atlasworld.network.file;
 
-import fr.atlasworld.network.AtlasNetwork;
-
 import java.io.File;
 
 public class FileManager {
