@@ -23,7 +23,6 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
-        AtlasNetwork.logger.info("Packet received!");
         PacketByteBuf buf = new PacketByteBuf((ByteBuf) msg);
 
         String token = buf.readString();

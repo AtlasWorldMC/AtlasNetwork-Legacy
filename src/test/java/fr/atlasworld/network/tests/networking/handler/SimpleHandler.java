@@ -11,10 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class SimpleHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
-        NetworkClient.logger.info("Packet received!");
-
         PacketByteBuf buf = new PacketByteBuf((ByteBuf) msg);
-
         String packet = buf.readString();
 
         if (packet.equals("request_fail")) {
@@ -42,8 +39,8 @@ public class SimpleHandler extends ChannelInboundHandlerAdapter {
     public void channelActive(@NotNull ChannelHandlerContext ctx) throws Exception {
         ctx.channel().writeAndFlush(new PacketByteBuf(Unpooled.buffer())
                 .writeString("authenticate")
-                .writeString("827e799d-e3e3-464a-a599-cbacc9519ec0").writeString("dZbh87C_2FkWtYEZfthADrrLWNRV5e8k")
+                .writeString("c9987370-92f5-4d38-a9bf-4293183f7546")
+                .writeString("xModeBb4yZ0gdXlHMD-A5rkmDed4M5PI")
                 .getParent());
-        NetworkClient.logger.info("Sent packet!");
     }
 }

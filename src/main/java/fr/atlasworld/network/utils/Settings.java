@@ -1,5 +1,7 @@
 package fr.atlasworld.network.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.file.loader.GsonFileLoader;
 
@@ -33,7 +35,8 @@ public class Settings {
 
     public static Settings getSettings() {
         if (settings == null) {
-            GsonFileLoader<Settings> settingsLoader = new GsonFileLoader<>(FileManager.getSettingsFile(), Settings.class);
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            GsonFileLoader<Settings> settingsLoader = new GsonFileLoader<>(FileManager.getSettingsFile(), gson, Settings.class);
             if (!FileManager.getSettingsFile().isFile()) {
                 settingsLoader.save(new Settings("0.0.0.0", 27767,
                         new DatabaseSettings("user", "password", "0.0.0.0",

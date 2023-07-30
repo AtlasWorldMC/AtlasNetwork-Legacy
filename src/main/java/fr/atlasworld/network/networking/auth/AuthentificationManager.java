@@ -37,8 +37,6 @@ public class AuthentificationManager {
             String token = generateSecureToken();
             UUID tokenUuid = UUID.randomUUID();
 
-            System.out.println(token);
-
             Document document = new Document();
             document.put("token", CryptoUtils.hashString(token, "sha256"));
             document.put("uuid", tokenUuid.toString());
