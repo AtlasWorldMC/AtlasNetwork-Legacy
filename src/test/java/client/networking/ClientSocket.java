@@ -1,8 +1,8 @@
-package fr.atlasworld.network.tests.networking;
+package client.networking;
 
 import fr.atlasworld.network.AtlasNetwork;
-import fr.atlasworld.network.tests.NetworkClient;
-import fr.atlasworld.network.tests.networking.handler.SimpleHandler;
+import client.NetworkClient;
+import client.networking.handler.SimpleHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

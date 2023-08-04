@@ -1,7 +1,7 @@
-package fr.atlasworld.network.tests.networking.handler;
+package client.networking.handler;
 
 import fr.atlasworld.network.networking.PacketByteBuf;
-import fr.atlasworld.network.tests.NetworkClient;
+import client.NetworkClient;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;

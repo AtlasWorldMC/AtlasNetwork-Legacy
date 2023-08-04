@@ -1,6 +1,6 @@
-package fr.atlasworld.network.tests;
+package client;
 
-import fr.atlasworld.network.tests.networking.ClientSocket;
+import client.networking.ClientSocket;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
