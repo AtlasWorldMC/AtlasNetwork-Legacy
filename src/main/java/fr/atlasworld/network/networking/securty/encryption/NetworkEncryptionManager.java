@@ -76,13 +76,8 @@ public class NetworkEncryptionManager implements EncryptionManager {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, AESSecretKey);
 
-        byte[] inputBytes;
-        if (buf.getParent().hasArray() && buf.getParent().arrayOffset() == 0 && buf.getParent().readableBytes() == buf.capacity()) {
-            inputBytes = buf.getParent().array();
-        } else {
-            inputBytes = new byte[buf.getParent().readableBytes()];
-            buf.getParent().getBytes(buf.getParent().readerIndex(), inputBytes);
-        }
+        byte[] inputBytes = new byte[buf.getParent().readableBytes()];
+        buf.getParent().getBytes(buf.getParent().readerIndex(), inputBytes);
 
         byte[] encryptedBytes = cipher.doFinal(inputBytes);
         return Unpooled.wrappedBuffer(encryptedBytes);
@@ -93,13 +88,8 @@ public class NetworkEncryptionManager implements EncryptionManager {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, AESSecretKey);
 
-        byte[] inputBytes;
-        if (buf.getParent().hasArray() && buf.getParent().arrayOffset() == 0 && buf.getParent().readableBytes() == buf.capacity()) {
-            inputBytes = buf.getParent().array();
-        } else {
-            inputBytes = new byte[buf.getParent().readableBytes()];
-            buf.getParent().getBytes(buf.getParent().readerIndex(), inputBytes);
-        }
+        byte[] inputBytes = new byte[buf.getParent().readableBytes()];
+        buf.getParent().getBytes(buf.getParent().readerIndex(), inputBytes);
 
         byte[] decryptedBytes = cipher.doFinal(inputBytes);
         return new PacketByteBuf(Unpooled.wrappedBuffer(decryptedBytes));

@@ -1,5 +1,6 @@
 package client.networking;
 
+import client.NetworkClient;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -36,7 +37,6 @@ public class ClientEncryptionManager {
             this.serverKey = factory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
 
             AESSecretKey = this.generateAESKey();
-            this.encrypted = true;
 
             byte[] encryptedKey = this.encryptKey(this.AESSecretKey.getEncoded());
             PacketByteBuf respBuf = PacketByteBuf.create()
@@ -45,7 +45,8 @@ public class ClientEncryptionManager {
                     .writeInt(encryptedKey.length);
             respBuf.getParent().writeBytes(encryptedKey);
 
-            channel.writeAndFlush(respBuf.getParent());
+            channel.writeAndFlush(respBuf);
+            this.encrypted = true;
             return;
         }
         System.out.println("Unknown packet");
@@ -63,7 +64,10 @@ public class ClientEncryptionManager {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, AESSecretKey);
 
-        byte[] encryptedBytes = cipher.doFinal(buf.getParent().array());
+        byte[] inputBytes = new byte[buf.getParent().readableBytes()];
+        buf.getParent().getBytes(buf.getParent().readerIndex(), inputBytes);
+
+        byte[] encryptedBytes = cipher.doFinal(inputBytes);
         return Unpooled.wrappedBuffer(encryptedBytes);
     }
 
@@ -72,15 +76,8 @@ public class ClientEncryptionManager {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, AESSecretKey);
 
-        byte[] inputBytes;
-        if (buf.getParent().hasArray() && buf.getParent().arrayOffset() == 0 && buf.getParent().readableBytes() == buf.capacity()) {
-            // Use the backing array if available and accessible
-            inputBytes = buf.getParent().array();
-        } else {
-            // If buf is a direct buffer or has a non-zero array offset, copy the data
-            inputBytes = new byte[buf.getParent().readableBytes()];
-            buf.getParent().getBytes(buf.getParent().readerIndex(), inputBytes);
-        }
+        byte[] inputBytes = new byte[buf.getParent().readableBytes()];
+        buf.getParent().getBytes(buf.getParent().readerIndex(), inputBytes);
 
         byte[] decryptedBytes = cipher.doFinal(inputBytes);
         return new PacketByteBuf(Unpooled.wrappedBuffer(decryptedBytes));

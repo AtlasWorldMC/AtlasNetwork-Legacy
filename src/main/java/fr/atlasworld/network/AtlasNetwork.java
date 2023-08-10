@@ -1,5 +1,6 @@
 package fr.atlasworld.network;
 
+import ch.qos.logback.classic.Level;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.networking.securty.encryption.NetworkEncryptionManager;
 import fr.atlasworld.network.networking.session.NetworkSessionManager;
@@ -30,6 +31,11 @@ public class AtlasNetwork {
 
         //Handle Args
         launchArgs = new LaunchArgs(args);
+
+        if (launchArgs.isDevEnv()) {
+            ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(logger.getName());
+            rootLogger.setLevel(Level.DEBUG);
+        }
 
         //Load configuration
         if (launchArgs.isForceConfig()) {

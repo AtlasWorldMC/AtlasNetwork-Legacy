@@ -1,6 +1,7 @@
 package client.networking;
 
 import client.networking.handler.DecodeHandler;
+import client.networking.handler.EncodeHandler;
 import fr.atlasworld.network.AtlasNetwork;
 import client.NetworkClient;
 import client.networking.handler.SimpleHandler;
@@ -36,8 +37,10 @@ public class ClientSocket {
                     @Override
                     protected void initChannel(@NotNull SocketChannel ch) throws Exception {
                         ClientEncryptionManager manager = new ClientEncryptionManager();
-                        ch.pipeline().addFirst(new DecodeHandler(manager));
+                        ch.pipeline().addLast(new DecodeHandler(manager));
                         ch.pipeline().addLast(new SimpleHandler());
+
+                        ch.pipeline().addLast(new EncodeHandler(manager));
                     }
                 });
     }

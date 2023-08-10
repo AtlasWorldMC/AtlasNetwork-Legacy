@@ -28,6 +28,8 @@ public class SimpleHandler extends ChannelInboundHandlerAdapter {
 
         if (packet.equals("encryption_handshake")) {
             NetworkClient.logger.info("Handshake response successful: " + buf.readBoolean());
+            NetworkClient.logger.info("Sending data");
+            ctx.channel().writeAndFlush(PacketByteBuf.create().writeString("test_packet").writeInt(10));
             return;
         }
 

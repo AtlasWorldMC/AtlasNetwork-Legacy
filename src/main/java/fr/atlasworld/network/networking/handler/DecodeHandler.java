@@ -1,5 +1,6 @@
 package fr.atlasworld.network.networking.handler;
 
+import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.networking.securty.encryption.EncryptionManager;
 import io.netty.buffer.ByteBuf;
@@ -19,11 +20,22 @@ public class DecodeHandler extends ChannelInboundHandlerAdapter {
         PacketByteBuf rawBuf = new PacketByteBuf((ByteBuf) msg);
 
         if (!this.encryptionManager.isEncrypted()) {
+            String packet = rawBuf.readString();
+            AtlasNetwork.logger.debug("{} -> AtlasNetwork | Packet: {} | Encrypted: {}", ctx.channel().remoteAddress(),
+                    packet, false);
+
+            rawBuf.readerIndex(0);
             this.encryptionManager.handleHandshake(ctx.channel(), rawBuf);
             return;
         }
 
         PacketByteBuf processedBuf = this.encryptionManager.decrypt(rawBuf);
+
+        String packet = processedBuf.readString();
+        AtlasNetwork.logger.debug("{} -> AtlasNetwork | Packet: {} | Encrypted: {}", ctx.channel().remoteAddress(),
+                packet, true);
+
+        processedBuf.readerIndex(0);
         super.channelRead(ctx, processedBuf);
     }
 

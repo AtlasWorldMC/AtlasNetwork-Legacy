@@ -43,7 +43,7 @@ public class NetworkSocketSettings implements SocketSettings {
                         EncryptionManager encryptionManager = encryptionManagerBuilder.get();
 
                         //In
-                        ch.pipeline().addFirst(new DecodeHandler(encryptionManager));
+                        ch.pipeline().addLast(new DecodeHandler(encryptionManager));
                         ch.pipeline().addLast(new SessionChannelHandler(sessionManager));
 
                         //Out
