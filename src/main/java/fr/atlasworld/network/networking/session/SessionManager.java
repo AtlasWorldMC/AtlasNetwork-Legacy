@@ -1,56 +1,34 @@
 package fr.atlasworld.network.networking.session;
 
-import fr.atlasworld.network.exceptions.SessionException;
-import fr.atlasworld.network.networking.entities.Client;
 import io.netty.channel.Channel;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
+import java.util.Set;
 
-public class SessionManager {
-    private final Map<Channel, Client> sessionHolder;
+public interface SessionManager {
+    /**
+     * Registers a session
+     * @param channel Connection IO Channel
+     * @param session Connection Placeholder
+     */
+    void addSession(Channel channel, ClientSession session);
 
-    public SessionManager(Map<Channel, Client> sessionHolder) {
-        this.sessionHolder = sessionHolder;
-    }
+    /**
+     * Unregisters a session, should only be used when the connection closes
+     * @param channel Connection IO Channel
+     */
+    void removeSession(Channel channel);
 
-    public void createSession(Channel channel) {
-        if (this.sessionHolder.containsKey(channel)) {
-            throw new SessionException("Cannot create multiple sessions for " + channel.remoteAddress());
-        }
+    /**
+     * Gets all the active sessions
+     * @return active sessions
+     */
+    Set<ClientSession> getSessions();
 
-        //Delete session if the channel closes
-        channel.closeFuture().addListener(future -> this.deleteSession(channel));
-
-        Client client = new Client(channel);
-        this.sessionHolder.put(channel, client);
-    }
-
-    public void deleteSession(Channel channel) {
-        this.sessionHolder.remove(channel);
-    }
-
-    public boolean hasSession(Channel channel) {
-        return this.sessionHolder.containsKey(channel);
-    }
-
-    public Client getSession(Channel channel) {
-        return this.sessionHolder.get(channel);
-    }
-
-    public Stream<Client> getAllSessions() {
-        return this.sessionHolder.values().stream();
-    }
-
-    //Static fields
-    public static SessionManager manager;
-
-    public static SessionManager getManager() {
-        if(manager == null) {
-            manager = new SessionManager(new HashMap<>());
-        }
-
-        return manager;
-    }
+    /**
+     * Gets the session for a specific channel
+     * @param channel Connection IO Channel
+     * @return Connection Placeholder
+     */
+    @Nullable ClientSession getSession(Channel channel);
 }

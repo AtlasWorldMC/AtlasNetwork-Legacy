@@ -1,4 +1,4 @@
-package fr.atlasworld.network.networking.packet;
+package fr.atlasworld.network.old_networking.packet;
 
 import java.util.ArrayList;
 import java.util.List;

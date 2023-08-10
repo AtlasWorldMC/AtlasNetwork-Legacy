@@ -1,6 +1,6 @@
-package fr.atlasworld.network.networking.entities;
+package fr.atlasworld.network.old_networking.entities;
 
-import fr.atlasworld.network.networking.PacketByteBuf;
+import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;

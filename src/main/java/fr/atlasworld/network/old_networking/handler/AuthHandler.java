@@ -1,11 +1,11 @@
-package fr.atlasworld.network.networking.handler;
+package fr.atlasworld.network.old_networking.handler;
 
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.NetworkErrors;
-import fr.atlasworld.network.networking.PacketByteBuf;
-import fr.atlasworld.network.networking.auth.AuthResult;
-import fr.atlasworld.network.networking.auth.AuthentificationManager;
-import fr.atlasworld.network.networking.session.SessionManager;
+import fr.atlasworld.network.networking.packet.PacketByteBuf;
+import fr.atlasworld.network.old_networking.auth.AuthResult;
+import fr.atlasworld.network.old_networking.auth.TokenAuthenticationManager;
+import fr.atlasworld.network.old_networking.session.SessionManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,10 +13,10 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 public class AuthHandler extends ChannelInboundHandlerAdapter {
-    private final AuthentificationManager authManager;
+    private final TokenAuthenticationManager authManager;
     private final SessionManager sessionManager;
 
-    public AuthHandler(AuthentificationManager authManager, SessionManager sessionManager) {
+    public AuthHandler(TokenAuthenticationManager authManager, SessionManager sessionManager) {
         this.authManager = authManager;
         this.sessionManager = sessionManager;
     }
@@ -80,4 +80,6 @@ public class AuthHandler extends ChannelInboundHandlerAdapter {
         //Pass the data to the other handlers in the pipeline
         super.channelRead(ctx, buf);
     }
+
+
 }

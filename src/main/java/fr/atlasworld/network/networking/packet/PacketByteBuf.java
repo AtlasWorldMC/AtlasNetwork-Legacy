@@ -1,14 +1,22 @@
-package fr.atlasworld.network.networking;
+package fr.atlasworld.network.networking.packet;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import org.jetbrains.annotations.Nullable;
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.UUID;
 
 public class PacketByteBuf {
     private final ByteBuf parent;
-
     public PacketByteBuf(ByteBuf parent) {
         this.parent = parent;
     }
@@ -224,6 +232,7 @@ public class PacketByteBuf {
         return this;
     }
 
+
     public void release() {
         this.parent.release();
     }
@@ -261,5 +270,9 @@ public class PacketByteBuf {
 
     public ByteBuf getParent() {
         return parent;
+    }
+
+    public static PacketByteBuf create() {
+        return new PacketByteBuf(Unpooled.buffer());
     }
 }

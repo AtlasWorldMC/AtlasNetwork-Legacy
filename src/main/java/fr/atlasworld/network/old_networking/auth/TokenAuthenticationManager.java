@@ -1,4 +1,4 @@
-package fr.atlasworld.network.networking.auth;
+package fr.atlasworld.network.old_networking.auth;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
@@ -7,7 +7,7 @@ import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.database.DatabaseDefiner;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.networking.NetworkErrors;
-import fr.atlasworld.network.networking.PacketByteBuf;
+import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.utils.CryptoUtils;
 import io.netty.channel.Channel;
 import org.bson.Document;
@@ -16,16 +16,16 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.UUID;
 
-public class AuthentificationManager {
+public class TokenAuthenticationManager implements AuthenticationManager {
     private final DatabaseManager dbManager;
 
-    private AuthentificationManager(DatabaseManager dbManager) {
+    private TokenAuthenticationManager(DatabaseManager dbManager) {
         this.dbManager = dbManager;
     }
 
     //Authenticate new connection
     public AuthResult authenticate(Channel channel, PacketByteBuf buf) {
-        AtlasNetwork.logger.info("Starting authentification for {}.", channel.remoteAddress());
+        AtlasNetwork.logger.info("Starting authentication for {}.", channel.remoteAddress());
 
         MongoDatabase internalDatabase = dbManager.getClient().getDatabase(DatabaseDefiner.INTERNAL_DATABASE);
         MongoCollection<Document> apiCollection = internalDatabase.getCollection(DatabaseDefiner.API_COLLECTION);
@@ -81,11 +81,11 @@ public class AuthentificationManager {
     }
 
     //Static Fields
-    private static AuthentificationManager manager;
+    private static TokenAuthenticationManager manager;
 
-    public static AuthentificationManager getManager() {
+    public static TokenAuthenticationManager getManager() {
         if (manager == null) {
-            manager = new AuthentificationManager(DatabaseManager.getManager());
+            manager = new TokenAuthenticationManager(DatabaseManager.getManager());
         }
 
         return manager;

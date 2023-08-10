@@ -1,9 +1,8 @@
 package fr.atlasworld.network.networking.packet;
 
-import fr.atlasworld.network.networking.PacketByteBuf;
-import fr.atlasworld.network.networking.entities.Client;
+import fr.atlasworld.network.networking.session.ClientSession;
 
 public interface NetworkPacket {
-    String getIdentifier();
-    void execute(Client client, PacketByteBuf data);
+    String getKey();
+    void onReceive(ClientSession client, PacketByteBuf packet) throws Exception;
 }

@@ -5,8 +5,6 @@ import com.google.gson.GsonBuilder;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.file.loader.GsonFileLoader;
 
-import java.util.List;
-
 public class Settings {
     private final String socketHost;
     private final int socketPort;
@@ -38,9 +36,15 @@ public class Settings {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             GsonFileLoader<Settings> settingsLoader = new GsonFileLoader<>(FileManager.getSettingsFile(), gson, Settings.class);
             if (!FileManager.getSettingsFile().isFile()) {
-                settingsLoader.save(new Settings("0.0.0.0", 27767,
-                        new DatabaseSettings("user", "password", "0.0.0.0",
-                                27017)));
+                settingsLoader.save(new Settings(
+                        "0.0.0.0",
+                        27767,
+                        new DatabaseSettings(
+                                "user",
+                                "password",
+                                "0.0.0.0",
+                                27017
+                        )));
             }
 
             settings = settingsLoader.load();

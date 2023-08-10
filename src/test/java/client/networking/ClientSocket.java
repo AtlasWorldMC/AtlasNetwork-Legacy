@@ -1,13 +1,17 @@
 package client.networking;
 
+import client.networking.handler.DecodeHandler;
 import fr.atlasworld.network.AtlasNetwork;
 import client.NetworkClient;
 import client.networking.handler.SimpleHandler;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import org.jetbrains.annotations.NotNull;
 
 public class ClientSocket {
     private boolean connected = false;
@@ -28,7 +32,14 @@ public class ClientSocket {
         this.bootstrap
                 .channel(NioSocketChannel.class)
                 .group(workerGroup)
-                .handler(new SimpleHandler());
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(@NotNull SocketChannel ch) throws Exception {
+                        ClientEncryptionManager manager = new ClientEncryptionManager();
+                        ch.pipeline().addFirst(new DecodeHandler(manager));
+                        ch.pipeline().addLast(new SimpleHandler());
+                    }
+                });
     }
 
     public ChannelFuture connect() {

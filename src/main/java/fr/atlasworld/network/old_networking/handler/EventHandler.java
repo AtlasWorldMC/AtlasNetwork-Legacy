@@ -1,8 +1,8 @@
-package fr.atlasworld.network.networking.handler;
+package fr.atlasworld.network.old_networking.handler;
 
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.NetworkErrors;
-import fr.atlasworld.network.networking.PacketByteBuf;
+import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

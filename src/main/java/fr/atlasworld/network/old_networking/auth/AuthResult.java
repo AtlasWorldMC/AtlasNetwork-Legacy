@@ -1,6 +1,6 @@
-package fr.atlasworld.network.networking.auth;
+package fr.atlasworld.network.old_networking.auth;
 
-import fr.atlasworld.network.networking.PacketByteBuf;
+import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import io.netty.buffer.ByteBuf;
 
 public record AuthResult(boolean success, String message) {

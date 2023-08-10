@@ -1,8 +1,8 @@
-package fr.atlasworld.network.networking.packet;
+package fr.atlasworld.network.old_networking.packet;
 
 import fr.atlasworld.network.AtlasNetwork;
-import fr.atlasworld.network.networking.PacketByteBuf;
-import fr.atlasworld.network.networking.entities.Client;
+import fr.atlasworld.network.networking.packet.PacketByteBuf;
+import fr.atlasworld.network.old_networking.entities.Client;
 import io.netty.buffer.Unpooled;
 
 public class HelloWorldPacket implements NetworkPacket {

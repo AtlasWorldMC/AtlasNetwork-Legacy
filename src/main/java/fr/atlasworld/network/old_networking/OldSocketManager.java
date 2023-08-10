@@ -1,23 +1,24 @@
-package fr.atlasworld.network.networking;
+package fr.atlasworld.network.old_networking;
 
 import fr.atlasworld.network.AtlasNetwork;
-import fr.atlasworld.network.networking.auth.AuthentificationManager;
-import fr.atlasworld.network.networking.session.SessionManager;
-import fr.atlasworld.network.networking.handler.AuthHandler;
-import fr.atlasworld.network.networking.handler.EventHandler;
-import fr.atlasworld.network.networking.handler.PacketExecutor;
-import fr.atlasworld.network.networking.packet.PacketManager;
+import fr.atlasworld.network.old_networking.auth.TokenAuthenticationManager;
+import fr.atlasworld.network.old_networking.session.SessionManager;
+import fr.atlasworld.network.old_networking.handler.AuthHandler;
+import fr.atlasworld.network.old_networking.handler.EventHandler;
+import fr.atlasworld.network.old_networking.handler.PacketExecutor;
+import fr.atlasworld.network.old_networking.packet.PacketManager;
 import fr.atlasworld.network.utils.Settings;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.jetbrains.annotations.NotNull;
 
-public class SocketManager {
+public class OldSocketManager {
     private boolean connected = false;
     private final ServerBootstrap bootstrap;
     private final int port;
@@ -25,7 +26,7 @@ public class SocketManager {
     private final NioEventLoopGroup bossGroup, workerGroup;
     private Channel serverChannel;
 
-    private SocketManager(Settings settings) {
+    private OldSocketManager(Settings settings) {
         this.bootstrap = new ServerBootstrap();
         this.port = settings.getSocketPort();
         this.host = settings.getSocketHost();
@@ -40,7 +41,7 @@ public class SocketManager {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(@NotNull SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new AuthHandler(AuthentificationManager.getManager(), SessionManager.getManager()));
+                        ch.pipeline().addLast(new AuthHandler(TokenAuthenticationManager.getManager(), SessionManager.getManager()));
                         ch.pipeline().addLast(new PacketExecutor(PacketManager.getManager(), SessionManager.getManager()));
                         ch.pipeline().addLast(new EventHandler());
                     }
@@ -103,11 +104,11 @@ public class SocketManager {
 
 
     //Static fields
-    private static SocketManager manager;
+    private static OldSocketManager manager;
 
-    public static SocketManager getManager() {
+    public static OldSocketManager getManager() {
         if (manager == null) {
-            manager = new SocketManager(Settings.getSettings());
+            manager = new OldSocketManager(Settings.getSettings());
         }
         return manager;
     }
