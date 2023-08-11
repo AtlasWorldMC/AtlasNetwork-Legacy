@@ -1,7 +1,7 @@
 package fr.atlasworld.network.networking.handler;
 
 import fr.atlasworld.network.AtlasNetwork;
-import fr.atlasworld.network.networking.exception.InvalidPacketException;
+import fr.atlasworld.network.exceptions.InvalidPacketException;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.networking.securty.encryption.EncryptionManager;
 import io.netty.channel.ChannelHandlerContext;

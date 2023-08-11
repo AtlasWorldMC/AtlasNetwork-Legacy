@@ -4,15 +4,16 @@ import ch.qos.logback.classic.Level;
 import com.mojang.brigadier.CommandDispatcher;
 import fr.atlasworld.network.command.CommandSource;
 import fr.atlasworld.network.command.CommandThread;
+import fr.atlasworld.network.command.commands.AuthCommand;
 import fr.atlasworld.network.command.commands.StopCommand;
+import fr.atlasworld.network.database.DatabaseManager;
+import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.networking.securty.encryption.NetworkEncryptionManager;
 import fr.atlasworld.network.networking.session.NetworkSessionManager;
 import fr.atlasworld.network.networking.socket.NetworkSocketManager;
 import fr.atlasworld.network.networking.settings.NetworkSocketSettings;
 import fr.atlasworld.network.networking.socket.SocketManager;
-import fr.atlasworld.network.old_networking.packet.HelloWorldPacket;
-import fr.atlasworld.network.old_networking.packet.PacketManager;
 import fr.atlasworld.network.security.NetworkSecurityManager;
 import fr.atlasworld.network.security.SecurityManager;
 import fr.atlasworld.network.utils.LaunchArgs;
@@ -29,6 +30,7 @@ public class AtlasNetwork {
     private static SocketManager socket;
     private static Settings settings;
     private static SecurityManager securityManager;
+    private static DatabaseManager databaseManager;
     private static CommandDispatcher<CommandSource> commandDispatcher;
 
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
@@ -49,7 +51,8 @@ public class AtlasNetwork {
         }
         settings = Settings.getSettings();
 
-        securityManager = new NetworkSecurityManager();
+        securityManager = new NetworkSecurityManager(settings);
+        databaseManager = new MongoDatabaseManager(settings.getDatabase());
         commandDispatcher = new CommandDispatcher<>();
 
         //Handles the command execution
@@ -67,7 +70,6 @@ public class AtlasNetwork {
                 () -> new NetworkEncryptionManager(securityManager));
 
         socket = new NetworkSocketManager(socketSettings);
-        registerPackets(PacketManager.getManager());
 
         AtlasNetwork.logger.info("Network Initialized.");
 
@@ -87,15 +89,9 @@ public class AtlasNetwork {
         }));
     }
 
-
-    private static void registerPackets(PacketManager manager) {
-        AtlasNetwork.logger.info("Registering packets...");
-        manager.registerPacket(new HelloWorldPacket());
-        AtlasNetwork.logger.info("Packets registered!");
-    }
-
     private static void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
         StopCommand.register(dispatcher);
+        AuthCommand.register(dispatcher);
     }
 
     public static LaunchArgs getLaunchArgs() {
@@ -109,11 +105,16 @@ public class AtlasNetwork {
     public static Settings getSettings() {
         return settings;
     }
+
     public static SecurityManager getSecurityManager() {
         return securityManager;
     }
 
     public static CommandDispatcher<CommandSource> getCommandDispatcher() {
         return commandDispatcher;
+    }
+
+    public static DatabaseManager getDatabaseManager() {
+        return databaseManager;
     }
 }

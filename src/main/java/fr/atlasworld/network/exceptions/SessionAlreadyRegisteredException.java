@@ -1,4 +1,4 @@
-package fr.atlasworld.network.networking.exception;
+package fr.atlasworld.network.exceptions;
 
 public class SessionAlreadyRegisteredException extends IllegalStateException {
     public SessionAlreadyRegisteredException(String s) {

@@ -2,17 +2,20 @@ package fr.atlasworld.network.utils;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.file.loader.GsonFileLoader;
 
 public class Settings {
     private final String socketHost;
     private final int socketPort;
+    private final String hashSalt;
     private final DatabaseSettings database;
 
-    public Settings(String socketHost, int socketPort, DatabaseSettings database) {
+    public Settings(String socketHost, int socketPort, String hashSalt, DatabaseSettings database) {
         this.socketHost = socketHost;
         this.socketPort = socketPort;
+        this.hashSalt = hashSalt;
         this.database = database;
     }
 
@@ -22,6 +25,10 @@ public class Settings {
 
     public int getSocketPort() {
         return socketPort;
+    }
+
+    public String getHashSalt() {
+        return hashSalt;
     }
 
     public DatabaseSettings getDatabase() {
@@ -39,6 +46,7 @@ public class Settings {
                 settingsLoader.save(new Settings(
                         "0.0.0.0",
                         27767,
+                        "CHANGE ME!",
                         new DatabaseSettings(
                                 "user",
                                 "password",

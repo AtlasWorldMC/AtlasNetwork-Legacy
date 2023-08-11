@@ -37,7 +37,7 @@ public class CommandThread extends Thread {
 
             this.executor.submit(() -> {
                 try {
-                    int result = this.dispatcher.execute(command, new CommandSource());
+                    int result = this.dispatcher.execute(command, new CommandSource(AtlasNetwork.logger));
                     if (result != Command.SINGLE_SUCCESS) {
                         AtlasNetwork.logger.error("Something went wrong trying to execute '{}'", command);
                     }

@@ -1,41 +1,16 @@
 package fr.atlasworld.network.database;
 
-import com.mongodb.client.MongoClient;
-import com.mongodb.client.MongoClients;
-import fr.atlasworld.network.database.serializers.DatabaseSerializer;
-import fr.atlasworld.network.utils.Settings;
-import org.bson.Document;
+import fr.atlasworld.network.entities.auth.AuthProfile;
+import org.jetbrains.annotations.Nullable;
 
-public class DatabaseManager {
-    private final MongoClient client;
+import java.util.Set;
+import java.util.UUID;
 
-    private DatabaseManager(Settings.DatabaseSettings settings) {
-        String connectionString =
-                "mongodb://" + settings.username() + ":" + settings.password() + "@" +
-                        settings.host() + ":" + settings.port() + "/";
-
-        this.client = MongoClients.create(connectionString);
-    }
-
-    public MongoClient getClient() {
-        return client;
-    }
-    public <T> T deserialize(DatabaseSerializer<T> serializer, Document document) {
-        return serializer.deserialize(document);
-    }
-
-    public <T> Document serialize(DatabaseSerializer<T> serializer, T object) {
-        return serializer.serialize(object);
-    }
-
-    //Static Fields
-    private static DatabaseManager manager;
-
-    public static DatabaseManager getManager() {
-        if (manager == null) {
-            manager = new DatabaseManager(Settings.getSettings().getDatabase());
-        }
-
-        return manager;
-    }
+public interface DatabaseManager {
+    //Auth Profiles
+    @Nullable AuthProfile getAuthProfile(UUID uuid);
+    Set<AuthProfile> getAuthProfiles();
+    boolean authProfileExists(UUID uuid);
+    void saveAuthProfile(AuthProfile profile);
+    void deleteAuthProfile(UUID uuid);
 }

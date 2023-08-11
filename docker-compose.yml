@@ -8,12 +8,3 @@ services:
     ports:
       - "27017:27017"
     restart: unless-stopped
-  replication-database:
-    container_name: MongoDB-replica
-    image: mongo
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: dev
-      MONGO_INITDB_ROOT_PASSWORD: dev_password
-    ports:
-      - "27018:27017"
-    restart: unless-stopped

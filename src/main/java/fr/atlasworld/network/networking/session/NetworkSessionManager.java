@@ -1,7 +1,7 @@
 package fr.atlasworld.network.networking.session;
 
-import fr.atlasworld.network.networking.exception.SessionAlreadyRegisteredException;
-import fr.atlasworld.network.networking.exception.SessionNotRegisteredException;
+import fr.atlasworld.network.exceptions.SessionAlreadyRegisteredException;
+import fr.atlasworld.network.exceptions.SessionNotRegisteredException;
 import io.netty.channel.Channel;
 import org.jetbrains.annotations.Nullable;
 
