@@ -8,6 +8,9 @@ version = '1.0.0'
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://libraries.minecraft.net"
+    }
 }
 
 dependencies {
@@ -25,6 +28,9 @@ dependencies {
     implementation "com.google.code.gson:gson:2.10.1"
     implementation "com.google.guava:guava:31.1-jre"
     implementation "org.jetbrains:annotations:24.0.0"
+
+    //Command
+    implementation "com.mojang:brigadier:1.0.18"
 
     //Testing
     implementation "org.junit.jupiter:junit-jupiter-api:5.9.3"

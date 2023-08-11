@@ -43,12 +43,15 @@ public class NetworkSocketManager implements SocketManager {
 
                     this.bound = true;
 
-                    future.channel().closeFuture().addListener(closeFuture -> {
+                    future.channel().closeFuture().addListener((ChannelFuture closeFuture) -> {
                         this.bound = false;
                         this.settings.cleanUp();
-                        AtlasNetwork.logger.error("[Socket] Disconnected!");
-                        AtlasNetwork.logger.warn("If this is caused by a connection issue you can ignore this message");
-                        AtlasNetwork.logger.warn("Please stop the socket by using the SocketManager#unbind() method!");
+
+                        if (future.cause() == null) {
+                            AtlasNetwork.logger.info("[Socket] Disconnected");
+                        } else {
+                            AtlasNetwork.logger.error("[Socket] Disconnected: ", future.cause());
+                        }
                     });
                 });
     }
@@ -56,6 +59,5 @@ public class NetworkSocketManager implements SocketManager {
     @Override
     public void unbind() {
         this.settings.cleanUp();
-        AtlasNetwork.logger.info("[Socket] Disconnected!");
     }
 }

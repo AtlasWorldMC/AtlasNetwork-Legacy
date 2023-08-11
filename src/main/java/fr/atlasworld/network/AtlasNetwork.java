@@ -1,6 +1,10 @@
 package fr.atlasworld.network;
 
 import ch.qos.logback.classic.Level;
+import com.mojang.brigadier.CommandDispatcher;
+import fr.atlasworld.network.command.CommandSource;
+import fr.atlasworld.network.command.CommandThread;
+import fr.atlasworld.network.command.commands.StopCommand;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.networking.securty.encryption.NetworkEncryptionManager;
 import fr.atlasworld.network.networking.session.NetworkSessionManager;
@@ -25,6 +29,7 @@ public class AtlasNetwork {
     private static SocketManager socket;
     private static Settings settings;
     private static SecurityManager securityManager;
+    private static CommandDispatcher<CommandSource> commandDispatcher;
 
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
         AtlasNetwork.logger.info("Initializing AtlasNetwork...");
@@ -45,6 +50,15 @@ public class AtlasNetwork {
         settings = Settings.getSettings();
 
         securityManager = new NetworkSecurityManager();
+        commandDispatcher = new CommandDispatcher<>();
+
+        //Handles the command execution
+        AtlasNetwork.logger.info("Starting command handler..");
+        registerCommands(commandDispatcher);
+        CommandThread commandThread = new CommandThread(commandDispatcher);
+        commandThread.setDaemon(true);
+        commandThread.start();
+        AtlasNetwork.logger.info("Command handler started.");
 
         //Init Socket
         NetworkSocketSettings socketSettings = new NetworkSocketSettings(
@@ -80,6 +94,10 @@ public class AtlasNetwork {
         AtlasNetwork.logger.info("Packets registered!");
     }
 
+    private static void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
+        StopCommand.register(dispatcher);
+    }
+
     public static LaunchArgs getLaunchArgs() {
         return launchArgs;
     }
@@ -93,5 +111,9 @@ public class AtlasNetwork {
     }
     public static SecurityManager getSecurityManager() {
         return securityManager;
+    }
+
+    public static CommandDispatcher<CommandSource> getCommandDispatcher() {
+        return commandDispatcher;
     }
 }
