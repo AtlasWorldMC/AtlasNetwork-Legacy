@@ -1,8 +1,10 @@
 package fr.atlasworld.network.networking.settings;
 
+import fr.atlasworld.network.networking.handler.AuthenticationHandler;
 import fr.atlasworld.network.networking.handler.DecodeHandler;
 import fr.atlasworld.network.networking.handler.EncodeHandler;
 import fr.atlasworld.network.networking.handler.SessionChannelHandler;
+import fr.atlasworld.network.networking.securty.authentication.AuthenticationManager;
 import fr.atlasworld.network.networking.securty.encryption.EncryptionManager;
 import fr.atlasworld.network.networking.session.SessionManager;
 import fr.atlasworld.network.utils.Settings;
@@ -22,10 +24,12 @@ public class NetworkSocketSettings implements SocketSettings {
     private final EventLoopGroup bossGroup, workerGroup;
     private final SessionManager sessionManager;
     private final Supplier<EncryptionManager> encryptionManagerBuilder;
+    private final Supplier<AuthenticationManager> authenticationManagerBuilder;
 
-    public NetworkSocketSettings(Settings settings, SessionManager sessionManager, Supplier<EncryptionManager> encryptionManagerBuilder) {
+    public NetworkSocketSettings(Settings settings, SessionManager sessionManager, Supplier<EncryptionManager> encryptionManagerBuilder, Supplier<AuthenticationManager> authenticationManagerBuilder) {
         this.port = settings.getSocketPort();
         this.address = settings.getSocketHost();
+        this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup();
         this.sessionManager = sessionManager;
@@ -41,9 +45,11 @@ public class NetworkSocketSettings implements SocketSettings {
                     @Override
                     protected void initChannel(@NotNull SocketChannel ch) throws Exception {
                         EncryptionManager encryptionManager = encryptionManagerBuilder.get();
+                        AuthenticationManager authenticationManager = authenticationManagerBuilder.get();
 
                         //In
                         ch.pipeline().addLast(new DecodeHandler(encryptionManager));
+                        ch.pipeline().addLast(new AuthenticationHandler(authenticationManager));
                         ch.pipeline().addLast(new SessionChannelHandler(sessionManager));
 
                         //Out

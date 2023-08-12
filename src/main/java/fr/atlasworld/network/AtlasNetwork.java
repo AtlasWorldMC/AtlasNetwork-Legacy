@@ -9,6 +9,7 @@ import fr.atlasworld.network.command.commands.StopCommand;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
 import fr.atlasworld.network.file.FileManager;
+import fr.atlasworld.network.networking.securty.authentication.NetworkAuthenticationManager;
 import fr.atlasworld.network.networking.securty.encryption.NetworkEncryptionManager;
 import fr.atlasworld.network.networking.session.NetworkSessionManager;
 import fr.atlasworld.network.networking.socket.NetworkSocketManager;
@@ -67,7 +68,8 @@ public class AtlasNetwork {
         NetworkSocketSettings socketSettings = new NetworkSocketSettings(
                 settings,
                 new NetworkSessionManager(new HashMap<>()),
-                () -> new NetworkEncryptionManager(securityManager));
+                () -> new NetworkEncryptionManager(securityManager),
+                () -> new NetworkAuthenticationManager(securityManager, databaseManager));
 
         socket = new NetworkSocketManager(socketSettings);
 

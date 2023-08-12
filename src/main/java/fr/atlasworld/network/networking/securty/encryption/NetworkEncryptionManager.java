@@ -50,7 +50,17 @@ public class NetworkEncryptionManager implements EncryptionManager {
                     .writeString("encryption_handshake")
                     .writeBoolean(true);
             channel.writeAndFlush(respBuf);
+            return;
         }
+
+        PacketByteBuf response = PacketByteBuf.create()
+                .writeString("request_fail")
+                .writeString("ENCRYPTION_HANDSHAKE_FAIL");
+
+        AtlasNetwork.logger.error("Encryption failed with {}, terminating connection..", channel.remoteAddress());
+
+        channel.writeAndFlush(response);
+        channel.disconnect();
     }
 
     @Override

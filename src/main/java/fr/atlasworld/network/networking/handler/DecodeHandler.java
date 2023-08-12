@@ -26,10 +26,12 @@ public class DecodeHandler extends ChannelInboundHandlerAdapter {
 
             rawBuf.readerIndex(0);
             this.encryptionManager.handleHandshake(ctx.channel(), rawBuf);
+            rawBuf.release();
             return;
         }
 
         PacketByteBuf processedBuf = this.encryptionManager.decrypt(rawBuf);
+        rawBuf.release(); //Free memory
 
         String packet = processedBuf.readString();
         AtlasNetwork.logger.debug("{} -> AtlasNetwork | Packet: {} | Encrypted: {}", ctx.channel().remoteAddress(),

@@ -19,6 +19,11 @@ public class EncodeHandler extends ChannelOutboundHandlerAdapter {
     public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise) throws Exception {
         if (msg instanceof PacketByteBuf buf) {
             String packet = buf.readString();
+            if (packet.equals("request_fail")) {
+                AtlasNetwork.logger.warn("Request failed for {}: {}", ctx.channel().remoteAddress(),
+                        buf.readString());
+            }
+
             buf.readerIndex(0);
             if (this.encryptionManager.isEncrypted()) {
                 AtlasNetwork.logger.debug("AtlasNetwork -> {} | Packet: {} | Encrypted: {}",
@@ -30,6 +35,7 @@ public class EncodeHandler extends ChannelOutboundHandlerAdapter {
                     ctx.channel().remoteAddress(), packet, false);
             super.write(ctx, buf.getParent(), promise);
         } else {
+            AtlasNetwork.logger.error("Only PacketByteBuf objets can be sent!");
             promise.setFailure(new InvalidPacketException("Only PacketByteBuf can be sent!"));
         }
     }

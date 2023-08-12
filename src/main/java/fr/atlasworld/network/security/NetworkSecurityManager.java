@@ -5,6 +5,9 @@ import fr.atlasworld.network.utils.Settings;
 
 import java.security.*;
 import java.util.Base64;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public class NetworkSecurityManager implements SecurityManager {
     private static final String KEY_ALGORITHM = "RSA";
@@ -14,10 +17,12 @@ public class NetworkSecurityManager implements SecurityManager {
 
     private final KeyPair sessionKeyPair;
     private final String hashSalt;
+    private final Set<UUID> activeProfiles;
 
     public NetworkSecurityManager(Settings settings) throws NoSuchAlgorithmException {
         this.sessionKeyPair = this.generateKeyPair();
         this.hashSalt = settings.getHashSalt();
+        this.activeProfiles = new HashSet<>();
     }
 
     @Override
@@ -50,6 +55,21 @@ public class NetworkSecurityManager implements SecurityManager {
             AtlasNetwork.logger.error("Unable to hash token", e);
         }
         return null;
+    }
+
+    @Override
+    public boolean isAuthProfileActive(UUID profileId) {
+        return this.activeProfiles.contains(profileId);
+    }
+
+    @Override
+    public void activateAuthProfile(UUID profileId) {
+        this.activeProfiles.add(profileId);
+    }
+
+    @Override
+    public void deactivateAuthProfile(UUID profileId) {
+        this.activeProfiles.remove(profileId);
     }
 
     private KeyPair generateKeyPair() throws NoSuchAlgorithmException {
