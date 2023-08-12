@@ -46,6 +46,10 @@ public class SimpleHandler extends ChannelInboundHandlerAdapter {
 
             if (successful) {
                 AtlasNetwork.logger.info("Successfully authed!");
+                PacketByteBuf helloWorldPacket = PacketByteBuf.create()
+                        .writeString("hello_world");
+
+                ctx.channel().writeAndFlush(helloWorldPacket);
             } else {
                 AtlasNetwork.logger.error("Authentication failed: {}", message);
             }

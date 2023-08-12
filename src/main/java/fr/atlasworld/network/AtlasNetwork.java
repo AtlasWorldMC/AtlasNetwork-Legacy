@@ -9,6 +9,9 @@ import fr.atlasworld.network.command.commands.StopCommand;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
 import fr.atlasworld.network.file.FileManager;
+import fr.atlasworld.network.networking.packet.HelloWorldPacket;
+import fr.atlasworld.network.networking.packet.NetworkPacketManager;
+import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.securty.authentication.NetworkAuthenticationManager;
 import fr.atlasworld.network.networking.securty.encryption.NetworkEncryptionManager;
 import fr.atlasworld.network.networking.session.NetworkSessionManager;
@@ -64,12 +67,15 @@ public class AtlasNetwork {
         commandThread.start();
         AtlasNetwork.logger.info("Command handler started.");
 
+        PacketManager packetManager = new NetworkPacketManager();
+
         //Init Socket
         NetworkSocketSettings socketSettings = new NetworkSocketSettings(
                 settings,
                 new NetworkSessionManager(new HashMap<>()),
                 () -> new NetworkEncryptionManager(securityManager),
-                () -> new NetworkAuthenticationManager(securityManager, databaseManager));
+                () -> new NetworkAuthenticationManager(securityManager, databaseManager),
+                packetManager);
 
         socket = new NetworkSocketManager(socketSettings);
 
@@ -78,6 +84,7 @@ public class AtlasNetwork {
 
         //Boot up Socket
         AtlasNetwork.logger.info("Starting socket...");
+        registerPackets(packetManager);
         socket.bind().sync();
         AtlasNetwork.logger.info("Socket started.");
 
@@ -89,6 +96,10 @@ public class AtlasNetwork {
             socket.unbind();
             AtlasNetwork.logger.info("Socket stopped.");
         }));
+    }
+
+    private static void registerPackets(PacketManager packetManager) {
+        packetManager.register(new HelloWorldPacket());
     }
 
     private static void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
