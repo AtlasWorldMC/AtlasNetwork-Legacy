@@ -90,4 +90,9 @@ public class MongoDatabaseManager implements DatabaseManager {
 
         profileCollection.deleteOne(Filters.eq("profileId", uuid.toString()));
     }
+
+    @Override
+    public void close() {
+        this.client.close();
+    }
 }

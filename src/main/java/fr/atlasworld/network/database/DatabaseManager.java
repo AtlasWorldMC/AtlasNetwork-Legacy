@@ -13,4 +13,5 @@ public interface DatabaseManager {
     boolean authProfileExists(UUID uuid);
     void saveAuthProfile(AuthProfile profile);
     void deleteAuthProfile(UUID uuid);
+    void close();
 }

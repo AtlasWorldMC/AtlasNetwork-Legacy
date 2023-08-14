@@ -46,6 +46,9 @@ public class AtlasNetwork {
         if (launchArgs.isDevEnv()) {
             ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(logger.getName());
             rootLogger.setLevel(Level.DEBUG);
+        } else {
+            ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger("org.mongodb.driver");
+            rootLogger.setLevel(Level.OFF);
         }
 
         //Load configuration
@@ -95,6 +98,9 @@ public class AtlasNetwork {
             AtlasNetwork.logger.info("Stopping socket..");
             socket.unbind();
             AtlasNetwork.logger.info("Socket stopped.");
+            AtlasNetwork.logger.info("Terminating Database connection...");
+            databaseManager.close();
+            AtlasNetwork.logger.info("Good Bye!");
         }));
     }
 
