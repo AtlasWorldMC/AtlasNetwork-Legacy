@@ -13,8 +13,6 @@ import java.util.concurrent.Executors;
 public class CommandThread extends Thread {
     private final CommandDispatcher<CommandSource> dispatcher;
     private final ExecutorService executor;
-    private final CopyOnWriteArrayList<String> commandHistory = new CopyOnWriteArrayList<>();
-    private int historyIndex = -1;
 
     public CommandThread(CommandDispatcher<CommandSource> dispatcher) {
         this(dispatcher, Executors.newFixedThreadPool(5));
@@ -37,7 +35,7 @@ public class CommandThread extends Thread {
 
             this.executor.submit(() -> {
                 try {
-                    int result = this.dispatcher.execute(command, new CommandSource(AtlasNetwork.logger));
+                    int result = this.dispatcher.execute(command.trim(), new CommandSource(AtlasNetwork.logger));
                     if (result != Command.SINGLE_SUCCESS) {
                         AtlasNetwork.logger.error("Something went wrong trying to execute '{}'", command);
                     }
