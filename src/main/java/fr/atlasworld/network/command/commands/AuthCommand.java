@@ -20,6 +20,7 @@ public class AuthCommand {
                         .then(LiteralArgumentBuilder.<CommandSource>literal("list")
                                 .executes(ctx -> executeListProfiles(ctx.getSource())))
                         .then(LiteralArgumentBuilder.<CommandSource>literal("create")
+                                .executes(ctx -> executeCreateProfile(ctx.getSource(), UUID.randomUUID().toString()))
                                 .then(RequiredArgumentBuilder.<CommandSource, String>argument("uuid", StringArgumentType.word())
                                         .executes(ctx -> executeCreateProfile(ctx.getSource(), ctx.getArgument("uuid", String.class)))))
                         .then(LiteralArgumentBuilder.<CommandSource>literal("delete")
