@@ -7,12 +7,10 @@ import java.util.List;
 
 public class LaunchArgs {
     private final boolean devEnv;
-    private final boolean forceConfig;
 
     public LaunchArgs(String[] args) {
         List<String> argsList = Arrays.asList(args);
         this.devEnv = argsList.contains(DEV_ENV_ARG);
-        this.forceConfig = argsList.contains(FORCE_CONFIG);
 
         //Messages
         if (this.devEnv) {
@@ -24,11 +22,6 @@ public class LaunchArgs {
         return devEnv;
     }
 
-    public boolean isForceConfig() {
-        return forceConfig;
-    }
-
     //Static Args
     public static final String DEV_ENV_ARG = "-devEnv";
-    public static final String FORCE_CONFIG = "-forceConfig";
 }

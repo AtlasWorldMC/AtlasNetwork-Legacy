@@ -8,7 +8,6 @@ import fr.atlasworld.network.command.commands.AuthCommand;
 import fr.atlasworld.network.command.commands.StopCommand;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
-import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.networking.packet.HelloWorldPacket;
 import fr.atlasworld.network.networking.packet.NetworkPacketManager;
 import fr.atlasworld.network.networking.packet.PacketManager;
@@ -42,7 +41,6 @@ public class AtlasNetwork {
 
         //Handle Args
         launchArgs = new LaunchArgs(args);
-
         if (launchArgs.isDevEnv()) {
             ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(logger.getName());
             rootLogger.setLevel(Level.DEBUG);
@@ -51,28 +49,26 @@ public class AtlasNetwork {
             rootLogger.setLevel(Level.OFF);
         }
 
-        //Load configuration
-        if (launchArgs.isForceConfig()) {
-            AtlasNetwork.logger.warn("AtlasNetwork launched with argument '{}' overriding already existent configuration.", LaunchArgs.FORCE_CONFIG);
-            FileManager.getSettingsFile().delete();
-        }
+        AtlasNetwork.logger.info("Loading Configuration..");
         settings = Settings.getSettings();
 
+        AtlasNetwork.logger.info("Initializing connections managers..");
         securityManager = new NetworkSecurityManager(settings);
         databaseManager = new MongoDatabaseManager(settings.getDatabase());
-        commandDispatcher = new CommandDispatcher<>();
+
 
         //Handles the command execution
         AtlasNetwork.logger.info("Starting command handler..");
+        commandDispatcher = new CommandDispatcher<>();
         registerCommands(commandDispatcher);
         CommandThread commandThread = new CommandThread(commandDispatcher);
         commandThread.setDaemon(true);
         commandThread.start();
-        AtlasNetwork.logger.info("Command handler started.");
-
-        PacketManager packetManager = new NetworkPacketManager();
+        AtlasNetwork.logger.info("Command handler started..");
 
         //Init Socket
+        AtlasNetwork.logger.info("Initializing Socket...");
+        PacketManager packetManager = new NetworkPacketManager();
         NetworkSocketSettings socketSettings = new NetworkSocketSettings(
                 settings,
                 new NetworkSessionManager(new HashMap<>()),
@@ -86,11 +82,10 @@ public class AtlasNetwork {
 
 
         //Boot up Socket
-        AtlasNetwork.logger.info("Starting socket...");
+        AtlasNetwork.logger.info("Starting socket..");
         registerPackets(packetManager);
         socket.bind().sync();
         AtlasNetwork.logger.info("Socket started.");
-
         AtlasNetwork.logger.info("Ready, Waiting for connections.");
 
         //Shutdown Hook
@@ -98,7 +93,7 @@ public class AtlasNetwork {
             AtlasNetwork.logger.info("Stopping socket..");
             socket.unbind();
             AtlasNetwork.logger.info("Socket stopped.");
-            AtlasNetwork.logger.info("Terminating Database connection...");
+            AtlasNetwork.logger.info("Terminating Database connection..");
             databaseManager.close();
             AtlasNetwork.logger.info("Good Bye!");
         }));
