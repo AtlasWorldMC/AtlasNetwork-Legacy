@@ -2,7 +2,7 @@ package fr.atlasworld.network.networking.handler;
 
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
-import fr.atlasworld.network.networking.securty.encryption.EncryptionManager;
+import fr.atlasworld.network.networking.security.encryption.EncryptionManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;

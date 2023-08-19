@@ -1,4 +1,4 @@
-package fr.atlasworld.network.networking.securty.authentication;
+package fr.atlasworld.network.networking.security.authentication;
 
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.entities.auth.AuthProfile;
@@ -47,6 +47,7 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
 
         this.authenticated = true;
         this.securityManager.activateAuthProfile(authUuid);
+        channel.closeFuture().addListener(future -> this.securityManager.deactivateAuthProfile(authUuid));
         return new AuthenticationResult(true, "success");
     }
 }

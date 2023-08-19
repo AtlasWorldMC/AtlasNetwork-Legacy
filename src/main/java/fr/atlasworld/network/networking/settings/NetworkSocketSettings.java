@@ -2,8 +2,8 @@ package fr.atlasworld.network.networking.settings;
 
 import fr.atlasworld.network.networking.handler.*;
 import fr.atlasworld.network.networking.packet.PacketManager;
-import fr.atlasworld.network.networking.securty.authentication.AuthenticationManager;
-import fr.atlasworld.network.networking.securty.encryption.EncryptionManager;
+import fr.atlasworld.network.networking.security.authentication.AuthenticationManager;
+import fr.atlasworld.network.networking.security.encryption.EncryptionManager;
 import fr.atlasworld.network.networking.session.SessionManager;
 import fr.atlasworld.network.utils.Settings;
 import io.netty.bootstrap.ServerBootstrap;

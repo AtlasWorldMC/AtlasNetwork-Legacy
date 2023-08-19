@@ -1,4 +1,4 @@
-package fr.atlasworld.network.networking.securty.authentication;
+package fr.atlasworld.network.networking.security.authentication;
 
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import io.netty.channel.Channel;

@@ -1,4 +1,4 @@
-package fr.atlasworld.network.networking.securty.encryption;
+package fr.atlasworld.network.networking.security.encryption;
 
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
@@ -11,11 +11,6 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 
 public class NetworkEncryptionManager implements EncryptionManager {
     private boolean encrypted;
