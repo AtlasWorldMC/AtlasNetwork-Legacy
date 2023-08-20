@@ -26,8 +26,8 @@ public class NetworkSocketSettings implements SocketSettings {
     private final PacketManager packetManager;
 
     public NetworkSocketSettings(Config config, SessionManager sessionManager, Supplier<EncryptionManager> encryptionManagerBuilder, Supplier<AuthenticationManager> authenticationManagerBuilder, PacketManager packetManager) {
-        this.port = config.getSocketPort();
-        this.address = config.getSocketHost();
+        this.port = config.socketPort();
+        this.address = config.socketHost();
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup();

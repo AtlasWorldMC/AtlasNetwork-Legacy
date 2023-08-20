@@ -21,7 +21,7 @@ public class NetworkSecurityManager implements SecurityManager {
 
     public NetworkSecurityManager(Config config) throws NoSuchAlgorithmException {
         this.sessionKeyPair = this.generateKeyPair();
-        this.hashSalt = config.getHashSalt();
+        this.hashSalt = config.hashSalt();
         this.activeProfiles = new HashSet<>();
     }
 

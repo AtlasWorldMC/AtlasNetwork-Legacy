@@ -57,10 +57,10 @@ public class AtlasNetwork {
 
         AtlasNetwork.logger.info("Initializing connections managers..");
         securityManager = new NetworkSecurityManager(config);
-        databaseManager = new MongoDatabaseManager(config.getDatabase());
+        databaseManager = new MongoDatabaseManager(config.database());
 
         AtlasNetwork.logger.info("Starting connection with server panel..");
-        panelApplication = PteroBuilder.createApplication(config.getPanel().url(), config.getPanel().token());
+        panelApplication = PteroBuilder.createApplication(config.panel().url(), config.panel().token());
 
         //Handles the command execution
         AtlasNetwork.logger.info("Starting command handler..");

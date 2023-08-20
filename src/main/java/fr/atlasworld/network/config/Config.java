@@ -7,41 +7,7 @@ import fr.atlasworld.network.file.loader.GsonFileLoader;
 
 import java.util.ArrayList;
 
-public class Config {
-    private final String socketHost;
-    private final int socketPort;
-    private final String hashSalt;
-    private final DatabaseConfig database;
-    private final PanelConfig panel;
-
-    public Config(String socketHost, int socketPort, String hashSalt, DatabaseConfig database, PanelConfig panel) {
-        this.socketHost = socketHost;
-        this.socketPort = socketPort;
-        this.hashSalt = hashSalt;
-        this.database = database;
-        this.panel = panel;
-    }
-
-    public String getSocketHost() {
-        return socketHost;
-    }
-
-    public int getSocketPort() {
-        return socketPort;
-    }
-
-    public String getHashSalt() {
-        return hashSalt;
-    }
-
-    public DatabaseConfig getDatabase() {
-        return database;
-    }
-
-    public PanelConfig getPanel() {
-        return panel;
-    }
-
+public record Config(String socketHost, int socketPort, String hashSalt, DatabaseConfig database, PanelConfig panel) {
     //Static fields
     private static Config config;
 
@@ -64,7 +30,10 @@ public class Config {
                                 "panel.atlasworld.fr",
                                 "<token>",
                                 new PanelConfig.EggsConfig(
-                                        new ArrayList<>())
+                                        new EggConfig(1, 1),
+                                        new EggConfig(1, 1),
+                                        new EggConfig(1, 1)
+                                )
                         )));
             }
 
