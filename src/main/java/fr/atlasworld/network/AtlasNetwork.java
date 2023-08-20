@@ -1,11 +1,14 @@
 package fr.atlasworld.network;
 
 import ch.qos.logback.classic.Level;
+import com.mattmalec.pterodactyl4j.PteroBuilder;
+import com.mattmalec.pterodactyl4j.application.entities.PteroApplication;
 import com.mojang.brigadier.CommandDispatcher;
 import fr.atlasworld.network.command.CommandSource;
 import fr.atlasworld.network.command.CommandThread;
 import fr.atlasworld.network.command.commands.AuthCommand;
 import fr.atlasworld.network.command.commands.StopCommand;
+import fr.atlasworld.network.config.Config;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
 import fr.atlasworld.network.networking.packet.HelloWorldPacket;
@@ -14,13 +17,12 @@ import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.security.authentication.NetworkAuthenticationManager;
 import fr.atlasworld.network.networking.security.encryption.NetworkEncryptionManager;
 import fr.atlasworld.network.networking.session.NetworkSessionManager;
-import fr.atlasworld.network.networking.socket.NetworkSocketManager;
 import fr.atlasworld.network.networking.settings.NetworkSocketSettings;
+import fr.atlasworld.network.networking.socket.NetworkSocketManager;
 import fr.atlasworld.network.networking.socket.SocketManager;
 import fr.atlasworld.network.security.NetworkSecurityManager;
 import fr.atlasworld.network.security.SecurityManager;
 import fr.atlasworld.network.utils.LaunchArgs;
-import fr.atlasworld.network.utils.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +33,10 @@ public class AtlasNetwork {
     public static final Logger logger = LoggerFactory.getLogger("AtlasNetwork");
     private static LaunchArgs launchArgs;
     private static SocketManager socket;
-    private static Settings settings;
+    private static Config config;
     private static SecurityManager securityManager;
     private static DatabaseManager databaseManager;
+    private static PteroApplication panelApplication;
     private static CommandDispatcher<CommandSource> commandDispatcher;
 
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
@@ -50,12 +53,14 @@ public class AtlasNetwork {
         }
 
         AtlasNetwork.logger.info("Loading Configuration..");
-        settings = Settings.getSettings();
+        config = Config.getSettings();
 
         AtlasNetwork.logger.info("Initializing connections managers..");
-        securityManager = new NetworkSecurityManager(settings);
-        databaseManager = new MongoDatabaseManager(settings.getDatabase());
+        securityManager = new NetworkSecurityManager(config);
+        databaseManager = new MongoDatabaseManager(config.getDatabase());
 
+        AtlasNetwork.logger.info("Starting connection with server panel..");
+        panelApplication = PteroBuilder.createApplication(config.getPanel().url(), config.getPanel().token());
 
         //Handles the command execution
         AtlasNetwork.logger.info("Starting command handler..");
@@ -70,7 +75,7 @@ public class AtlasNetwork {
         AtlasNetwork.logger.info("Initializing Socket...");
         PacketManager packetManager = new NetworkPacketManager();
         NetworkSocketSettings socketSettings = new NetworkSocketSettings(
-                settings,
+                config,
                 new NetworkSessionManager(new HashMap<>()),
                 () -> new NetworkEncryptionManager(securityManager),
                 () -> new NetworkAuthenticationManager(securityManager, databaseManager),
@@ -116,19 +121,23 @@ public class AtlasNetwork {
         return socket;
     }
 
-    public static Settings getSettings() {
-        return settings;
+    public static Config getSettings() {
+        return config;
     }
 
     public static SecurityManager getSecurityManager() {
         return securityManager;
     }
 
-    public static CommandDispatcher<CommandSource> getCommandDispatcher() {
-        return commandDispatcher;
-    }
-
     public static DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    public static PteroApplication getPanelApplication() {
+        return panelApplication;
+    }
+
+    public static CommandDispatcher<CommandSource> getCommandDispatcher() {
+        return commandDispatcher;
     }
 }

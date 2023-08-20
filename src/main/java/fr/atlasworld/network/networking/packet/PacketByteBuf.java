@@ -2,17 +2,9 @@ package fr.atlasworld.network.networking.packet;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.jetbrains.annotations.Nullable;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.UUID;
 
 public class PacketByteBuf {

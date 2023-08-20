@@ -1,14 +1,15 @@
 package fr.atlasworld.network.database.mongo;
 
+import com.mattmalec.pterodactyl4j.application.entities.ApplicationServer;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.Filters;
+import fr.atlasworld.network.config.DatabaseConfig;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.entities.auth.AuthProfile;
 import fr.atlasworld.network.exceptions.AuthProfileOverrideException;
-import fr.atlasworld.network.utils.Settings;
 import org.bson.Document;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,17 +24,17 @@ public class MongoDatabaseManager implements DatabaseManager {
     private final MongoClient client;
     private final MongoDatabaseSerializer serializer;
 
-    public MongoDatabaseManager(Settings.DatabaseSettings settings, MongoDatabaseSerializer serializer) {
+    public MongoDatabaseManager(DatabaseConfig config, MongoDatabaseSerializer serializer) {
         String connectionString =
-                "mongodb://" + settings.username() + ":" + settings.password() + "@" +
-                        settings.host() + ":" + settings.port() + "/";
+                "mongodb://" + config.username() + ":" + config.password() + "@" +
+                        config.host() + ":" + config.port() + "/";
 
         this.client = MongoClients.create(connectionString);
         this.serializer = serializer;
     }
 
-    public MongoDatabaseManager(Settings.DatabaseSettings settings) {
-        this(settings, new MongoDatabaseSerializer());
+    public MongoDatabaseManager(DatabaseConfig config) {
+        this(config, new MongoDatabaseSerializer());
     }
 
     @Override
@@ -89,6 +90,11 @@ public class MongoDatabaseManager implements DatabaseManager {
         }
 
         profileCollection.deleteOne(Filters.eq("profileId", uuid.toString()));
+    }
+
+    @Override
+    public void saveServer(String serverId, ApplicationServer server) {
+        
     }
 
     @Override

@@ -1,5 +1,6 @@
 package fr.atlasworld.network.database;
 
+import com.mattmalec.pterodactyl4j.application.entities.ApplicationServer;
 import fr.atlasworld.network.entities.auth.AuthProfile;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,5 +14,6 @@ public interface DatabaseManager {
     boolean authProfileExists(UUID uuid);
     void saveAuthProfile(AuthProfile profile);
     void deleteAuthProfile(UUID uuid);
+    void saveServer(String serverId, ApplicationServer server);
     void close();
 }

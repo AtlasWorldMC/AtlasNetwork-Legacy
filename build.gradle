@@ -11,6 +11,16 @@ repositories {
     maven {
         url "https://libraries.minecraft.net"
     }
+    maven {
+        url = 'https://repo.mattmalec.com/repository/releases'
+    }
+    maven {
+        url "https://maven.atlasworld.fr/repository/maven-private/"
+        credentials {
+            username "$maven_user"
+            password "$maven_password"
+        }
+    }
 }
 
 dependencies {
@@ -31,6 +41,9 @@ dependencies {
 
     //Command
     implementation "com.mojang:brigadier:1.0.18"
+
+    //Panel Integration
+    implementation 'com.mattmalec:Pterodactyl4J:2.BETA_140'
 
     //Testing
     implementation "org.junit.jupiter:junit-jupiter-api:5.9.3"

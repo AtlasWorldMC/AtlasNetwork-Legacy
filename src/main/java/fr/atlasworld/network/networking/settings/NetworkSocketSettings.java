@@ -1,11 +1,11 @@
 package fr.atlasworld.network.networking.settings;
 
+import fr.atlasworld.network.config.Config;
 import fr.atlasworld.network.networking.handler.*;
 import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.security.authentication.AuthenticationManager;
 import fr.atlasworld.network.networking.security.encryption.EncryptionManager;
 import fr.atlasworld.network.networking.session.SessionManager;
-import fr.atlasworld.network.utils.Settings;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
@@ -25,9 +25,9 @@ public class NetworkSocketSettings implements SocketSettings {
     private final Supplier<AuthenticationManager> authenticationManagerBuilder;
     private final PacketManager packetManager;
 
-    public NetworkSocketSettings(Settings settings, SessionManager sessionManager, Supplier<EncryptionManager> encryptionManagerBuilder, Supplier<AuthenticationManager> authenticationManagerBuilder, PacketManager packetManager) {
-        this.port = settings.getSocketPort();
-        this.address = settings.getSocketHost();
+    public NetworkSocketSettings(Config config, SessionManager sessionManager, Supplier<EncryptionManager> encryptionManagerBuilder, Supplier<AuthenticationManager> authenticationManagerBuilder, PacketManager packetManager) {
+        this.port = config.getSocketPort();
+        this.address = config.getSocketHost();
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup();

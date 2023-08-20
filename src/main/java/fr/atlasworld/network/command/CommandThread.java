@@ -6,7 +6,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.atlasworld.network.AtlasNetwork;
 
 import java.util.Scanner;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
