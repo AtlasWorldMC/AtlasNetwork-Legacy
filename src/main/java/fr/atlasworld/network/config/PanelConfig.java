@@ -1,6 +1,6 @@
 package fr.atlasworld.network.config;
 
-public record PanelConfig(String url, String token, EggsConfig eggs) {
-    public record EggsConfig(EggConfig velocity, EggConfig papermc, EggConfig redis) {
-    }
+import java.util.List;
+
+public record PanelConfig(String url, String token, long userId, List<EggConfig> eggs) {
 }

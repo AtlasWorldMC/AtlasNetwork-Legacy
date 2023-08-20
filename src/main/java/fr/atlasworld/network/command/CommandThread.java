@@ -41,6 +41,8 @@ public class CommandThread extends Thread {
                 } catch (CommandSyntaxException e) {
                     AtlasNetwork.logger.info("Unknown or incomplete command.");
                     AtlasNetwork.logger.info("{} <--[HERE]", command);
+                } catch (Exception e) {
+                    AtlasNetwork.logger.error("Something went wrong with this command: ", e);
                 }
             });
         }

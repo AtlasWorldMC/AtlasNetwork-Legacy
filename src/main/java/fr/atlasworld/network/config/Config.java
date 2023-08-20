@@ -2,10 +2,11 @@ package fr.atlasworld.network.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.file.loader.GsonFileLoader;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public record Config(String socketHost, int socketPort, String hashSalt, DatabaseConfig database, PanelConfig panel) {
     //Static fields
@@ -27,13 +28,24 @@ public record Config(String socketHost, int socketPort, String hashSalt, Databas
                                 27017
                         ),
                         new PanelConfig(
-                                "panel.atlasworld.fr",
-                                "<token>",
-                                new PanelConfig.EggsConfig(
-                                        new EggConfig(1, 1),
-                                        new EggConfig(1, 1),
-                                        new EggConfig(1, 1)
-                                )
+                                "https://panel.atlasworld.fr",
+                                "token",
+                                1,
+                                List.of(new EggConfig(
+                                        "example",
+                                        1,
+                                        1,
+                                        "ghcr.io/software-noob/pterodactyl-images:java_17",
+                                        new EggConfig.ResourceConfig(
+                                                1,
+                                                1,
+                                                1024,
+                                                0,
+                                                100,
+                                                1024
+                                        ),
+                                        new JsonObject()
+                                ))
                         )));
             }
 

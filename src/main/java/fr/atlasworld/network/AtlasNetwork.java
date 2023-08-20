@@ -1,16 +1,16 @@
 package fr.atlasworld.network;
 
 import ch.qos.logback.classic.Level;
-import com.mattmalec.pterodactyl4j.PteroBuilder;
-import com.mattmalec.pterodactyl4j.application.entities.PteroApplication;
 import com.mojang.brigadier.CommandDispatcher;
 import fr.atlasworld.network.command.CommandSource;
 import fr.atlasworld.network.command.CommandThread;
 import fr.atlasworld.network.command.commands.AuthCommand;
+import fr.atlasworld.network.command.commands.ServersCommand;
 import fr.atlasworld.network.command.commands.StopCommand;
 import fr.atlasworld.network.config.Config;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
+import fr.atlasworld.network.integration.ptero.PteroManager;
 import fr.atlasworld.network.networking.packet.HelloWorldPacket;
 import fr.atlasworld.network.networking.packet.NetworkPacketManager;
 import fr.atlasworld.network.networking.packet.PacketManager;
@@ -36,7 +36,7 @@ public class AtlasNetwork {
     private static Config config;
     private static SecurityManager securityManager;
     private static DatabaseManager databaseManager;
-    private static PteroApplication panelApplication;
+    private static PteroManager panelApplication;
     private static CommandDispatcher<CommandSource> commandDispatcher;
 
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
@@ -60,7 +60,8 @@ public class AtlasNetwork {
         databaseManager = new MongoDatabaseManager(config.database());
 
         AtlasNetwork.logger.info("Starting connection with server panel..");
-        panelApplication = PteroBuilder.createApplication(config.panel().url(), config.panel().token());
+        panelApplication = new PteroManager(config.panel(), databaseManager);
+        panelApplication.initialize();
 
         //Handles the command execution
         AtlasNetwork.logger.info("Starting command handler..");
@@ -111,6 +112,7 @@ public class AtlasNetwork {
     private static void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
         StopCommand.register(dispatcher);
         AuthCommand.register(dispatcher);
+        ServersCommand.register(dispatcher);
     }
 
     public static LaunchArgs getLaunchArgs() {
@@ -121,7 +123,7 @@ public class AtlasNetwork {
         return socket;
     }
 
-    public static Config getSettings() {
+    public static Config getConfig() {
         return config;
     }
 
@@ -133,7 +135,7 @@ public class AtlasNetwork {
         return databaseManager;
     }
 
-    public static PteroApplication getPanelApplication() {
+    public static PteroManager getPanelApplication() {
         return panelApplication;
     }
 
