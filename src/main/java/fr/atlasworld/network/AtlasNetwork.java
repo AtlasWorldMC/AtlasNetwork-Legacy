@@ -58,12 +58,7 @@ public class AtlasNetwork {
 
         AtlasNetwork.logger.info("Initializing connections managers..");
         securityManager = new NetworkSecurityManager(config);
-        try {
-            databaseManager = new MongoDatabaseManager(config.database());
-        } catch (DatabaseException e) {
-            AtlasNetwork.logger.error("Could not connect to database!", e);
-            System.exit(-1);
-        }
+        databaseManager = new MongoDatabaseManager(config.database());
 
         AtlasNetwork.logger.info("Starting connection with server panel..");
         panelApplication = new PteroManager(config.panel(), databaseManager);
