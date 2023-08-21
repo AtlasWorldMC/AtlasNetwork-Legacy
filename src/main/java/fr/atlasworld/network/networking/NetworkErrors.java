@@ -1,6 +1,9 @@
 package fr.atlasworld.network.networking;
 
 public class NetworkErrors {
+    //Misc
+    public static final String INTERNAL_EXCEPTION = "INTERNAL_EXCEPTION";
+
     //Auth
     public static final String UNKNOWN_OR_MISSING_PROFILE = "UNKNOWN_OR_MISSING_PROFILE";
     public static final String PROFILE_ALREADY_INUSE = "PROFILE_ALREADY_INUSE";

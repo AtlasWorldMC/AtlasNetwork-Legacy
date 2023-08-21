@@ -10,6 +10,7 @@ import fr.atlasworld.network.command.commands.StopCommand;
 import fr.atlasworld.network.config.Config;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
+import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.integration.ptero.PteroManager;
 import fr.atlasworld.network.networking.packet.HelloWorldPacket;
 import fr.atlasworld.network.networking.packet.NetworkPacketManager;
@@ -57,7 +58,12 @@ public class AtlasNetwork {
 
         AtlasNetwork.logger.info("Initializing connections managers..");
         securityManager = new NetworkSecurityManager(config);
-        databaseManager = new MongoDatabaseManager(config.database());
+        try {
+            databaseManager = new MongoDatabaseManager(config.database());
+        } catch (DatabaseException e) {
+            AtlasNetwork.logger.error("Could not connect to database!", e);
+            System.exit(-1);
+        }
 
         AtlasNetwork.logger.info("Starting connection with server panel..");
         panelApplication = new PteroManager(config.panel(), databaseManager);

@@ -9,6 +9,7 @@ import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.command.CommandSource;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.entities.auth.AuthProfile;
+import fr.atlasworld.network.exceptions.database.DatabaseException;
 
 import java.util.Set;
 import java.util.UUID;
@@ -29,10 +30,13 @@ public class AuthCommand {
     }
 
     public static int executeListProfiles(CommandSource source) {
-        Set<AuthProfile> profiles = AtlasNetwork.getDatabaseManager().getAuthProfiles();
-
-        source.sendMessage("Showing {} Profiles:", profiles.size());
-        profiles.forEach(profile -> source.sendMessage("{} - {}", profile.profileId(), profile.tokenHash()));
+        try {
+            Set<AuthProfile> profiles = AtlasNetwork.getDatabaseManager().getAuthProfiles();
+            source.sendMessage("Showing {} Profiles:", profiles.size());
+            profiles.forEach(profile -> source.sendMessage("{} - {}", profile.profileId(), profile.tokenHash()));
+        } catch (DatabaseException e) {
+            source.sendError("Failed to retrieve authentication profiles", e);
+        }
 
         return Command.SINGLE_SUCCESS;
     }
@@ -46,20 +50,31 @@ public class AuthCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        DatabaseManager dbManager = AtlasNetwork.getDatabaseManager();
+        DatabaseManager database = AtlasNetwork.getDatabaseManager();
 
-        if (dbManager.authProfileExists(uuid)) {
-            source.sendError("Profile with this uuid already exists!");
+        try {
+            if (database.authProfileExists(uuid)) {
+                source.sendError("Profile with this uuid already exists!");
+                return Command.SINGLE_SUCCESS;
+            }
+        } catch (DatabaseException e) {
+            source.sendError("Something went wrong trying to create a new profile", e);
             return Command.SINGLE_SUCCESS;
         }
 
         String token = AtlasNetwork.getSecurityManager().generateAuthenticationToken();
         AuthProfile profile = new AuthProfile(uuid, AtlasNetwork.getSecurityManager().hash(token));
+
+        try {
+            database.saveAuthProfile(profile);
+        } catch (DatabaseException e) {
+            source.sendError("Something went wrong trying to create a new profile", e);
+            return Command.SINGLE_SUCCESS;
+        }
+
         source.sendMessage("Profile Created:");
         source.sendMessage("ID: {}", uuid.toString());
         source.sendMessage("Token: {} <-- COPY THIS, THIS IS THE ONLY TIME YOU WILL BE ABLE TO SEE IT!", token);
-
-        dbManager.saveAuthProfile(profile);
 
         return Command.SINGLE_SUCCESS;
     }
@@ -73,15 +88,19 @@ public class AuthCommand {
             return Command.SINGLE_SUCCESS;
         }
 
-        DatabaseManager dbManager = AtlasNetwork.getDatabaseManager();
+        DatabaseManager database = AtlasNetwork.getDatabaseManager();
 
-        if (!dbManager.authProfileExists(uuid)) {
-            source.sendError("Unknown profile!");
-            return Command.SINGLE_SUCCESS;
+        try {
+            if (!database.authProfileExists(uuid)) {
+                source.sendError("Unknown profile!");
+                return Command.SINGLE_SUCCESS;
+            }
+
+            database.deleteAuthProfile(uuid);
+            source.sendMessage("Successfully deleted profile!");
+        } catch (DatabaseException e) {
+            source.sendError("Something went wrong trying to delete profile", e);
         }
-
-        dbManager.deleteAuthProfile(uuid);
-        source.sendMessage("Successfully deleted profile!");
         return Command.SINGLE_SUCCESS;
     }
 }

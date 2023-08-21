@@ -10,6 +10,7 @@ import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.config.EggConfig;
 import fr.atlasworld.network.config.PanelConfig;
 import fr.atlasworld.network.database.DatabaseManager;
+import fr.atlasworld.network.exceptions.ConfigException;
 
 import java.util.List;
 import java.util.Map;
@@ -44,7 +45,31 @@ public class PteroManager {
         }).thenAccept(success -> this.ready = success);
     }
 
-    public ServerCreationResult createServer(EggConfig eggConfig, String name) {
+    public ServerCreationResult createServer(String name) {
+        EggConfig egg = this.config.eggs().stream()
+                .filter(eggFilter -> eggFilter.key().equals(this.config.defaults().server()))
+                .findFirst().orElse(null);
+
+        if (egg == null) {
+            throw new ConfigException("Cannot find defined default server egg '" + this.config.defaults().server() + "'!");
+        }
+
+        return this.createServer(egg, name, false);
+    }
+
+    public ServerCreationResult createProxy(String name) {
+        EggConfig egg = this.config.eggs().stream()
+                .filter(eggFilter -> eggFilter.key().equals(this.config.defaults().proxy()))
+                .findFirst().orElse(null);
+
+        if (egg == null) {
+            throw new ConfigException("Cannot find defined default proxy egg '" + this.config.defaults().server() + "'!");
+        }
+
+        return this.createServer(egg, name, false);
+    }
+
+    public ServerCreationResult createServer(EggConfig eggConfig, String name, boolean createDatabaseEntry) {
         Node node = this.application.retrieveNodeById(eggConfig.resources().node()).execute();
         ApplicationEgg egg = this.application.retrieveEggById(this.application.retrieveNestById(eggConfig.nest()).execute(),
                 eggConfig.egg()).execute();

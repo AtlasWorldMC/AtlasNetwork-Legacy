@@ -45,7 +45,8 @@ public record Config(String socketHost, int socketPort, String hashSalt, Databas
                                                 1024
                                         ),
                                         new JsonObject()
-                                ))
+                                )),
+                                new PanelConfig.Defaults("example", "example")
                         )));
             }
 

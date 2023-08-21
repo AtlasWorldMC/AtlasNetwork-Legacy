@@ -1,10 +1,10 @@
 package fr.atlasworld.network.networking.handler;
 
 import fr.atlasworld.network.AtlasNetwork;
+import fr.atlasworld.network.exceptions.networking.auth.AuthenticationException;
 import fr.atlasworld.network.networking.NetworkErrors;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.networking.security.authentication.AuthenticationManager;
-import fr.atlasworld.network.networking.security.authentication.AuthenticationResult;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -32,19 +32,21 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
 
-            AuthenticationResult result = this.authenticationManager.authenticate(ctx.channel(), buf);
-
-            if (result.success()) {
+            PacketByteBuf response;
+            try {
+                this.authenticationManager.authenticate(ctx.channel(), buf);
+                response = PacketByteBuf.create()
+                        .writeString("auth_response")
+                        .writeBoolean(true)
+                        .writeString("SUCCESS");
                 AtlasNetwork.logger.info("{} was successfully authenticated!", ctx.channel().remoteAddress());
-            } else {
-                AtlasNetwork.logger.warn("{} authentication has failed: {}", ctx.channel().remoteAddress(), result.message());
+            } catch (AuthenticationException e) {
+                response = PacketByteBuf.create()
+                        .writeString("auth_response")
+                        .writeBoolean(false)
+                        .writeString(e.getNetworkFeedback());
+                AtlasNetwork.logger.warn("{} authentication has failed: ", ctx.channel().remoteAddress(), e);
             }
-
-            PacketByteBuf response = PacketByteBuf.create()
-                    .writeString("auth_response")
-                    .writeBoolean(result.success())
-                    .writeString(result.message());
-
             ctx.channel().writeAndFlush(response);
             buf.release();
 

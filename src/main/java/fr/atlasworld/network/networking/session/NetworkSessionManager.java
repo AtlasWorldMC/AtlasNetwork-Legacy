@@ -1,7 +1,8 @@
 package fr.atlasworld.network.networking.session;
 
-import fr.atlasworld.network.exceptions.SessionAlreadyRegisteredException;
-import fr.atlasworld.network.exceptions.SessionNotRegisteredException;
+import fr.atlasworld.network.exceptions.networking.session.SessionAlreadyInUseException;
+import fr.atlasworld.network.exceptions.networking.session.SessionException;
+import fr.atlasworld.network.exceptions.networking.session.SessionNotUsedException;
 import io.netty.channel.Channel;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,17 +18,17 @@ public class NetworkSessionManager implements SessionManager {
     }
 
     @Override
-    public void addSession(Channel channel, ClientSession session) {
+    public void addSession(Channel channel, ClientSession session) throws SessionException {
         if (this.sessionHolder.containsKey(channel)) {
-            throw new SessionAlreadyRegisteredException(String.valueOf(channel.remoteAddress()));
+            throw new SessionAlreadyInUseException(String.valueOf(channel.remoteAddress()));
         }
         this.sessionHolder.put(channel, session);
     }
 
     @Override
-    public void removeSession(Channel channel) {
+    public void removeSession(Channel channel) throws SessionException {
         if (!this.sessionHolder.containsKey(channel)) {
-            throw new SessionNotRegisteredException(String.valueOf(channel.remoteAddress()));
+            throw new SessionNotUsedException(String.valueOf(channel.remoteAddress()));
         }
         this.sessionHolder.remove(channel);
     }

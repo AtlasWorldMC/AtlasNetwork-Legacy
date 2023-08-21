@@ -16,14 +16,56 @@ public class ServersCommand {
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("servers")
                 .then(LiteralArgumentBuilder.<CommandSource>literal("create")
-                        .then(RequiredArgumentBuilder.<CommandSource, String>argument("egg", StringArgumentType.word())
+                        .then(LiteralArgumentBuilder.<CommandSource>literal("server")
                                 .then(RequiredArgumentBuilder.<CommandSource, String>argument("name", StringArgumentType.word())
-                                        .executes(ctx -> createServer(ctx.getSource(),
-                                                ctx.getArgument("egg", String.class),
-                                                ctx.getArgument("name", String.class)))))));
+                                        .executes(ctx -> createServer(ctx.getSource(), ctx.getArgument("name", String.class)))
+                                )
+                        )
+                        .then(LiteralArgumentBuilder.<CommandSource>literal("proxy")
+                                .then(RequiredArgumentBuilder.<CommandSource, String>argument("name", StringArgumentType.word())
+                                        .executes(ctx -> createProxy(ctx.getSource(), ctx.getArgument("name", String.class)))
+                                )
+                        )
+                        .then(LiteralArgumentBuilder.<CommandSource>literal("egg")
+                                .then(RequiredArgumentBuilder.<CommandSource, String>argument("name", StringArgumentType.word())
+                                        .then(RequiredArgumentBuilder.<CommandSource, String>argument("egg", StringArgumentType.word())
+                                                .executes(ctx -> createServerUsingEgg(ctx.getSource(), ctx.getArgument("name", String.class), ctx.getArgument("egg", String.class)))
+                                        )
+                                )
+                        )
+                )
+        );
     }
 
-    private static int createServer(CommandSource source, String egg, String name) {
+    private static int createServer(CommandSource source, String name) {
+        PteroManager manager = AtlasNetwork.getPanelApplication();
+
+        source.sendMessage("Creating server..");
+        ServerCreationResult result = manager.createServer(name);
+        if (result.success()) {
+            source.sendMessage("Server created!");
+        } else {
+            source.sendError("Unable to create server: " + result.msg());
+        }
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int createProxy(CommandSource source, String name) {
+        PteroManager manager = AtlasNetwork.getPanelApplication();
+
+        source.sendMessage("Creating proxy..");
+        ServerCreationResult result = manager.createProxy(name);
+        if (result.success()) {
+            source.sendMessage("Proxy created!");
+        } else {
+            source.sendError("Unable to create proxy: " + result.msg());
+        }
+
+        return Command.SINGLE_SUCCESS;
+    }
+
+    private static int createServerUsingEgg(CommandSource source, String name, String egg) {
         PteroManager manager = AtlasNetwork.getPanelApplication();
         PanelConfig config = AtlasNetwork.getConfig().panel();
 
@@ -37,7 +79,7 @@ public class ServersCommand {
         }
 
         source.sendMessage("Creating server..");
-        ServerCreationResult result = manager.createServer(eggConfig, name);
+        ServerCreationResult result = manager.createServer(eggConfig, name, true);
         if (result.success()) {
             source.sendMessage("Server created!");
         } else {
