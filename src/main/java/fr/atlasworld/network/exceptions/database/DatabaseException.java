@@ -1,6 +1,8 @@
 package fr.atlasworld.network.exceptions.database;
 
-public class DatabaseException extends Exception {
+import java.io.IOException;
+
+public class DatabaseException extends IOException {
     public DatabaseException(String message) {
         super(message);
     }

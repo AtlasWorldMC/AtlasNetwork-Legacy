@@ -1,5 +1,6 @@
 package fr.atlasworld.network.networking.security.authentication;
 
+import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.entities.auth.AuthProfile;
 import fr.atlasworld.network.exceptions.database.DatabaseException;
@@ -14,12 +15,12 @@ import java.util.UUID;
 public class NetworkAuthenticationManager implements AuthenticationManager {
     private boolean authenticated;
     private final SecurityManager securityManager;
-    private final DatabaseManager databaseManager;
+    private final Database<AuthProfile> database;
 
-    public NetworkAuthenticationManager(SecurityManager securityManager, DatabaseManager databaseManager) {
+    public NetworkAuthenticationManager(SecurityManager securityManager, Database<AuthProfile> database) {
         this.authenticated = false;
         this.securityManager = securityManager;
-        this.databaseManager = databaseManager;
+        this.database = database;
     }
 
     @Override
@@ -36,7 +37,7 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
         }
 
         try {
-            if (!this.databaseManager.authProfileExists(authUuid)) {
+            if (!this.database.has(authUuid.toString())) {
                 throw new AuthenticationException("Profile does not exist!", NetworkErrors.UNKNOWN_OR_MISSING_PROFILE);
             }
         } catch (DatabaseException e) {
@@ -44,7 +45,7 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
         }
 
         try {
-            AuthProfile profile = this.databaseManager.getAuthProfile(authUuid);
+            AuthProfile profile = this.database.get(authUuid.toString());
             String token = buf.readString();
             String hashedToken = this.securityManager.hash(token);
 

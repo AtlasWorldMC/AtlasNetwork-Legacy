@@ -8,8 +8,10 @@ import fr.atlasworld.network.command.commands.AuthCommand;
 import fr.atlasworld.network.command.commands.ServersCommand;
 import fr.atlasworld.network.command.commands.StopCommand;
 import fr.atlasworld.network.config.Config;
+import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
+import fr.atlasworld.network.entities.auth.AuthProfile;
 import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.integration.ptero.PteroManager;
 import fr.atlasworld.network.networking.packet.HelloWorldPacket;
@@ -76,14 +78,19 @@ public class AtlasNetwork {
         //Init Socket
         AtlasNetwork.logger.info("Initializing Socket...");
         PacketManager packetManager = new NetworkPacketManager();
-        NetworkSocketSettings socketSettings = new NetworkSocketSettings(
-                config,
-                new NetworkSessionManager(new HashMap<>()),
-                () -> new NetworkEncryptionManager(securityManager),
-                () -> new NetworkAuthenticationManager(securityManager, databaseManager),
-                packetManager);
-
-        socket = new NetworkSocketManager(socketSettings);
+        try {
+            Database<AuthProfile> authDatabase = databaseManager.getAuthenticationProfileDatabase();
+            NetworkSocketSettings socketSettings = new NetworkSocketSettings(
+                    config,
+                    new NetworkSessionManager(new HashMap<>()),
+                    () -> new NetworkEncryptionManager(securityManager),
+                    () -> new NetworkAuthenticationManager(securityManager, authDatabase),
+                    packetManager);
+            socket = new NetworkSocketManager(socketSettings);
+        } catch (Exception e) {
+            AtlasNetwork.logger.error("Unable to start socket", e);
+            System.exit(-1);
+        }
 
         AtlasNetwork.logger.info("Network Initialized.");
 
