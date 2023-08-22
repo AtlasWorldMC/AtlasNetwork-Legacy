@@ -7,6 +7,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.command.CommandSource;
+import fr.atlasworld.network.command.arguments.UuidArgumentType;
 import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.entities.auth.AuthProfile;
@@ -22,12 +23,12 @@ public class AuthCommand {
                         .then(LiteralArgumentBuilder.<CommandSource>literal("list")
                                 .executes(ctx -> executeListProfiles(ctx.getSource())))
                         .then(LiteralArgumentBuilder.<CommandSource>literal("create")
-                                .executes(ctx -> executeCreateProfile(ctx.getSource(), UUID.randomUUID().toString()))
-                                .then(RequiredArgumentBuilder.<CommandSource, String>argument("uuid", StringArgumentType.word())
-                                        .executes(ctx -> executeCreateProfile(ctx.getSource(), ctx.getArgument("uuid", String.class)))))
+                                .executes(ctx -> executeCreateProfile(ctx.getSource(), UUID.randomUUID()))
+                                .then(RequiredArgumentBuilder.<CommandSource, UUID>argument("uuid", UuidArgumentType.UUID())
+                                        .executes(ctx -> executeCreateProfile(ctx.getSource(), ctx.getArgument("uuid", UUID.class)))))
                         .then(LiteralArgumentBuilder.<CommandSource>literal("delete")
-                                .then(RequiredArgumentBuilder.<CommandSource, String>argument("uuid", StringArgumentType.word())
-                                        .executes(ctx -> executeDeleteProfile(ctx.getSource(), ctx.getArgument("uuid", String.class)))))));
+                                .then(RequiredArgumentBuilder.<CommandSource, UUID>argument("uuid", UuidArgumentType.UUID())
+                                        .executes(ctx -> executeDeleteProfile(ctx.getSource(), ctx.getArgument("uuid", UUID.class)))))));
     }
 
     public static int executeListProfiles(CommandSource source) {
@@ -44,15 +45,7 @@ public class AuthCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    public static int executeCreateProfile(CommandSource source, String strUuid) {
-        UUID uuid;
-        try {
-            uuid = UUID.fromString(strUuid);
-        } catch (Exception e) {
-            source.sendError("Please provide a valid uuid!");
-            return Command.SINGLE_SUCCESS;
-        }
-
+    public static int executeCreateProfile(CommandSource source, UUID uuid) {
         try {
             Database<AuthProfile> database = AtlasNetwork.getDatabaseManager().getAuthenticationProfileDatabase();
 
@@ -76,15 +69,7 @@ public class AuthCommand {
         return Command.SINGLE_SUCCESS;
     }
 
-    public static int executeDeleteProfile(CommandSource source, String strUuid) {
-        UUID uuid;
-        try {
-            uuid = UUID.fromString(strUuid);
-        } catch (Exception e) {
-            source.sendError("Please provide a valid uuid!");
-            return Command.SINGLE_SUCCESS;
-        }
-
+    public static int executeDeleteProfile(CommandSource source, UUID uuid) {
         try {
             Database<AuthProfile> database = AtlasNetwork.getDatabaseManager().getAuthenticationProfileDatabase();
             if (!database.has(uuid.toString())) {
