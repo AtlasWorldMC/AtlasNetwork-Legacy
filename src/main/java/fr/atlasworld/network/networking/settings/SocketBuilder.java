@@ -4,7 +4,7 @@ import fr.atlasworld.network.networking.session.SessionManager;
 import io.netty.bootstrap.ServerBootstrap;
 import org.jetbrains.annotations.NotNull;
 
-public interface SocketSettings {
+public interface SocketBuilder {
     /**
      * Gets the boostrap for the server
      * @return Server Bootstrap

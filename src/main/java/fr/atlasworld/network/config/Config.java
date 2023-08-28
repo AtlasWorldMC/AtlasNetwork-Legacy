@@ -6,7 +6,6 @@ import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.file.loader.GsonFileLoader;
 
 public record Config(String socketHost, int socketPort, String hashSalt, DatabaseConfig database, PanelConfig panel) {
-    //Static fields
     private static Config config;
 
     public static Config getSettings() {

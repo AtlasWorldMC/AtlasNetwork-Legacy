@@ -1,14 +1,14 @@
 package fr.atlasworld.network.networking.socket;
 
 import fr.atlasworld.network.AtlasNetwork;
-import fr.atlasworld.network.networking.settings.SocketSettings;
+import fr.atlasworld.network.networking.settings.SocketBuilder;
 import io.netty.channel.ChannelFuture;
 
 public class NetworkSocketManager implements SocketManager {
-    private final SocketSettings settings;
+    private final SocketBuilder settings;
     private boolean bound;
 
-    public NetworkSocketManager(SocketSettings settings) {
+    public NetworkSocketManager(SocketBuilder settings) {
         this.settings = settings;
     }
 

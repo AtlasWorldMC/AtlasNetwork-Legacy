@@ -50,7 +50,7 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
 
                 NetworkClient client = new NetworkClient(ctx.channel(), connectionId);
                 this.sessionManager.addSession(ctx.channel(), client);
-
+                ctx.channel().closeFuture().addListener(future -> this.sessionManager.removeSession(ctx.channel()));
             } catch (AuthenticationException e) {
                 response = PacketByteBuf.create()
                         .writeString("auth_response")

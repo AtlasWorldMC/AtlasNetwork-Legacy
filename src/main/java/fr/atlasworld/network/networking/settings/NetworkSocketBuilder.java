@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
-public class NetworkSocketSettings implements SocketSettings {
+public class NetworkSocketBuilder implements SocketBuilder {
     private final int port;
     private final String address;
     private final EventLoopGroup bossGroup, workerGroup;
@@ -25,7 +25,7 @@ public class NetworkSocketSettings implements SocketSettings {
     private final Supplier<AuthenticationManager> authenticationManagerBuilder;
     private final PacketManager packetManager;
 
-    public NetworkSocketSettings(Config config, SessionManager sessionManager, Supplier<EncryptionManager> encryptionManagerBuilder, Supplier<AuthenticationManager> authenticationManagerBuilder, PacketManager packetManager) {
+    public NetworkSocketBuilder(Config config, SessionManager sessionManager, Supplier<EncryptionManager> encryptionManagerBuilder, Supplier<AuthenticationManager> authenticationManagerBuilder, PacketManager packetManager) {
         this.port = config.socketPort();
         this.address = config.socketHost();
         this.authenticationManagerBuilder = authenticationManagerBuilder;
@@ -50,7 +50,6 @@ public class NetworkSocketSettings implements SocketSettings {
                         //In
                         ch.pipeline().addLast(new DecodeHandler(encryptionManager));
                         ch.pipeline().addLast(new AuthenticationHandler(authenticationManager, sessionManager));
-                        ch.pipeline().addLast(new SessionChannelHandler(sessionManager));
                         ch.pipeline().addLast(new PacketHandler(packetManager, sessionManager));
                         ch.pipeline().addLast(new ExceptionHandler());
 

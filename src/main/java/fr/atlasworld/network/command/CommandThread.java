@@ -24,6 +24,7 @@ public class CommandThread extends Thread {
 
     @Override
     public void run() {
+        AtlasNetwork.logger.info("Command thread started.");
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();

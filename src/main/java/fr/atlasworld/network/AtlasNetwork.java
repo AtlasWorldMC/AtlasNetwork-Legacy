@@ -17,7 +17,7 @@ import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.security.authentication.NetworkAuthenticationManager;
 import fr.atlasworld.network.networking.security.encryption.NetworkEncryptionManager;
 import fr.atlasworld.network.networking.session.NetworkSessionManager;
-import fr.atlasworld.network.networking.settings.NetworkSocketSettings;
+import fr.atlasworld.network.networking.settings.NetworkSocketBuilder;
 import fr.atlasworld.network.networking.socket.NetworkSocketManager;
 import fr.atlasworld.network.networking.socket.SocketManager;
 import fr.atlasworld.network.security.NetworkSecurityManager;
@@ -71,7 +71,7 @@ public class AtlasNetwork {
         PacketManager packetManager = new NetworkPacketManager();
         try {
             Database<AuthenticationProfile> authDatabase = databaseManager.getAuthenticationProfileDatabase();
-            NetworkSocketSettings socketSettings = new NetworkSocketSettings(
+            NetworkSocketBuilder socketSettings = new NetworkSocketBuilder(
                     config,
                     new NetworkSessionManager(),
                     () -> new NetworkEncryptionManager(securityManager),
