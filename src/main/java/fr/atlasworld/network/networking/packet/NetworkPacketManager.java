@@ -2,6 +2,7 @@ package fr.atlasworld.network.networking.packet;
 
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.NetworkErrors;
+import fr.atlasworld.network.networking.entities.NetworkClient;
 import fr.atlasworld.network.networking.session.ClientSession;
 
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class NetworkPacketManager implements PacketManager {
     }
 
     @Override
-    public void execute(String strPacket, ClientSession client, PacketByteBuf buf) {
+    public void execute(String strPacket, NetworkClient client, PacketByteBuf buf) {
         if (!this.packets.containsKey(strPacket)) {
             AtlasNetwork.logger.warn("{} requested an unknown packet '{}'", client.remoteAddress(), strPacket);
 

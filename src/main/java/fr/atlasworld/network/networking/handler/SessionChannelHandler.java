@@ -1,6 +1,5 @@
 package fr.atlasworld.network.networking.handler;
 
-import fr.atlasworld.network.networking.session.ClientSession;
 import fr.atlasworld.network.networking.session.SessionManager;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -16,11 +15,6 @@ public class SessionChannelHandler extends ChannelInboundHandlerAdapter {
 
     public SessionChannelHandler(SessionManager sessionManager) {
         this.sessionManager = sessionManager;
-    }
-
-    @Override
-    public void channelActive(@NotNull ChannelHandlerContext ctx) throws Exception {
-        this.sessionManager.addSession(ctx.channel(), new ClientSession(this.sessionManager, ctx.channel()));
     }
 
     @Override

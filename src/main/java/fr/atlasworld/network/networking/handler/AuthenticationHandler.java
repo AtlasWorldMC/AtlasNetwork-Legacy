@@ -3,17 +3,23 @@ package fr.atlasworld.network.networking.handler;
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.exceptions.networking.auth.AuthenticationException;
 import fr.atlasworld.network.networking.NetworkErrors;
+import fr.atlasworld.network.networking.entities.NetworkClient;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.networking.security.authentication.AuthenticationManager;
+import fr.atlasworld.network.networking.session.SessionManager;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.UUID;
+
 public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
     private final AuthenticationManager authenticationManager;
+    private final SessionManager sessionManager;
 
-    public AuthenticationHandler(AuthenticationManager authenticationManager) {
+    public AuthenticationHandler(AuthenticationManager authenticationManager, SessionManager sessionManager) {
         this.authenticationManager = authenticationManager;
+        this.sessionManager = sessionManager;
     }
 
     @Override
@@ -34,12 +40,17 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
 
             PacketByteBuf response;
             try {
-                this.authenticationManager.authenticate(ctx.channel(), buf);
+                UUID connectionId = this.authenticationManager.authenticate(ctx.channel(), buf);
                 response = PacketByteBuf.create()
                         .writeString("auth_response")
                         .writeBoolean(true)
                         .writeString("SUCCESS");
                 AtlasNetwork.logger.info("{} was successfully authenticated!", ctx.channel().remoteAddress());
+                ctx.fireChannelActive();
+
+                NetworkClient client = new NetworkClient(ctx.channel(), connectionId);
+                this.sessionManager.addSession(ctx.channel(), client);
+
             } catch (AuthenticationException e) {
                 response = PacketByteBuf.create()
                         .writeString("auth_response")
@@ -66,5 +77,10 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
 
         buf.readerIndex(0);
         super.channelRead(ctx, buf);
+    }
+
+    @Override
+    public void channelActive(@NotNull ChannelHandlerContext ctx) throws Exception {
+        // Don't Trigger the Channel Active Event for other channel handlers yet
     }
 }

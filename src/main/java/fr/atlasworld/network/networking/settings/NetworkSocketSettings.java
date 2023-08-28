@@ -49,7 +49,7 @@ public class NetworkSocketSettings implements SocketSettings {
 
                         //In
                         ch.pipeline().addLast(new DecodeHandler(encryptionManager));
-                        ch.pipeline().addLast(new AuthenticationHandler(authenticationManager));
+                        ch.pipeline().addLast(new AuthenticationHandler(authenticationManager, sessionManager));
                         ch.pipeline().addLast(new SessionChannelHandler(sessionManager));
                         ch.pipeline().addLast(new PacketHandler(packetManager, sessionManager));
                         ch.pipeline().addLast(new ExceptionHandler());

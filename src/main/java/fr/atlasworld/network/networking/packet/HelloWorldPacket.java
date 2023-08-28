@@ -1,7 +1,7 @@
 package fr.atlasworld.network.networking.packet;
 
 import fr.atlasworld.network.AtlasNetwork;
-import fr.atlasworld.network.networking.session.ClientSession;
+import fr.atlasworld.network.networking.entities.NetworkClient;
 
 public class HelloWorldPacket implements NetworkPacket {
     @Override
@@ -10,7 +10,7 @@ public class HelloWorldPacket implements NetworkPacket {
     }
 
     @Override
-    public void onReceive(ClientSession client, PacketByteBuf packet) {
+    public void onReceive(NetworkClient client, PacketByteBuf packet) {
         AtlasNetwork.logger.info("Received a Hello World packet from {}", client.remoteAddress());
         packet.release();
     }

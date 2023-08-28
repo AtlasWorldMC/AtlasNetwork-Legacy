@@ -28,7 +28,7 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
     }
 
     @Override
-    public void authenticate(Channel channel, PacketByteBuf buf) throws AuthenticationException {
+    public UUID authenticate(Channel channel, PacketByteBuf buf) throws AuthenticationException {
         UUID authUuid = buf.readUuid();
 
         if (this.securityManager.isAuthProfileActive(authUuid)) {
@@ -55,6 +55,7 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
             this.authenticated = true;
             this.securityManager.activateAuthProfile(authUuid);
             channel.closeFuture().addListener(future -> this.securityManager.deactivateAuthProfile(authUuid));
+            return authUuid;
         } catch (DatabaseException e) {
             throw new AuthenticationException("Cannot fetch authentication profile", NetworkErrors.INTERNAL_EXCEPTION, e);
         }

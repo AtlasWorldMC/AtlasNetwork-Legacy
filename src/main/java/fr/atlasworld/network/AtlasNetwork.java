@@ -74,7 +74,7 @@ public class AtlasNetwork {
             Database<AuthenticationProfile> authDatabase = databaseManager.getAuthenticationProfileDatabase();
             NetworkSocketSettings socketSettings = new NetworkSocketSettings(
                     config,
-                    new NetworkSessionManager(new HashMap<>()),
+                    new NetworkSessionManager(),
                     () -> new NetworkEncryptionManager(securityManager),
                     () -> new NetworkAuthenticationManager(securityManager, authDatabase),
                     packetManager);
