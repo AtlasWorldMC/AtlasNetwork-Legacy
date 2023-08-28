@@ -10,12 +10,12 @@ import com.mongodb.client.model.Filters;
 import fr.atlasworld.network.config.DatabaseConfig;
 import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.DatabaseManager;
-import fr.atlasworld.network.entities.auth.AuthProfile;
+import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
+import fr.atlasworld.network.database.entities.server.DatabaseServer;
 import fr.atlasworld.network.exceptions.database.DatabaseConnectionClosedException;
 import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.exceptions.database.DatabaseIOException;
 import fr.atlasworld.network.exceptions.database.DatabaseTimeoutException;
-import fr.atlasworld.network.panel.ServerInfo;
 
 public class MongoDatabaseManager implements DatabaseManager {
     private static final String INTERNAL_DATABASE = "internal";
@@ -39,10 +39,10 @@ public class MongoDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public Database<AuthProfile> getAuthenticationProfileDatabase() throws DatabaseException {
+    public Database<AuthenticationProfile> getAuthenticationProfileDatabase() throws DatabaseException {
         try {
             return new MongoDatabase<>(
-                    AuthProfile.class,
+                    AuthenticationProfile.class,
                     this.client.getDatabase(INTERNAL_DATABASE).getCollection(AUTH_PROFILE_COLLECTION),
                     id -> Filters.eq("profileId", id),
                     this.serializer
@@ -59,10 +59,10 @@ public class MongoDatabaseManager implements DatabaseManager {
     }
 
     @Override
-    public Database<ServerInfo> getServerDatabase() throws DatabaseException {
+    public Database<DatabaseServer> getServerDatabase() throws DatabaseException {
         try {
             return new MongoDatabase<>(
-                    ServerInfo.class,
+                    DatabaseServer.class,
                     this.client.getDatabase(INTERNAL_DATABASE).getCollection(SERVER_COLLECTION),
                     id -> Filters.eq("id", id),
                     this.serializer

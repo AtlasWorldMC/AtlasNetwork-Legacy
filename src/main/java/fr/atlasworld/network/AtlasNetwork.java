@@ -5,13 +5,12 @@ import com.mojang.brigadier.CommandDispatcher;
 import fr.atlasworld.network.command.CommandSource;
 import fr.atlasworld.network.command.CommandThread;
 import fr.atlasworld.network.command.commands.AuthCommand;
-import fr.atlasworld.network.command.commands.ServersCommand;
 import fr.atlasworld.network.command.commands.StopCommand;
 import fr.atlasworld.network.config.Config;
 import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
-import fr.atlasworld.network.entities.auth.AuthProfile;
+import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
 import fr.atlasworld.network.networking.packet.HelloWorldPacket;
 import fr.atlasworld.network.networking.packet.NetworkPacketManager;
 import fr.atlasworld.network.networking.packet.PacketManager;
@@ -21,8 +20,6 @@ import fr.atlasworld.network.networking.session.NetworkSessionManager;
 import fr.atlasworld.network.networking.settings.NetworkSocketSettings;
 import fr.atlasworld.network.networking.socket.NetworkSocketManager;
 import fr.atlasworld.network.networking.socket.SocketManager;
-import fr.atlasworld.network.panel.PanelManager;
-import fr.atlasworld.network.panel.ServerInfo;
 import fr.atlasworld.network.security.NetworkSecurityManager;
 import fr.atlasworld.network.security.SecurityManager;
 import fr.atlasworld.network.utils.LaunchArgs;
@@ -39,7 +36,6 @@ public class AtlasNetwork {
     private static Config config;
     private static SecurityManager securityManager;
     private static DatabaseManager databaseManager;
-    private static PanelManager panelManager;
     private static CommandDispatcher<CommandSource> commandDispatcher;
 
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
@@ -58,19 +54,9 @@ public class AtlasNetwork {
         AtlasNetwork.logger.info("Loading Configuration..");
         config = Config.getSettings();
 
-        AtlasNetwork.logger.info("Initializing connections managers..");
+        AtlasNetwork.logger.info("Initializing managers..");
         securityManager = new NetworkSecurityManager(config);
         databaseManager = new MongoDatabaseManager(config.database());
-
-        AtlasNetwork.logger.info("Starting connection with the panel..");
-        try {
-            Database<ServerInfo> serverDatabase = databaseManager.getServerDatabase();
-            panelManager = new PanelManager(config.panel(), serverDatabase);
-            panelManager.init();
-        } catch (Exception e) {
-            AtlasNetwork.logger.error("Could connect to the panel!", e);
-            System.exit(-1);
-        }
 
         //Handles the command execution
         AtlasNetwork.logger.info("Starting command handler..");
@@ -85,7 +71,7 @@ public class AtlasNetwork {
         AtlasNetwork.logger.info("Initializing Socket...");
         PacketManager packetManager = new NetworkPacketManager();
         try {
-            Database<AuthProfile> authDatabase = databaseManager.getAuthenticationProfileDatabase();
+            Database<AuthenticationProfile> authDatabase = databaseManager.getAuthenticationProfileDatabase();
             NetworkSocketSettings socketSettings = new NetworkSocketSettings(
                     config,
                     new NetworkSessionManager(new HashMap<>()),
@@ -126,7 +112,6 @@ public class AtlasNetwork {
     private static void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
         StopCommand.register(dispatcher);
         AuthCommand.register(dispatcher);
-        ServersCommand.register(dispatcher);
     }
 
     public static LaunchArgs getLaunchArgs() {
@@ -147,10 +132,6 @@ public class AtlasNetwork {
 
     public static DatabaseManager getDatabaseManager() {
         return databaseManager;
-    }
-
-    public static PanelManager getPanelManager() {
-        return panelManager;
     }
 
     public static CommandDispatcher<CommandSource> getCommandDispatcher() {

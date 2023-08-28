@@ -1,8 +1,7 @@
 package fr.atlasworld.network.networking.security.authentication;
 
 import fr.atlasworld.network.database.Database;
-import fr.atlasworld.network.database.DatabaseManager;
-import fr.atlasworld.network.entities.auth.AuthProfile;
+import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
 import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.exceptions.networking.auth.AuthenticationException;
 import fr.atlasworld.network.networking.NetworkErrors;
@@ -15,9 +14,9 @@ import java.util.UUID;
 public class NetworkAuthenticationManager implements AuthenticationManager {
     private boolean authenticated;
     private final SecurityManager securityManager;
-    private final Database<AuthProfile> database;
+    private final Database<AuthenticationProfile> database;
 
-    public NetworkAuthenticationManager(SecurityManager securityManager, Database<AuthProfile> database) {
+    public NetworkAuthenticationManager(SecurityManager securityManager, Database<AuthenticationProfile> database) {
         this.authenticated = false;
         this.securityManager = securityManager;
         this.database = database;
@@ -45,11 +44,11 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
         }
 
         try {
-            AuthProfile profile = this.database.get(authUuid.toString());
+            AuthenticationProfile profile = this.database.get(authUuid.toString());
             String token = buf.readString();
             String hashedToken = this.securityManager.hash(token);
 
-            if (!profile.tokenHash().equals(hashedToken)) {
+            if (!profile.getHashedToken().equals(hashedToken)) {
                 throw new AuthenticationException("Invalid token!", NetworkErrors.INVALID_TOKEN);
             }
 

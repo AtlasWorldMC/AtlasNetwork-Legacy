@@ -4,6 +4,7 @@ import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.DatabaseSerializer;
+import fr.atlasworld.network.database.entities.DatabaseEntity;
 import fr.atlasworld.network.exceptions.database.DatabaseConnectionClosedException;
 import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.exceptions.database.DatabaseIOException;
@@ -14,7 +15,7 @@ import org.bson.conversions.Bson;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MongoDatabase<T> implements Database<T> {
+public class MongoDatabase<T extends DatabaseEntity> implements Database<T> {
     private final Class<T> clazz;
     private final MongoCollection<Document> collection;
     private final Function<String, Bson> finder;

@@ -2,15 +2,13 @@ package fr.atlasworld.network.command.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.command.CommandSource;
 import fr.atlasworld.network.command.arguments.UuidArgumentType;
 import fr.atlasworld.network.database.Database;
-import fr.atlasworld.network.database.DatabaseManager;
-import fr.atlasworld.network.entities.auth.AuthProfile;
+import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
 import fr.atlasworld.network.exceptions.database.DatabaseException;
 
 import java.util.Set;
@@ -33,11 +31,11 @@ public class AuthCommand {
 
     public static int executeListProfiles(CommandSource source) {
         try {
-            Set<AuthProfile> profiles = AtlasNetwork.getDatabaseManager().getAuthenticationProfileDatabase()
+            Set<AuthenticationProfile> profiles = AtlasNetwork.getDatabaseManager().getAuthenticationProfileDatabase()
                     .getAllEntries();
 
             source.sendMessage("Showing {} Profiles:", profiles.size());
-            profiles.forEach(profile -> source.sendMessage("{} - {}", profile.profileId(), profile.tokenHash()));
+            profiles.forEach(profile -> source.sendMessage("{} - {}", profile.getId(), profile.getHashedToken()));
         } catch (DatabaseException e) {
             source.sendError("Failed to retrieve authentication profiles", e);
         }
@@ -47,7 +45,7 @@ public class AuthCommand {
 
     public static int executeCreateProfile(CommandSource source, UUID uuid) {
         try {
-            Database<AuthProfile> database = AtlasNetwork.getDatabaseManager().getAuthenticationProfileDatabase();
+            Database<AuthenticationProfile> database = AtlasNetwork.getDatabaseManager().getAuthenticationProfileDatabase();
 
             if (database.has(uuid.toString())) {
                 source.sendError("Profile with this uuid already exists!");
@@ -55,7 +53,7 @@ public class AuthCommand {
             }
 
             String token = AtlasNetwork.getSecurityManager().generateAuthenticationToken();
-            AuthProfile profile = new AuthProfile(uuid, AtlasNetwork.getSecurityManager().hash(token));
+            AuthenticationProfile profile = new AuthenticationProfile(uuid, AtlasNetwork.getSecurityManager().hash(token));
 
             database.save(profile);
 
@@ -71,7 +69,7 @@ public class AuthCommand {
 
     public static int executeDeleteProfile(CommandSource source, UUID uuid) {
         try {
-            Database<AuthProfile> database = AtlasNetwork.getDatabaseManager().getAuthenticationProfileDatabase();
+            Database<AuthenticationProfile> database = AtlasNetwork.getDatabaseManager().getAuthenticationProfileDatabase();
             if (!database.has(uuid.toString())) {
                 source.sendError("Unknown profile!");
                 return Command.SINGLE_SUCCESS;
