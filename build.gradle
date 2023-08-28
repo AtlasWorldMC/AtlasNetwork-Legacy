@@ -44,9 +44,6 @@ dependencies {
 
     //Panel Integration
     implementation 'com.mattmalec:Pterodactyl4J:2.BETA_140'
-
-    //Testing
-    implementation "org.junit.jupiter:junit-jupiter-api:5.9.3"
 }
 
 compileJava {

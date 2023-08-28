@@ -31,21 +31,6 @@ public record Config(String socketHost, int socketPort, String hashSalt, Databas
                                 "https://panel.atlasworld.fr",
                                 "token",
                                 1,
-                                List.of(new EggConfig(
-                                        "example",
-                                        1,
-                                        1,
-                                        "ghcr.io/software-noob/pterodactyl-images:java_17",
-                                        new EggConfig.ResourceConfig(
-                                                1,
-                                                1,
-                                                1024,
-                                                0,
-                                                100,
-                                                1024
-                                        ),
-                                        new JsonObject()
-                                )),
                                 new PanelConfig.Defaults("example", "example")
                         )));
             }
