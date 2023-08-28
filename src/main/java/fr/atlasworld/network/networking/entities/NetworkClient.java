@@ -23,7 +23,7 @@ public class NetworkClient {
     }
 
     @CanIgnoreReturnValue
-    public ChannelFuture disconnect(PacketByteBuf buf) {
+    public ChannelFuture disconnect() {
         return this.channel.disconnect();
     }
 

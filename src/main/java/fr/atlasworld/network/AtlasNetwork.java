@@ -9,8 +9,8 @@ import fr.atlasworld.network.command.commands.StopCommand;
 import fr.atlasworld.network.config.Config;
 import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.DatabaseManager;
-import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
 import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
+import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
 import fr.atlasworld.network.networking.packet.HelloWorldPacket;
 import fr.atlasworld.network.networking.packet.NetworkPacketManager;
 import fr.atlasworld.network.networking.packet.PacketManager;
@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 
 public class AtlasNetwork {
     public static final Logger logger = LoggerFactory.getLogger("AtlasNetwork");

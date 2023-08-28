@@ -3,7 +3,6 @@ package fr.atlasworld.network.networking.packet;
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.NetworkErrors;
 import fr.atlasworld.network.networking.entities.NetworkClient;
-import fr.atlasworld.network.networking.session.ClientSession;
 
 import java.util.HashMap;
 import java.util.Map;

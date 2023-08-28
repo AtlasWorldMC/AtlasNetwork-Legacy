@@ -2,11 +2,8 @@ package fr.atlasworld.network.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.file.loader.GsonFileLoader;
-
-import java.util.List;
 
 public record Config(String socketHost, int socketPort, String hashSalt, DatabaseConfig database, PanelConfig panel) {
     //Static fields
