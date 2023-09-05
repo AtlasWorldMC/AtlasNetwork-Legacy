@@ -11,6 +11,8 @@ import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
 import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
+import fr.atlasworld.network.exceptions.database.DatabaseException;
+import fr.atlasworld.network.exceptions.panel.PanelException;
 import fr.atlasworld.network.networking.packet.HelloWorldPacket;
 import fr.atlasworld.network.networking.packet.NetworkPacketManager;
 import fr.atlasworld.network.networking.packet.PacketManager;
@@ -22,10 +24,13 @@ import fr.atlasworld.network.networking.socket.NetworkSocketManager;
 import fr.atlasworld.network.networking.socket.SocketManager;
 import fr.atlasworld.network.security.NetworkSecurityManager;
 import fr.atlasworld.network.security.SecurityManager;
+import fr.atlasworld.network.server.ServerManager;
+import fr.atlasworld.network.server.pterodactyl.PteroServerManager;
 import fr.atlasworld.network.utils.LaunchArgs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.PrintStream;
 import java.security.NoSuchAlgorithmException;
 
 public class AtlasNetwork {
@@ -36,6 +41,7 @@ public class AtlasNetwork {
     private static SecurityManager securityManager;
     private static DatabaseManager databaseManager;
     private static CommandDispatcher<CommandSource> commandDispatcher;
+    private static ServerManager serverManager;
 
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
         AtlasNetwork.logger.info("Initializing AtlasNetwork...");
@@ -50,12 +56,26 @@ public class AtlasNetwork {
             rootLogger.setLevel(Level.OFF);
         }
 
+
+
         AtlasNetwork.logger.info("Loading Configuration..");
         config = Config.getSettings();
 
         AtlasNetwork.logger.info("Initializing managers..");
         securityManager = new NetworkSecurityManager(config);
         databaseManager = new MongoDatabaseManager(config.database());
+
+        AtlasNetwork.logger.info("Connecting with the panel..");
+        try {
+            serverManager = new PteroServerManager(
+                    databaseManager.getServerDatabase(),
+                    config.panel()
+            );
+            serverManager.initialize();
+        } catch (DatabaseException | PanelException e) {
+            AtlasNetwork.logger.error("Unable to connect to the panel", e);
+            System.exit(-1);
+        }
 
         //Handles the command execution
         AtlasNetwork.logger.info("Starting command handler..");
@@ -135,5 +155,9 @@ public class AtlasNetwork {
 
     public static CommandDispatcher<CommandSource> getCommandDispatcher() {
         return commandDispatcher;
+    }
+
+    public static ServerManager getServerManager() {
+        return serverManager;
     }
 }

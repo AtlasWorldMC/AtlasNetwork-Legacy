@@ -5,15 +5,19 @@ import fr.atlasworld.network.database.entities.DatabaseEntity;
 import java.util.UUID;
 
 public class DatabaseServer implements DatabaseEntity {
-    private final UUID id;
+    private final String id;
     private final String type;
 
-    public DatabaseServer(UUID id, String type) {
+    public DatabaseServer(String id, String type) {
         this.id = id;
         this.type = type;
     }
 
-    public UUID getId() {
+    public DatabaseServer(UUID id, String type) {
+        this(id.toString(), type);
+    }
+
+    public String getId() {
         return id;
     }
 

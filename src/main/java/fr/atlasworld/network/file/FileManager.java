@@ -4,7 +4,7 @@ import java.io.File;
 
 public class FileManager {
     //Static Fields
-    public static final String SETTINGS = "settings.json";
+    public static final String CONFIG = "config.json";
 
     public static File getWorkingDirectory() {
         return new File(System.getProperty("user.dir"));
@@ -14,7 +14,11 @@ public class FileManager {
         return new File(getWorkingDirectory(), filename);
     }
 
-    public static File getSettingsFile() {
-        return getWorkingDirectoryFile(SETTINGS);
+    public static File getConfigFile() {
+        return getWorkingDirectoryFile(CONFIG);
+    }
+
+    public static File getServerConfigDirectory() {
+        return getWorkingDirectoryFile("servers");
     }
 }

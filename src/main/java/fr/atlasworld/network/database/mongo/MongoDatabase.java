@@ -13,6 +13,7 @@ import org.bson.Document;
 import org.bson.conversions.Bson;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class MongoDatabase<T extends DatabaseEntity> implements Database<T> {
@@ -45,6 +46,11 @@ public class MongoDatabase<T extends DatabaseEntity> implements Database<T> {
         } catch (MongoException e) {
             throw new DatabaseException(e.getMessage());
         }
+    }
+
+    @Override
+    public Optional<T> getOptional(String id) throws DatabaseException {
+        return Optional.ofNullable(this.get(id));
     }
 
     @Override

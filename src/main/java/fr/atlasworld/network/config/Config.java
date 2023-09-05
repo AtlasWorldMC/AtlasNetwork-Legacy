@@ -11,8 +11,8 @@ public record Config(String socketHost, int socketPort, String hashSalt, Databas
     public static Config getSettings() {
         if (config == null) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            GsonFileLoader<Config> settingsLoader = new GsonFileLoader<>(FileManager.getSettingsFile(), gson, Config.class);
-            if (!FileManager.getSettingsFile().isFile()) {
+            GsonFileLoader<Config> settingsLoader = new GsonFileLoader<>(FileManager.getConfigFile(), gson, Config.class);
+            if (!FileManager.getConfigFile().isFile()) {
                 settingsLoader.save(new Config(
                         "0.0.0.0",
                         27767,
