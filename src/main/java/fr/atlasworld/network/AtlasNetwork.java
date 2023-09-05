@@ -55,8 +55,8 @@ public class AtlasNetwork {
             rootLogger.setLevel(Level.DEBUG);
             ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
         } else {
-            ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger("org.mongodb.driver");
-            rootLogger.setLevel(Level.OFF);
+            ch.qos.logback.classic.Logger mongoLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger("org.mongodb.driver");
+            mongoLogger.setLevel(Level.OFF);
         }
 
 
