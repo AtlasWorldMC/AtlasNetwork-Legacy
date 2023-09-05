@@ -27,6 +27,8 @@ import fr.atlasworld.network.security.SecurityManager;
 import fr.atlasworld.network.server.ServerManager;
 import fr.atlasworld.network.server.pterodactyl.PteroServerManager;
 import fr.atlasworld.network.utils.LaunchArgs;
+import io.netty.util.NettyRuntime;
+import io.netty.util.ResourceLeakDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +53,7 @@ public class AtlasNetwork {
         if (launchArgs.isDevEnv()) {
             ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger(logger.getName());
             rootLogger.setLevel(Level.DEBUG);
+            ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
         } else {
             ch.qos.logback.classic.Logger rootLogger = (ch.qos.logback.classic.Logger)LoggerFactory.getLogger("org.mongodb.driver");
             rootLogger.setLevel(Level.OFF);
