@@ -2,6 +2,7 @@ package fr.atlasworld.network.server.pterodactyl;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 import com.mattmalec.pterodactyl4j.DataType;
 import com.mattmalec.pterodactyl4j.EnvironmentValue;
 import com.mattmalec.pterodactyl4j.PteroBuilder;
@@ -19,10 +20,13 @@ import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.exceptions.panel.PanelException;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.file.loader.GsonFileLoader;
+import fr.atlasworld.network.file.loader.JsonFileLoader;
 import fr.atlasworld.network.server.ServerManager;
 import fr.atlasworld.network.server.configuration.NodeBalancer;
 import fr.atlasworld.network.server.configuration.ServerConfiguration;
+import fr.atlasworld.network.server.configuration.ServerFileConfiguration;
 import fr.atlasworld.network.server.entities.PanelServer;
+import fr.atlasworld.network.server.listener.ServerSetupEventListener;
 
 import java.io.File;
 import java.util.*;
@@ -30,6 +34,7 @@ import java.util.stream.Collectors;
 
 public class PteroServerManager implements ServerManager {
     private final Map<String, ServerConfiguration> serverConfigurations;
+    private final Map<String, ServerFileConfiguration> serverFileConfigurations;
     private final List<PanelServer> servers;
     private final Database<DatabaseServer> database;
     private final PteroApplication application;
@@ -38,8 +43,9 @@ public class PteroServerManager implements ServerManager {
     private ServerConfiguration proxyDefault;
     private ServerConfiguration serverDefault;
 
-    public PteroServerManager(Map<String, ServerConfiguration> serverConfigurations, List<PanelServer> servers, Database<DatabaseServer> database, PteroApplication application, PteroClient client, PanelConfig config) {
+    public PteroServerManager(Map<String, ServerConfiguration> serverConfigurations, Map<String, ServerFileConfiguration> serverFileConfigurations, List<PanelServer> servers, Database<DatabaseServer> database, PteroApplication application, PteroClient client, PanelConfig config) {
         this.serverConfigurations = serverConfigurations;
+        this.serverFileConfigurations = serverFileConfigurations;
         this.servers = servers;
         this.database = database;
         this.application = application;
@@ -49,6 +55,7 @@ public class PteroServerManager implements ServerManager {
 
     public PteroServerManager(Database<DatabaseServer> database, PanelConfig config) {
         this(
+                new HashMap<>(),
                 new HashMap<>(),
                 new ArrayList<>(),
                 database,
@@ -76,6 +83,16 @@ public class PteroServerManager implements ServerManager {
                 }
                 this.serverConfigurations.put(configuration.id(), configuration);
             }
+        }
+
+        if (FileManager.getServerFileIndex().exists()) {
+            JsonFileLoader serverFileIndexLoader = new JsonFileLoader(FileManager.getServerFileIndex());
+            Gson gson = new Gson();
+            serverFileIndexLoader.load().getAsJsonArray()
+                    .asList()
+                    .stream()
+                    .map(jsonFileIndex -> gson.fromJson(jsonFileIndex, ServerFileConfiguration.class))
+                    .forEach(fileIndex -> this.serverFileConfigurations.put(fileIndex.id(), fileIndex));
         }
 
         List<ApplicationServer> networkManagedServers = this.application.retrieveServers().execute().stream()
@@ -147,10 +164,7 @@ public class PteroServerManager implements ServerManager {
                         .equals(this.proxyDefault.id()))
                 .findFirst().orElse(null);
 
-        if (proxy == null) {
-            AtlasNetwork.logger.info("No Proxy found, creating a new one..");
-            this.createDefaultProxy("Proxy - 0");
-        }
+
     }
 
     @Override
@@ -211,6 +225,8 @@ public class PteroServerManager implements ServerManager {
         } catch (DatabaseException e) {
             throw new PanelException("Could not save server to database", e);
         }
+
+        clientServer.getWebSocketBuilder().addEventListeners(new ServerSetupEventListener(this.serverFileConfigurations.get(configuration.id()))).build();
 
         return new PteroServer(clientServer, appServer, configuration, databaseServer);
     }

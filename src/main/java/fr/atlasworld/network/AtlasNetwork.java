@@ -27,12 +27,10 @@ import fr.atlasworld.network.security.SecurityManager;
 import fr.atlasworld.network.server.ServerManager;
 import fr.atlasworld.network.server.pterodactyl.PteroServerManager;
 import fr.atlasworld.network.utils.LaunchArgs;
-import io.netty.util.NettyRuntime;
 import io.netty.util.ResourceLeakDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.PrintStream;
 import java.security.NoSuchAlgorithmException;
 
 public class AtlasNetwork {
