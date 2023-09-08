@@ -174,7 +174,7 @@ public class PteroServerManager implements ServerManager {
 
     @Override
     public PanelServer createCustomServer(ServerConfiguration configuration, String name) throws PanelException {
-        NodeBalancer balancer = NodeBalancer.fromString(configuration.node().balancer());
+        NodeBalancer balancer = configuration.node().getBalancer();
         int nodeId = configuration.node().nodes()[balancer.selector(configuration.node().nodes())];
 
         Node node = this.application.retrieveNodeById(nodeId).execute();
