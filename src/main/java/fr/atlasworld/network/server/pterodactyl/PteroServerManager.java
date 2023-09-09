@@ -164,7 +164,10 @@ public class PteroServerManager implements ServerManager {
                         .equals(this.proxyDefault.id()))
                 .findFirst().orElse(null);
 
-
+        if (proxy == null) {
+            AtlasNetwork.logger.info("No Proxy found, creating a new one..");
+            this.createDefaultProxy("Proxy - 0");
+        }
     }
 
     @Override
