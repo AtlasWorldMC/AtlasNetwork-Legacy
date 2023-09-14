@@ -6,23 +6,33 @@ import com.mattmalec.pterodactyl4j.client.entities.ClientServer;
 import com.mattmalec.pterodactyl4j.client.entities.Directory;
 import com.mattmalec.pterodactyl4j.client.managers.UploadFileAction;
 import com.mattmalec.pterodactyl4j.client.ws.hooks.ClientSocketListenerAdapter;
+import com.mattmalec.pterodactyl4j.entities.Allocation;
 import fr.atlasworld.network.database.entities.server.DatabaseServer;
 import fr.atlasworld.network.server.configuration.ServerConfiguration;
 import fr.atlasworld.network.server.entities.PanelServer;
 import fr.atlasworld.network.server.entities.ServerStatus;
 import fr.atlasworld.network.server.entities.UploadAction;
 
+import java.net.InetSocketAddress;
+import java.util.UUID;
+
 public class PteroServer implements PanelServer {
     private final ClientServer clientServer;
     private final ApplicationServer appServer;
     private final ServerConfiguration configuration;
     private final DatabaseServer databaseServer;
+    private InetSocketAddress address;
 
     public PteroServer(ClientServer clientServer, ApplicationServer appServer, ServerConfiguration configuration, DatabaseServer databaseServer) {
         this.clientServer = clientServer;
         this.appServer = appServer;
         this.configuration = configuration;
         this.databaseServer = databaseServer;
+    }
+
+    @Override
+    public UUID id() {
+        return this.appServer.getUUID();
     }
 
     @Override
@@ -33,6 +43,15 @@ public class PteroServer implements PanelServer {
     @Override
     public void name(String name) {
         this.appServer.getDetailManager().setName(name).executeAsync();
+    }
+
+    @Override
+    public InetSocketAddress address() {
+        if (this.address == null) {
+            Allocation allocation = this.appServer.retrieveDefaultAllocation().execute();
+            this.address = new InetSocketAddress(allocation.getAlias(), Integer.parseInt(allocation.getPort()));
+        }
+        return this.address;
     }
 
     @Override

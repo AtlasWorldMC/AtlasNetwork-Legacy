@@ -13,11 +13,13 @@ import com.mattmalec.pterodactyl4j.client.entities.ClientServer;
 import com.mattmalec.pterodactyl4j.client.entities.PteroClient;
 import com.mattmalec.pterodactyl4j.client.entities.Utilization;
 import fr.atlasworld.network.AtlasNetwork;
+import fr.atlasworld.network.balancer.LoadBalancer;
 import fr.atlasworld.network.config.PanelConfig;
 import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.entities.server.DatabaseServer;
 import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.exceptions.panel.PanelException;
+import fr.atlasworld.network.exceptions.requests.RequestException;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.file.loader.GsonFileLoader;
 import fr.atlasworld.network.file.loader.JsonFileLoader;
@@ -33,6 +35,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class PteroServerManager implements ServerManager {
+    private final LoadBalancer loadBalancer;
     private final Map<String, ServerConfiguration> serverConfigurations;
     private final Map<String, ServerFileConfiguration> serverFileConfigurations;
     private final List<PanelServer> servers;
@@ -43,7 +46,8 @@ public class PteroServerManager implements ServerManager {
     private ServerConfiguration proxyDefault;
     private ServerConfiguration serverDefault;
 
-    public PteroServerManager(Map<String, ServerConfiguration> serverConfigurations, Map<String, ServerFileConfiguration> serverFileConfigurations, List<PanelServer> servers, Database<DatabaseServer> database, PteroApplication application, PteroClient client, PanelConfig config) {
+    public PteroServerManager(LoadBalancer loadBalancer, Map<String, ServerConfiguration> serverConfigurations, Map<String, ServerFileConfiguration> serverFileConfigurations, List<PanelServer> servers, Database<DatabaseServer> database, PteroApplication application, PteroClient client, PanelConfig config) {
+        this.loadBalancer = loadBalancer;
         this.serverConfigurations = serverConfigurations;
         this.serverFileConfigurations = serverFileConfigurations;
         this.servers = servers;
@@ -53,9 +57,9 @@ public class PteroServerManager implements ServerManager {
         this.config = config;
     }
 
-    public PteroServerManager(Database<DatabaseServer> database, PanelConfig config) {
+    public PteroServerManager(Database<DatabaseServer> database, PanelConfig config, LoadBalancer loadBalancer) {
         this(
-                new HashMap<>(),
+                loadBalancer, new HashMap<>(),
                 new HashMap<>(),
                 new ArrayList<>(),
                 database,
@@ -163,8 +167,6 @@ public class PteroServerManager implements ServerManager {
                 .filter(availableServer -> availableServer.getDatabaseServer().getType()
                         .equals(this.proxyDefault.id()))
                 .findFirst().orElse(null);
-
-
     }
 
     @Override
@@ -238,7 +240,21 @@ public class PteroServerManager implements ServerManager {
 
     @Override
     public PanelServer createDefaultProxy(String name) throws PanelException {
-        return this.createCustomServer(this.proxyDefault, name);
+        PanelServer server = this.createCustomServer(this.proxyDefault, name);
+        try {
+            this.loadBalancer.addServer(server.name(), server.address());
+            return server;
+        } catch (RequestException e) {
+            AtlasNetwork.logger.error("Could not add proxy to load balancer!");
+            server.delete();
+            try {
+                this.database.remove(server.id().toString());
+                this.servers.remove(server);
+            } catch (DatabaseException ex) {
+                throw new PanelException("Could not delete server from database", e);
+            }
+            throw new PanelException("Could not add proxy to load balancer", e);
+        }
     }
 
     @Override

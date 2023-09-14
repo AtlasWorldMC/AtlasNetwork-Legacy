@@ -4,10 +4,19 @@ import com.mattmalec.pterodactyl4j.client.ws.hooks.ClientSocketListenerAdapter;
 import fr.atlasworld.network.database.entities.server.DatabaseServer;
 import fr.atlasworld.network.server.configuration.ServerConfiguration;
 
+import java.net.InetSocketAddress;
+import java.util.UUID;
+
 /**
  * Represents a remote server on the panel
  */
 public interface PanelServer {
+    /**
+     * Get the server id
+     * @return server id
+     */
+    UUID id();
+
     /**
      * Retrieves the server name
      * @return server name
@@ -19,6 +28,12 @@ public interface PanelServer {
      * @param name server name
      */
     void name(String name);
+
+    /**
+     * Gets the server address
+     * @return server address
+     */
+    InetSocketAddress address();
 
     /**
      * Retrieves the server description

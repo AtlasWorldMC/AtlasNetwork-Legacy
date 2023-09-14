@@ -44,6 +44,10 @@ dependencies {
 
     //Panel Integration
     implementation 'com.mattmalec:Pterodactyl4J:2.BETA_140'
+
+    //Web
+    implementation 'com.squareup.okhttp:okhttp:2.7.5'
+
 }
 
 compileJava {

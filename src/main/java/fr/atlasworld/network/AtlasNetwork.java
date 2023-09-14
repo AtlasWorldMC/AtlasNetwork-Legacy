@@ -2,6 +2,8 @@ package fr.atlasworld.network;
 
 import ch.qos.logback.classic.Level;
 import com.mojang.brigadier.CommandDispatcher;
+import fr.atlasworld.network.balancer.LoadBalancer;
+import fr.atlasworld.network.balancer.haproxy.HAProxyLoadBalancer;
 import fr.atlasworld.network.command.CommandSource;
 import fr.atlasworld.network.command.CommandThread;
 import fr.atlasworld.network.command.commands.AuthCommand;
@@ -13,6 +15,7 @@ import fr.atlasworld.network.database.entities.authentification.AuthenticationPr
 import fr.atlasworld.network.database.mongo.MongoDatabaseManager;
 import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.exceptions.panel.PanelException;
+import fr.atlasworld.network.exceptions.requests.RequestException;
 import fr.atlasworld.network.networking.packet.HelloWorldPacket;
 import fr.atlasworld.network.networking.packet.NetworkPacketManager;
 import fr.atlasworld.network.networking.packet.PacketManager;
@@ -31,6 +34,7 @@ import io.netty.util.ResourceLeakDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 
 public class AtlasNetwork {
@@ -40,8 +44,9 @@ public class AtlasNetwork {
     private static Config config;
     private static SecurityManager securityManager;
     private static DatabaseManager databaseManager;
-    private static CommandDispatcher<CommandSource> commandDispatcher;
     private static ServerManager serverManager;
+    private static LoadBalancer loadBalancer;
+    private static CommandDispatcher<CommandSource> commandDispatcher;
 
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
         AtlasNetwork.logger.info("Initializing AtlasNetwork...");
@@ -66,11 +71,25 @@ public class AtlasNetwork {
         securityManager = new NetworkSecurityManager(config);
         databaseManager = new MongoDatabaseManager(config.database());
 
+        AtlasNetwork.logger.info("Connecting to the load balancer..");
+        try {
+            loadBalancer = new HAProxyLoadBalancer(
+                    "https://balance-api.atlasworld.fr",
+                    "mc_proxies",
+                    "network",
+                    "OAncZCM22QdGdsgvXkhhAOhi2ikv"
+            );
+        } catch (RequestException e) {
+            AtlasNetwork.logger.error("Unable to connect to the load balancer", e);
+            System.exit(-1);
+        }
+
         AtlasNetwork.logger.info("Connecting with the panel..");
         try {
             serverManager = new PteroServerManager(
                     databaseManager.getServerDatabase(),
-                    config.panel()
+                    config.panel(),
+                    loadBalancer
             );
             serverManager.initialize();
         } catch (DatabaseException | PanelException e) {
