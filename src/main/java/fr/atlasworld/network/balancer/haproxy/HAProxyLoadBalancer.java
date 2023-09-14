@@ -9,6 +9,7 @@ import fr.atlasworld.network.balancer.entities.BalanceServerEntry;
 import fr.atlasworld.network.config.BalancerConfig;
 import fr.atlasworld.network.exceptions.requests.RequestException;
 import fr.atlasworld.network.request.Request;
+import org.checkerframework.checker.units.qual.C;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -19,7 +20,6 @@ import java.util.stream.Collectors;
 
 public class HAProxyLoadBalancer implements LoadBalancer {
     //End Points
-    private static final String RUNTIME_SERVERS_ENDPOINT = "/v2/services/haproxy/runtime/servers";
     private static final String CONFIG_SERVERS_ENDPOINT = "/v2/services/haproxy/configuration/servers";
     private static final String CONFIG_VERSION_ENDPOINT = "/v2/services/haproxy/configuration/version";
 
@@ -41,10 +41,10 @@ public class HAProxyLoadBalancer implements LoadBalancer {
                 .execute();
 
         this.servers = new Request<Map<String ,HAProxyServer>>()
-                .url(this.baseUrl + RUNTIME_SERVERS_ENDPOINT)
+                .url(this.baseUrl + CONFIG_SERVERS_ENDPOINT)
                 .addHeader("Authorization", "Basic " + this.credentials)
                 .addQuery("backend", this.serverBackendName)
-                .builder(json -> json.getAsJsonArray()
+                .builder(json -> json.getAsJsonObject().getAsJsonArray("data")
                         .asList()
                         .stream()
                         .map(JsonElement::getAsJsonObject)
