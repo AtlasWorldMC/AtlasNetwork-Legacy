@@ -70,7 +70,7 @@ public class HAProxyLoadBalancer implements LoadBalancer {
     @Override
     public void addServer(String name, InetSocketAddress address) throws RequestException {
         if (this.servers.containsKey(name)) {
-            throw new RequestException("Server '" + name + "' already exists!");
+            this.removeServer(name);
         }
 
         HAProxyServer server = new HAProxyServer(name, address);
