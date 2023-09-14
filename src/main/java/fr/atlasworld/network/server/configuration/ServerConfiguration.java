@@ -7,6 +7,9 @@ public record ServerConfiguration(String id, String version, String image, Locat
     }
 
     public record Node(Integer[] nodes, String balancer){
+        public NodeBalancer getBalancer() {
+            return NodeBalancer.fromString(this.balancer);
+        }
     }
 
     public record Resources(int allocation, int memory, int swap, int cpu, int disk) {
