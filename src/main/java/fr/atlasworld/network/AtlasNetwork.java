@@ -34,7 +34,6 @@ import io.netty.util.ResourceLeakDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 
 public class AtlasNetwork {
@@ -62,8 +61,6 @@ public class AtlasNetwork {
             mongoLogger.setLevel(Level.OFF);
         }
 
-
-
         AtlasNetwork.logger.info("Loading Configuration..");
         config = Config.getSettings();
 
@@ -73,12 +70,7 @@ public class AtlasNetwork {
 
         AtlasNetwork.logger.info("Connecting to the load balancer..");
         try {
-            loadBalancer = new HAProxyLoadBalancer(
-                    "https://balance-api.atlasworld.fr",
-                    "mc_proxies",
-                    "network",
-                    "OAncZCM22QdGdsgvXkhhAOhi2ikv"
-            );
+            loadBalancer = new HAProxyLoadBalancer(config.balancer());
         } catch (RequestException e) {
             AtlasNetwork.logger.error("Unable to connect to the load balancer", e);
             System.exit(-1);
@@ -124,7 +116,6 @@ public class AtlasNetwork {
         }
 
         AtlasNetwork.logger.info("Network Initialized.");
-
 
         //Boot up Socket
         AtlasNetwork.logger.info("Starting socket..");

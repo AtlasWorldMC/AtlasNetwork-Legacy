@@ -2,10 +2,11 @@ package fr.atlasworld.network.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.file.loader.GsonFileLoader;
 
-public record Config(String socketHost, int socketPort, String hashSalt, DatabaseConfig database, PanelConfig panel) {
+public record Config(String socketHost, int socketPort, @SerializedName("hash_salt") String hashSalt, DatabaseConfig database, PanelConfig panel, BalancerConfig balancer) {
     private static Config config;
 
     public static Config getSettings() {
@@ -28,6 +29,12 @@ public record Config(String socketHost, int socketPort, String hashSalt, Databas
                                 "token",
                                 1,
                                 new PanelConfig.Defaults("example", "example")
+                        ),
+                        new BalancerConfig(
+                                "https://balance-api.atlasworld.fr",
+                                "minecraft",
+                                "username",
+                                "password"
                         )));
             }
 

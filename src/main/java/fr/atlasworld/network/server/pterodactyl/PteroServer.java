@@ -49,7 +49,7 @@ public class PteroServer implements PanelServer {
     public InetSocketAddress address() {
         if (this.address == null) {
             Allocation allocation = this.appServer.retrieveDefaultAllocation().execute();
-            this.address = new InetSocketAddress(allocation.getAlias(), Integer.parseInt(allocation.getPort()));
+            this.address = new InetSocketAddress(allocation.getIP(), Integer.parseInt(allocation.getPort()));
         }
         return this.address;
     }

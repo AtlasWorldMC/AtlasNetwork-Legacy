@@ -6,6 +6,7 @@ import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.RequestBody;
 import fr.atlasworld.network.balancer.LoadBalancer;
 import fr.atlasworld.network.balancer.entities.BalanceServerEntry;
+import fr.atlasworld.network.config.BalancerConfig;
 import fr.atlasworld.network.exceptions.requests.RequestException;
 import fr.atlasworld.network.request.Request;
 
@@ -57,6 +58,9 @@ public class HAProxyLoadBalancer implements LoadBalancer {
         System.out.println(servers);
     }
 
+    public HAProxyLoadBalancer(BalancerConfig config) throws RequestException {
+        this(config.url(), config.backendName(), config.username(), config.password());
+    }
 
     @Override
     public List<BalanceServerEntry> getServers() {
