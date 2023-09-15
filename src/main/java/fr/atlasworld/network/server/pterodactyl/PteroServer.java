@@ -3,19 +3,19 @@ package fr.atlasworld.network.server.pterodactyl;
 import com.mattmalec.pterodactyl4j.UtilizationState;
 import com.mattmalec.pterodactyl4j.application.entities.ApplicationServer;
 import com.mattmalec.pterodactyl4j.client.entities.ClientServer;
-import com.mattmalec.pterodactyl4j.client.entities.Directory;
-import com.mattmalec.pterodactyl4j.client.managers.UploadFileAction;
 import com.mattmalec.pterodactyl4j.client.ws.hooks.ClientSocketListenerAdapter;
 import com.mattmalec.pterodactyl4j.entities.Allocation;
 import fr.atlasworld.network.database.entities.server.DatabaseServer;
 import fr.atlasworld.network.server.configuration.ServerConfiguration;
 import fr.atlasworld.network.server.entities.PanelServer;
 import fr.atlasworld.network.server.entities.ServerStatus;
-import fr.atlasworld.network.server.entities.UploadAction;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
 
+/**
+ *
+ */
 public class PteroServer implements PanelServer {
     private final ClientServer clientServer;
     private final ApplicationServer appServer;
@@ -125,18 +125,6 @@ public class PteroServer implements PanelServer {
     @Override
     public void kill() {
         this.clientServer.kill();
-    }
-
-    @Override
-    public void upload(String directory, UploadAction... uploads) {
-        Directory uploadDir = this.clientServer.retrieveDirectory(directory).execute();
-        UploadFileAction action = this.clientServer.getFileManager().upload(uploadDir);
-
-        for (UploadAction uploadFile : uploads) {
-            action.addFile(uploadFile.localFile(), uploadFile.remoteName());
-        }
-
-        action.executeAsync();
     }
 
     @Override

@@ -1,5 +1,8 @@
 package fr.atlasworld.network.exceptions.networking.auth;
 
+/**
+ * AuthenticationException, Thrown when something related to authentication fails
+ */
 public class AuthenticationException extends Exception {
     private final String networkFeedback;
     public AuthenticationException(String message, String networkFeedback) {

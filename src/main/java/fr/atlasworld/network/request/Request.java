@@ -2,7 +2,10 @@ package fr.atlasworld.network.request;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import com.squareup.okhttp.*;
+import com.squareup.okhttp.Headers;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.RequestBody;
+import com.squareup.okhttp.Response;
 import fr.atlasworld.network.exceptions.requests.RequestException;
 
 import java.io.IOException;
@@ -13,6 +16,10 @@ import java.util.concurrent.CompletionException;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+/**
+ * Web Request Builder, creates a request before sending it
+ * @param <T> data expected to receive
+ */
 public class Request<T> {
     private final OkHttpClient client;
     private String url;
@@ -190,6 +197,10 @@ public class Request<T> {
         });
     }
 
+    /**
+     * Builds the url with all the arguments
+     * @return the full url
+     */
     private String buildUrl() {
         if (this.query.isEmpty()) {
             return this.url;

@@ -16,6 +16,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Supplier;
 
+/**
+ * Network implementation of the SocketBuilder
+ * @see SocketBuilder
+ */
 public class NetworkSocketBuilder implements SocketBuilder {
     private final int port;
     private final String address;

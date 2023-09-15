@@ -7,6 +7,10 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+/**
+ * Packet data holder, simplifies writing data to the socket
+ * Basically it transform java objects into primitive bytes
+ */
 public class PacketByteBuf {
     private final ByteBuf parent;
     public PacketByteBuf(ByteBuf parent) {

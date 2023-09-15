@@ -4,6 +4,9 @@ import fr.atlasworld.network.networking.session.SessionManager;
 import io.netty.bootstrap.ServerBootstrap;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Socket builder, builds the socket
+ */
 public interface SocketBuilder {
     /**
      * Gets the boostrap for the server

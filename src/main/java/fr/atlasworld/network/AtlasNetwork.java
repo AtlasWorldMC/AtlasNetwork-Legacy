@@ -139,9 +139,10 @@ public class AtlasNetwork {
         packetManager.register(new HelloWorldPacket());
     }
 
+
     private static void registerCommands(CommandDispatcher<CommandSource> dispatcher) {
         StopCommand.register(dispatcher);
-        AuthCommand.register(dispatcher);
+        AuthCommand.register(dispatcher); // Auth Command Deprecated
     }
 
     public static LaunchArgs getLaunchArgs() {

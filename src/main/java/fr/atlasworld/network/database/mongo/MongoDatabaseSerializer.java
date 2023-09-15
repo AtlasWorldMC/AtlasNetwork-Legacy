@@ -4,6 +4,10 @@ import com.google.gson.Gson;
 import fr.atlasworld.network.database.DatabaseSerializer;
 import org.bson.Document;
 
+/**
+ * Database data serializer implementation for MongoDb
+ * @see DatabaseSerializer
+ */
 public class MongoDatabaseSerializer implements DatabaseSerializer<Document> {
     private final Gson gson;
 

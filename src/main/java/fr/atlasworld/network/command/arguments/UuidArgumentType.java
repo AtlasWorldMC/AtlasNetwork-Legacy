@@ -13,6 +13,9 @@ import java.util.Collections;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * UUID Argument type, used for command parsing using Brigadier
+ */
 public class UuidArgumentType implements ArgumentType<UUID> {
     public static UuidArgumentType UUID() {
         return new UuidArgumentType();

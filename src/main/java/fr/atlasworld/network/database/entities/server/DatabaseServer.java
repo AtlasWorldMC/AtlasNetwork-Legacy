@@ -4,6 +4,9 @@ import fr.atlasworld.network.database.entities.DatabaseEntity;
 
 import java.util.UUID;
 
+/**
+ * Server stored on the database
+ */
 public class DatabaseServer implements DatabaseEntity {
     private final String id;
     private final String type;

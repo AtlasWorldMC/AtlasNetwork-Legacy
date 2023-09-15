@@ -6,6 +6,19 @@ import com.google.gson.annotations.SerializedName;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.file.loader.GsonFileLoader;
 
+/**
+ * Base Configuration file
+ * @param socketHost bind host
+ * @param socketPort bind port
+ * @param hashSalt salt used for hashing
+ * @param database database configuration
+ * @param panel panel configuration
+ * @param balancer balancer configuration
+ *
+ * @see DatabaseConfig
+ * @see PanelConfig
+ * @see BalancerConfig
+ */
 public record Config(String socketHost, int socketPort, @SerializedName("hash_salt") String hashSalt, DatabaseConfig database, PanelConfig panel, BalancerConfig balancer) {
     private static Config config;
 

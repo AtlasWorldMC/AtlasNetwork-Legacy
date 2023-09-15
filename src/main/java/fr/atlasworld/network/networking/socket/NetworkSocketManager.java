@@ -4,6 +4,10 @@ import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.settings.SocketBuilder;
 import io.netty.channel.ChannelFuture;
 
+/**
+ * Network implementation of the SocketManager
+ * @see SocketManager
+ */
 public class NetworkSocketManager implements SocketManager {
     private final SocketBuilder settings;
     private boolean bound;

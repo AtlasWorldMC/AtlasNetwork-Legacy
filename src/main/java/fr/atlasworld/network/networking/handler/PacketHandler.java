@@ -9,6 +9,10 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Packet handler, prepares data for the packets, before sending it to the PacketManager that will execute them
+ * @see PacketManager
+ */
 @ChannelHandler.Sharable
 public class PacketHandler extends ChannelInboundHandlerAdapter {
     private final PacketManager packetManager;

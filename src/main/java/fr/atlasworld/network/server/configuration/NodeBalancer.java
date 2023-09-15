@@ -3,8 +3,18 @@ package fr.atlasworld.network.server.configuration;
 import java.util.Random;
 import java.util.function.BiFunction;
 
+/**
+ * The balancer for balancing servers on multiple nodes
+ */
 public enum NodeBalancer {
+    /**
+     * Round Robin, adds a server to a node then passes to the next one, once at the end of the list it rollbacks to the beginning
+     */
     ROUND_ROBIN((nodes, lastSelected) -> (lastSelected + 1) % nodes.length),
+
+    /**
+     * Random, randomly selects a node
+     */
     RANDOM((nodes, lastSelected) -> new Random().nextInt(nodes.length));
 
     private final BiFunction<Integer[], Integer, Integer> selectorFunc;

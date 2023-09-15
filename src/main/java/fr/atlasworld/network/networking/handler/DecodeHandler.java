@@ -8,6 +8,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Decodes and decrypts the received data
+ */
 public class DecodeHandler extends ChannelInboundHandlerAdapter {
     private final EncryptionManager encryptionManager;
 

@@ -5,8 +5,13 @@ import com.google.gson.Gson;
 import java.io.File;
 import java.lang.reflect.Type;
 
-//Author: RaftDev
-//Find the original file here : https://github.com/Raft08/Crafted-Launcher/blob/main/src/main/java/be/raft/launcher/file/loader/GsonFileLoader.java
+/**
+ * Loads the file as a json and process it using Gson
+ * <p>
+ * File from Crafted Launcher find the original file <a href="https://github.com/Raft08/Crafted-Launcher/blob/main/src/main/java/be/raft/launcher/file/loader/GsonFileLoader.java">here</a>
+ * @param <T> the target java object
+ * @author RaftDev
+ */
 public class GsonFileLoader<T> extends FileLoader<T> {
     private final Gson gson;
     private final Type type;

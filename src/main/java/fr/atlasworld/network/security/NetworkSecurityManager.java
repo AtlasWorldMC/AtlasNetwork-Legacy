@@ -9,6 +9,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Network implementation of the SecurityManager, uses RSA for the key pair, and SHA-256 for hashing
+ * <p>
+ * RaftDev Comment: I hate encryption
+ * @see SecurityManager
+ */
 public class NetworkSecurityManager implements SecurityManager {
     private static final String KEY_ALGORITHM = "RSA";
     private static final int KEY_LENGTH = 2048;

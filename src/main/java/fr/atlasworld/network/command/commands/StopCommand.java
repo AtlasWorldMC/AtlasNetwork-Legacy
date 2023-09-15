@@ -5,6 +5,11 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import fr.atlasworld.network.command.CommandSource;
 
+/**
+ * Stops AtlasNetwork
+ * Usage:
+ * <li>stop - Stops AtlasNetwork</li>
+ */
 public class StopCommand {
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("stop")

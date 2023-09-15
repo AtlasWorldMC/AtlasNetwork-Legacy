@@ -9,6 +9,11 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Network's default Packet manager, Executes the packets with an executor instead of blocking for every packet received,
+ * that makes this system able to execute multiple packets on the same time
+ * @see PacketManager
+ */
 public class NetworkPacketManager implements PacketManager {
     private final ExecutorService executor;
     private final Map<String, NetworkPacket> packets;

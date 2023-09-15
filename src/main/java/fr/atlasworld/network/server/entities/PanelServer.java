@@ -102,13 +102,6 @@ public interface PanelServer {
     void kill();
 
     /**
-     * Uploads a file to the server
-     * @param directory the remote target directory
-     * @param uploads the files to upload
-     */
-    void upload(String directory, UploadAction... uploads);
-
-    /**
      * Adds a listener to the server
      * @param listener the server listener
      */

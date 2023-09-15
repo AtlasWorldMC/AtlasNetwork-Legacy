@@ -7,30 +7,59 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Utility class, for file managing
+ */
 public class FileManager {
-    //Static Fields
     public static final String CONFIG = "config.json";
 
+    /**
+     * Gets the current working directory
+     * @return current working directory
+     */
     public static File getWorkingDirectory() {
         return new File(System.getProperty("user.dir"));
     }
 
+    /**
+     * Gets a file in the current working directory
+     * @param filename name of the file
+     * @return file
+     */
     public static File getWorkingDirectoryFile(String filename) {
         return new File(getWorkingDirectory(), filename);
     }
 
+    /**
+     * Gets the configuration file
+     * @return configuration file
+     */
     public static File getConfigFile() {
         return getWorkingDirectoryFile(CONFIG);
     }
 
+    /**
+     * Gets the server configurations directory
+     * @return server configurations directory
+     */
     public static File getServerConfigDirectory() {
         return getWorkingDirectoryFile("servers");
     }
 
+    /**
+     * Gets the upload file index
+     * @return upload file index
+     */
     public static File getServerFileIndex() {
         return getWorkingDirectoryFile("hub/index.json");
     }
 
+    /**
+     * Archive a directory
+     * @param sourceFolder directory to archive
+     * @param out archived file output path
+     * @throws IOException if something went wrong
+     */
     public static void archive(File sourceFolder, String out) throws IOException {
         FileOutputStream outStream = new FileOutputStream(out);
         ZipOutputStream zipOutStream = new ZipOutputStream(outStream);
@@ -48,6 +77,13 @@ public class FileManager {
         outStream.close();
     }
 
+    /**
+     * Archives and adds a file to a zip stream
+     * @param file file to archive
+     * @param zipEntryName file name in the zip
+     * @param stream zip stream
+     * @throws IOException if something went wrong
+     */
     public static void archiveFile(File file, String zipEntryName, ZipOutputStream stream) throws IOException {
         if (file.isDirectory()) {
             if (zipEntryName.endsWith("/")) {

@@ -4,6 +4,9 @@ import fr.atlasworld.network.database.entities.DatabaseEntity;
 
 import java.util.UUID;
 
+/**
+ * Socket Authentication Profile
+ */
 public class AuthenticationProfile implements DatabaseEntity {
     private final UUID id;
     private final String hashedToken;

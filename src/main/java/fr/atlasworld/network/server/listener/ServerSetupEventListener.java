@@ -9,9 +9,14 @@ import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.server.configuration.ServerFileConfiguration;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.zip.ZipOutputStream;
 
+/**
+ * Uploads and handles servers automatically without needing human interaction
+ */
 public class ServerSetupEventListener extends ClientSocketListenerAdapter {
     private final @Nullable ServerFileConfiguration configuration;
 

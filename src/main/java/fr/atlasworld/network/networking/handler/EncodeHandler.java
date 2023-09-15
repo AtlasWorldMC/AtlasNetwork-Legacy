@@ -8,6 +8,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 
+/**
+ * Encodes and encrypt data for sending
+ */
 public class EncodeHandler extends ChannelOutboundHandlerAdapter {
     private final EncryptionManager encryptionManager;
 

@@ -9,7 +9,6 @@ import fr.atlasworld.network.balancer.entities.BalanceServerEntry;
 import fr.atlasworld.network.config.BalancerConfig;
 import fr.atlasworld.network.exceptions.requests.RequestException;
 import fr.atlasworld.network.request.Request;
-import org.checkerframework.checker.units.qual.C;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -18,6 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+
+/**
+ * HAProxy Load Balancer implementation
+ */
 public class HAProxyLoadBalancer implements LoadBalancer {
     //End Points
     private static final String CONFIG_SERVERS_ENDPOINT = "/v2/services/haproxy/configuration/servers";

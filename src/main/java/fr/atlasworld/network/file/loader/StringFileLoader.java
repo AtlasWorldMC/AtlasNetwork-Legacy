@@ -6,8 +6,12 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
-//Author: RaftDev
-//Find the original file here : https://github.com/Raft08/Crafted-Launcher/blob/main/src/main/java/be/raft/launcher/file/loader/StringFileLoader.java
+/**
+ * Loads the file as a string
+ * <p>
+ * File from Crafted Launcher find the original file <a href="https://github.com/Raft08/Crafted-Launcher/blob/main/src/main/java/be/raft/launcher/file/loader/StringFileLoader.java">here</a>
+ * @author RaftDev
+ */
 public class StringFileLoader extends FileLoader<String> {
     public StringFileLoader(File file) {
         super(file);

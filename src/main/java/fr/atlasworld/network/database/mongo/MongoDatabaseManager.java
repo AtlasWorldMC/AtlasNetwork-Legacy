@@ -17,6 +17,10 @@ import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.exceptions.database.DatabaseIOException;
 import fr.atlasworld.network.exceptions.database.DatabaseTimeoutException;
 
+/**
+ * Database manager implementation for MongoDb
+ * @see DatabaseManager
+ */
 public class MongoDatabaseManager implements DatabaseManager {
     private static final String INTERNAL_DATABASE = "internal";
     private static final String AUTH_PROFILE_COLLECTION = "profiles";

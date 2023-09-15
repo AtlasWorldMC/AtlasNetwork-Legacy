@@ -9,6 +9,9 @@ import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * Command Thread, runs the commands that it receives
+ */
 public class CommandThread extends Thread {
     private final CommandDispatcher<CommandSource> dispatcher;
     private final ExecutorService executor;

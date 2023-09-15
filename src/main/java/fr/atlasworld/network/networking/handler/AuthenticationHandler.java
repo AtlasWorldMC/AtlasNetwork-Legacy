@@ -13,6 +13,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
+/**
+ * Handles authentication of the socket and assigns sessions to incoming connections
+ */
 public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
     private final AuthenticationManager authenticationManager;
     private final SessionManager sessionManager;

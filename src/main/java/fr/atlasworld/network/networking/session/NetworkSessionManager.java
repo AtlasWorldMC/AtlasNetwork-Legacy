@@ -9,6 +9,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+/**
+ * Network implementation of the SessionManager
+ * @see NetworkSessionManager
+ */
 public class NetworkSessionManager implements SessionManager {
     private final Map<Channel, NetworkClient> channelSessionHolder;
     private final Map<UUID, NetworkClient> idSessionHolder;

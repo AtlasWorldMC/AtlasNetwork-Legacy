@@ -6,6 +6,9 @@ import io.netty.channel.Channel;
 
 import java.util.UUID;
 
+/**
+ * Handles the authentication of the socket
+ */
 public interface AuthenticationManager {
     /**
      * Checks if the connection is authenticated, value can only be changed privately

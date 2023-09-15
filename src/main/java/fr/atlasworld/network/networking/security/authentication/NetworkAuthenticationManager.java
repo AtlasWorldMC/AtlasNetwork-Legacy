@@ -11,6 +11,10 @@ import io.netty.channel.Channel;
 
 import java.util.UUID;
 
+/**
+ * Network implementation of the Authentication Manager
+ * @see AuthenticationManager
+ */
 public class NetworkAuthenticationManager implements AuthenticationManager {
     private boolean authenticated;
     private final SecurityManager securityManager;

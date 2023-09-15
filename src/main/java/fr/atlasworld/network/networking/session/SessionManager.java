@@ -8,6 +8,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Session Manager, handles the sessions of the connections
+ */
 public interface SessionManager {
     /**
      * Registers a session

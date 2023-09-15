@@ -2,6 +2,9 @@ package fr.atlasworld.network.networking.socket;
 
 import io.netty.channel.ChannelFuture;
 
+/**
+ * Socket Manager, handles the socket
+ */
 public interface SocketManager {
     /**
      * Binds/starts the socket

@@ -16,6 +16,11 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * Database implementation for MongoDb
+ * @param <T> Database entity stored in the database
+ * @see Database
+ */
 public class MongoDatabase<T extends DatabaseEntity> implements Database<T> {
     private final Class<T> clazz;
     private final MongoCollection<Document> collection;

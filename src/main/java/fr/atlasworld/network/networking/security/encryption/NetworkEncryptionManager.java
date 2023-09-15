@@ -12,6 +12,10 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.GeneralSecurityException;
 
+/**
+ * Network implementation of the EncryptionManager interface
+ * @see EncryptionManager
+ */
 public class NetworkEncryptionManager implements EncryptionManager {
     private boolean encrypted;
     private final SecurityManager securityManager;
