@@ -5,6 +5,9 @@ import fr.atlasworld.network.AtlasNetwork;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Launch Arguments Parser
+ */
 public class LaunchArgs {
     private final boolean devEnv;
 
@@ -22,6 +25,8 @@ public class LaunchArgs {
         return devEnv;
     }
 
-    //Static Args
+    /**
+     * Starts Network in development environment
+     */
     public static final String DEV_ENV_ARG = "-devEnv";
 }

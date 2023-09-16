@@ -47,6 +47,9 @@ public class AtlasNetwork {
     private static LoadBalancer loadBalancer;
     private static CommandDispatcher<CommandSource> commandDispatcher;
 
+    /**
+     * Main Class, AtlasNetwork is an event driven application, so this only initializes everything.
+     */
     public static void main(String[] args) throws InterruptedException, NoSuchAlgorithmException {
         AtlasNetwork.logger.info("Initializing AtlasNetwork...");
 

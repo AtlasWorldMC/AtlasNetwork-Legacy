@@ -14,7 +14,8 @@ import java.net.InetSocketAddress;
 import java.util.UUID;
 
 /**
- *
+ * Panel Server implementation for Pterodactyl
+ * @see PanelServer
  */
 public class PteroServer implements PanelServer {
     private final ClientServer clientServer;

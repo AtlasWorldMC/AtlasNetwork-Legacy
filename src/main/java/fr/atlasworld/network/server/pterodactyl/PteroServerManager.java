@@ -34,6 +34,10 @@ import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Server Manager implementation for Pterdactyl Panel
+ * @see ServerManager
+ */
 public class PteroServerManager implements ServerManager {
     private final LoadBalancer loadBalancer;
     private final Map<String, ServerConfiguration> serverConfigurations;
