@@ -37,7 +37,6 @@ public class NetworkSessionManager implements SessionManager {
         if (!this.channelSessionHolder.containsKey(channel)) {
             throw new SessionNotUsedException(String.valueOf(channel.remoteAddress()));
         }
-        System.out.println("Session marked as free.");
         this.channelSessionHolder.remove(channel);
     }
 
