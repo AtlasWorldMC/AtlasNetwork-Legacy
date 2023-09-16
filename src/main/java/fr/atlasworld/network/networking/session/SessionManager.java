@@ -37,11 +37,4 @@ public interface SessionManager {
      * @return Connection Placeholder
      */
     @Nullable NetworkClient getSession(Channel channel);
-
-    /**
-     * Gets the session for a specific unique identifier
-     * @param uuid Connection's unique id
-     * @return connection
-     */
-    @Nullable NetworkClient getSession(UUID uuid);
 }

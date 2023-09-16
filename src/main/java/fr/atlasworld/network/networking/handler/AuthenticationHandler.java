@@ -2,6 +2,7 @@ package fr.atlasworld.network.networking.handler;
 
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.exceptions.networking.auth.AuthenticationException;
+import fr.atlasworld.network.exceptions.networking.session.SessionException;
 import fr.atlasworld.network.networking.NetworkErrors;
 import fr.atlasworld.network.networking.entities.NetworkClient;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
@@ -61,6 +62,7 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
                         .writeString(e.getNetworkFeedback());
                 AtlasNetwork.logger.warn("{} authentication has failed: ", ctx.channel().remoteAddress(), e);
             }
+
             ctx.channel().writeAndFlush(response);
             buf.release();
 

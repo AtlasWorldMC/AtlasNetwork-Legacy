@@ -15,15 +15,13 @@ import java.util.*;
  */
 public class NetworkSessionManager implements SessionManager {
     private final Map<Channel, NetworkClient> channelSessionHolder;
-    private final Map<UUID, NetworkClient> idSessionHolder;
 
-    public NetworkSessionManager(Map<Channel, NetworkClient> channelSessionHolder, Map<UUID, NetworkClient> idSessionHolder) {
+    public NetworkSessionManager(Map<Channel, NetworkClient> channelSessionHolder) {
         this.channelSessionHolder = channelSessionHolder;
-        this.idSessionHolder = idSessionHolder;
     }
 
     public NetworkSessionManager() {
-        this(new HashMap<>(), new HashMap<>());
+        this(new HashMap<>());
     }
 
     @Override
@@ -32,12 +30,6 @@ public class NetworkSessionManager implements SessionManager {
             throw new SessionAlreadyInUseException(String.valueOf(channel.remoteAddress()));
         }
         this.channelSessionHolder.put(channel, session);
-        UUID connectionId = session.getUuid();
-
-        if (this.idSessionHolder.containsKey(connectionId)) {
-            throw new SessionAlreadyInUseException(String.valueOf(channel.remoteAddress()));
-        }
-        this.idSessionHolder.put(connectionId, session);
     }
 
     @Override
@@ -45,6 +37,7 @@ public class NetworkSessionManager implements SessionManager {
         if (!this.channelSessionHolder.containsKey(channel)) {
             throw new SessionNotUsedException(String.valueOf(channel.remoteAddress()));
         }
+        System.out.println("Session marked as free.");
         this.channelSessionHolder.remove(channel);
     }
 
@@ -56,10 +49,5 @@ public class NetworkSessionManager implements SessionManager {
     @Override
     public @Nullable NetworkClient getSession(Channel channel) {
         return this.channelSessionHolder.get(channel);
-    }
-
-    @Override
-    public @Nullable NetworkClient getSession(UUID uuid) {
-        return this.idSessionHolder.get(uuid);
     }
 }
