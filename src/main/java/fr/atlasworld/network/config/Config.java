@@ -25,9 +25,9 @@ public record Config(String socketHost, int socketPort, @SerializedName("hash_sa
     public static Config getSettings() {
         if (config == null) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            GsonFileLoader<Config> settingsLoader = new GsonFileLoader<>(FileManager.getConfigFile(), gson, Config.class);
-            if (!FileManager.getConfigFile().isFile()) {
-                settingsLoader.save(new Config(
+            GsonFileLoader<Config> configLoader = new GsonFileLoader<>(FileManager.getConfigFile(), gson, Config.class);
+            if (!configLoader.fileExists()) {
+                configLoader.save(new Config(
                         "0.0.0.0",
                         27767,
                         "CHANGE ME!",
@@ -51,7 +51,7 @@ public record Config(String socketHost, int socketPort, @SerializedName("hash_sa
                         )));
             }
 
-            config = settingsLoader.load();
+            config = configLoader.load();
         }
         return config;
     }
