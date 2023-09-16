@@ -16,6 +16,7 @@ import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.balancer.LoadBalancer;
 import fr.atlasworld.network.config.PanelConfig;
 import fr.atlasworld.network.database.Database;
+import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
 import fr.atlasworld.network.database.entities.server.DatabaseServer;
 import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.exceptions.panel.PanelException;
@@ -43,31 +44,34 @@ public class PteroServerManager implements ServerManager {
     private final Map<String, ServerConfiguration> serverConfigurations;
     private final Map<String, ServerFileConfiguration> serverFileConfigurations;
     private final List<PanelServer> servers;
-    private final Database<DatabaseServer> database;
+    private final Database<DatabaseServer> serverDatabase;
+    private final Database<AuthenticationProfile> profileDatabase;
     private final PteroApplication application;
     private final PteroClient client;
     private final PanelConfig config;
     private ServerConfiguration proxyDefault;
     private ServerConfiguration serverDefault;
 
-    public PteroServerManager(LoadBalancer loadBalancer, Map<String, ServerConfiguration> serverConfigurations, Map<String, ServerFileConfiguration> serverFileConfigurations, List<PanelServer> servers, Database<DatabaseServer> database, PteroApplication application, PteroClient client, PanelConfig config) {
+    public PteroServerManager(LoadBalancer loadBalancer, Map<String, ServerConfiguration> serverConfigurations, Map<String, ServerFileConfiguration> serverFileConfigurations, List<PanelServer> servers, Database<DatabaseServer> serverDatabase, Database<AuthenticationProfile> profileDatabase, PteroApplication application, PteroClient client, PanelConfig config) {
         this.loadBalancer = loadBalancer;
         this.serverConfigurations = serverConfigurations;
         this.serverFileConfigurations = serverFileConfigurations;
         this.servers = servers;
-        this.database = database;
+        this.serverDatabase = serverDatabase;
+        this.profileDatabase = profileDatabase;
         this.application = application;
         this.client = client;
         this.config = config;
     }
 
-    public PteroServerManager(Database<DatabaseServer> database, PanelConfig config, LoadBalancer loadBalancer) {
+    public PteroServerManager(Database<DatabaseServer> serverDatabase, PanelConfig config, LoadBalancer loadBalancer, Database<AuthenticationProfile> profileDatabase) {
         this(
-                loadBalancer, new HashMap<>(),
+                loadBalancer,
+                new HashMap<>(),
                 new HashMap<>(),
                 new ArrayList<>(),
-                database,
-                PteroBuilder.createApplication(config.url(), config.token()),
+                serverDatabase,
+                profileDatabase, PteroBuilder.createApplication(config.url(), config.token()),
                 PteroBuilder.createClient(config.url(), config.token()),
                 config
         );
@@ -109,11 +113,16 @@ public class PteroServerManager implements ServerManager {
         try {
             for (ApplicationServer server : networkManagedServers) {
                 ClientServer clientServer = this.client.retrieveServerByIdentifier(server.getIdentifier()).execute();
-                Optional<DatabaseServer> optStoredServer = this.database.getOptional(server.getUUID().toString());
+                Optional<DatabaseServer> optStoredServer = this.serverDatabase.getOptional(server.getUUID().toString());
 
                 if (optStoredServer.isEmpty()) {
                     AtlasNetwork.logger.warn("Found unknown server '{}', Deleting server..", server.getName());
                     server.getController().delete(false).executeAsync();
+
+                    if (this.profileDatabase.has(server.getUUID().toString())) {
+                        this.profileDatabase.remove(server.getUUID().toString());
+                    }
+
                     continue;
                 }
 
@@ -122,14 +131,24 @@ public class PteroServerManager implements ServerManager {
                 if (serverUses.getState() == UtilizationState.OFFLINE || serverUses.getState() == UtilizationState.STOPPING) {
                     AtlasNetwork.logger.info("'{}' is offline, deleting unused server..", server.getName());
                     server.getController().delete(false).executeAsync();
-                    this.database.remove(storedServer.getId());
+                    this.serverDatabase.remove(storedServer.getId());
+
+                    if (this.profileDatabase.has(server.getUUID().toString())) {
+                        this.profileDatabase.remove(server.getUUID().toString());
+                    }
+
                     continue;
                 }
 
                 if (!this.serverConfigurations.containsKey(storedServer.getType())) {
                     AtlasNetwork.logger.warn("Found '{}' with an out-dated configuration id '{}', deleting server..", server.getName(), storedServer.getId());
                     server.getController().delete(false).executeAsync();
-                    this.database.remove(storedServer.getId());
+                    this.serverDatabase.remove(storedServer.getId());
+
+                    if (this.profileDatabase.has(server.getUUID().toString())) {
+                        this.profileDatabase.remove(server.getUUID().toString());
+                    }
+
                     continue;
                 }
 
@@ -232,12 +251,13 @@ public class PteroServerManager implements ServerManager {
         DatabaseServer databaseServer = new DatabaseServer(appServer.getUUID(), configuration.id());
 
         try {
-            this.database.save(databaseServer);
+            this.serverDatabase.save(databaseServer);
         } catch (DatabaseException e) {
             throw new PanelException("Could not save server to database", e);
         }
 
-        clientServer.getWebSocketBuilder().addEventListeners(new ServerSetupEventListener(this.serverFileConfigurations.get(configuration.id()))).build();
+        clientServer.getWebSocketBuilder().addEventListeners(new ServerSetupEventListener(this.serverFileConfigurations.get(configuration.id()),
+                this.profileDatabase)).build();
 
         return new PteroServer(clientServer, appServer, configuration, databaseServer);
     }
@@ -257,7 +277,7 @@ public class PteroServerManager implements ServerManager {
             AtlasNetwork.logger.error("Could not add proxy to load balancer!");
             server.delete();
             try {
-                this.database.remove(server.id().toString());
+                this.serverDatabase.remove(server.id().toString());
                 this.servers.remove(server);
             } catch (DatabaseException ex) {
                 throw new PanelException("Could not delete server from database", e);

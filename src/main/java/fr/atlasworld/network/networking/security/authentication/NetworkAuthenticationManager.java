@@ -52,7 +52,7 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
             String token = buf.readString();
             String hashedToken = this.securityManager.hash(token);
 
-            if (!profile.getHashedToken().equals(hashedToken)) {
+            if (!profile.hashedToken().equals(hashedToken)) {
                 throw new AuthenticationException("Invalid token!", NetworkErrors.INVALID_TOKEN);
             }
 

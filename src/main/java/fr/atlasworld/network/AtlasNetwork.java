@@ -84,8 +84,8 @@ public class AtlasNetwork {
             serverManager = new PteroServerManager(
                     databaseManager.getServerDatabase(),
                     config.panel(),
-                    loadBalancer
-            );
+                    loadBalancer,
+                    databaseManager.getAuthenticationProfileDatabase());
             serverManager.initialize();
         } catch (DatabaseException | PanelException e) {
             AtlasNetwork.logger.error("Unable to connect to the panel", e);

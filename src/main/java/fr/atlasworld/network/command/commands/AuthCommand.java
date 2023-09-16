@@ -50,7 +50,7 @@ public class AuthCommand {
                     .getAllEntries();
 
             source.sendMessage("Showing {} Profiles:", profiles.size());
-            profiles.forEach(profile -> source.sendMessage("{} - {}", profile.getId(), profile.getHashedToken()));
+            profiles.forEach(profile -> source.sendMessage("{} - {}", profile.id(), profile.hashedToken()));
         } catch (DatabaseException e) {
             source.sendError("Failed to retrieve authentication profiles", e);
         }
@@ -73,7 +73,7 @@ public class AuthCommand {
             }
 
             String token = AtlasNetwork.getSecurityManager().generateAuthenticationToken();
-            AuthenticationProfile profile = new AuthenticationProfile(uuid, AtlasNetwork.getSecurityManager().hash(token));
+            AuthenticationProfile profile = new AuthenticationProfile(uuid.toString(), AtlasNetwork.getSecurityManager().hash(token));
 
             database.save(profile);
 

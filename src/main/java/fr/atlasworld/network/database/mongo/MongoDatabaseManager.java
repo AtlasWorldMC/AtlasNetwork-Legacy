@@ -48,7 +48,7 @@ public class MongoDatabaseManager implements DatabaseManager {
             return new MongoDatabase<>(
                     AuthenticationProfile.class,
                     this.client.getDatabase(INTERNAL_DATABASE).getCollection(AUTH_PROFILE_COLLECTION),
-                    id -> Filters.eq("profileId", id),
+                    id -> Filters.eq("id", id),
                     this.serializer
             );
         } catch (MongoTimeoutException e) {

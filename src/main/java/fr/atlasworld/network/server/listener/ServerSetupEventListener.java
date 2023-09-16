@@ -1,10 +1,15 @@
 package fr.atlasworld.network.server.listener;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.mattmalec.pterodactyl4j.client.entities.Directory;
 import com.mattmalec.pterodactyl4j.client.managers.UploadFileAction;
 import com.mattmalec.pterodactyl4j.client.ws.events.install.InstallCompletedEvent;
 import com.mattmalec.pterodactyl4j.client.ws.hooks.ClientSocketListenerAdapter;
 import fr.atlasworld.network.AtlasNetwork;
+import fr.atlasworld.network.database.Database;
+import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
+import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.server.configuration.ServerFileConfiguration;
 import org.jetbrains.annotations.Nullable;
@@ -19,13 +24,37 @@ import java.util.zip.ZipOutputStream;
  */
 public class ServerSetupEventListener extends ClientSocketListenerAdapter {
     private final @Nullable ServerFileConfiguration configuration;
+    private final Database<AuthenticationProfile> database;
 
-    public ServerSetupEventListener(@Nullable ServerFileConfiguration configuration) {
+    public ServerSetupEventListener(@Nullable ServerFileConfiguration configuration, Database<AuthenticationProfile> database) {
         this.configuration = configuration;
+        this.database = database;
     }
 
     @Override
     public void onInstallCompleted(InstallCompletedEvent event) {
+        //Auth configuration file
+        AtlasNetwork.logger.info("Creating authentication token file for {}..", event.getServer().getName());
+        String authToken = AtlasNetwork.getSecurityManager().generateAuthenticationToken();
+        String hashedToken = AtlasNetwork.getSecurityManager().hash(authToken);
+
+        AuthenticationProfile profile = new AuthenticationProfile(event.getServer().getUUID().toString(), hashedToken);
+
+        JsonObject jsonProfile = new JsonObject();
+        jsonProfile.addProperty("uuid", event.getServer().getUUID().toString());
+        jsonProfile.addProperty("token", authToken);
+
+        try {
+            this.database.save(profile);
+        } catch (DatabaseException e) {
+            AtlasNetwork.logger.error("Could not generate token file for {}, reinstalling server..", event.getServer().getName(), e);
+            event.getServer().getManager().reinstall().executeAsync();
+            return;
+        }
+
+        Directory serverRootDir = event.getServer().retrieveDirectory().execute();
+        serverRootDir.createFile("network-credentials.json", jsonProfile.toString()).execute();
+
         if (this.configuration == null || this.configuration.files().isEmpty()) {
             AtlasNetwork.logger.info("{} has finished installation, starting server..", event.getServer().getName());
             event.getServer().start().executeAsync();
@@ -46,8 +75,6 @@ public class ServerSetupEventListener extends ClientSocketListenerAdapter {
             event.getServer().getManager().reinstall().executeAsync();
             return;
         }
-
-        Directory serverRootDir = event.getServer().retrieveDirectory().execute();
 
         UploadFileAction uploadAction = serverRootDir.upload();
         uploadAction.addFile(zipFile);
