@@ -29,11 +29,11 @@ import java.util.zip.ZipOutputStream;
  * Uploads and handles servers automatically without needing human interaction
  */
 public class ServerSetupEventListener extends ClientSocketListenerAdapter {
-    private final @Nullable ServerFileConfiguration configuration;
+    private final ServerFileConfiguration configuration;
     private final Database<AuthenticationProfile> database;
     private final boolean notifyProxies;
 
-    public ServerSetupEventListener(@Nullable ServerFileConfiguration configuration, Database<AuthenticationProfile> database, boolean notifyProxies) {
+    public ServerSetupEventListener(ServerFileConfiguration configuration, Database<AuthenticationProfile> database, boolean notifyProxies) {
         this.configuration = configuration;
         this.database = database;
         this.notifyProxies = notifyProxies;
@@ -63,7 +63,7 @@ public class ServerSetupEventListener extends ClientSocketListenerAdapter {
         Directory serverRootDir = event.getServer().retrieveDirectory().execute();
         serverRootDir.createFile("network-credentials.json", jsonProfile.toString()).execute();
 
-        if (this.configuration == null || this.configuration.files().isEmpty()) {
+        if (this.configuration.files().isEmpty()) {
             AtlasNetwork.logger.info("{} has finished installation, starting server..", event.getServer().getName());
             event.getServer().start().executeAsync();
             return;
@@ -102,6 +102,7 @@ public class ServerSetupEventListener extends ClientSocketListenerAdapter {
     public void onStatusUpdate(StatusUpdateEvent event) {
         switch (event.getState()) {
             case RUNNING -> this.onServerStarted(event.getServer());
+            case STOPPING -> this.onServerStopping(event.getServer());
         }
     }
 
@@ -121,6 +122,32 @@ public class ServerSetupEventListener extends ClientSocketListenerAdapter {
                                 .writeByte((byte) 0x01)
                                 .writeInt(1)
                                 .writeString(server.getName())
+                                .writeString(this.configuration.id())
+                                .writeString(server.getPrimaryAllocation().getIP())
+                                .writeInt(server.getPrimaryAllocation().getPortInt());
+
+                        client.sendPacket(addServerPacket);
+                    });
+        }
+    }
+
+    private void onServerStopping(ClientServer server) {
+        if (this.notifyProxies) {
+            ServerManager serverManager = AtlasNetwork.getServerManager();
+            SessionManager sessionManager = AtlasNetwork.getSessionManager();
+
+            serverManager.getServers().stream()
+                    .filter(pServer -> pServer.getConfiguration().equals(serverManager.defaultProxyConfiguration()))
+                    .filter(proxy -> proxy.status() == ServerStatus.ONLINE)
+                    .map(proxy ->  sessionManager.getSession(proxy.id()))
+                    .filter(Objects::nonNull)
+                    .forEach(client -> {
+                        PacketByteBuf addServerPacket = PacketByteBuf.create()
+                                .writeString("update_servers")
+                                .writeByte((byte) 0x02)
+                                .writeInt(1)
+                                .writeString(server.getName())
+                                .writeString(this.configuration.id())
                                 .writeString(server.getPrimaryAllocation().getIP())
                                 .writeInt(server.getPrimaryAllocation().getPortInt());
 

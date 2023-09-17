@@ -153,11 +153,19 @@ public class PteroServerManager implements ServerManager {
                     continue;
                 }
 
+                ServerConfiguration configuration = this.serverConfigurations.get(storedServer.getType());
+
                 PteroServer panelServer = new PteroServer(
                         clientServer,
                         server,
-                        this.serverConfigurations.get(storedServer.getType()),
+                        configuration,
                         storedServer);
+
+                panelServer.addListener(new ServerSetupEventListener(
+                        this.serverFileConfigurations.get(configuration.id()),
+                        this.profileDatabase,
+                        !configuration.equals(this.proxyDefault)
+                ));
 
                 this.servers.add(panelServer);
             }
@@ -268,7 +276,7 @@ public class PteroServerManager implements ServerManager {
         clientServer.getWebSocketBuilder().addEventListeners(new ServerSetupEventListener(
                 this.serverFileConfigurations.get(configuration.id()),
                 this.profileDatabase,
-                configuration.equals(this.serverDefault))).build();
+                !configuration.equals(this.proxyDefault))).build(); // Only notify proxies when it's not a proxy that's being created.
 
         PteroServer server = new PteroServer(clientServer, appServer, configuration, databaseServer);
         this.servers.add(server);

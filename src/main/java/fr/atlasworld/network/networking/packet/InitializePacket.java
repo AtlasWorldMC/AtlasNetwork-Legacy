@@ -29,7 +29,7 @@ public class InitializePacket implements NetworkPacket {
     private void initAtlasProxy(NetworkClient client) {
         ServerManager serverManager = AtlasNetwork.getServerManager();
         List<PanelServer> serverToSent = serverManager.getServers().stream()
-                .filter(server -> server.getConfiguration().equals(serverManager.defaultServerConfiguration()))
+                .filter(server -> !server.getConfiguration().equals(serverManager.defaultProxyConfiguration()))
                 .toList();
 
         PacketByteBuf syncServersPacket = PacketByteBuf.create()
@@ -40,6 +40,7 @@ public class InitializePacket implements NetworkPacket {
         serverToSent.forEach(server -> {
             syncServersPacket
                     .writeString(server.name())
+                    .writeString(server.getConfiguration().id())
                     .writeString(server.address().getHostString())
                     .writeInt(server.address().getPort());
         });
