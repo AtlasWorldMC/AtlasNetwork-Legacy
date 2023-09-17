@@ -49,4 +49,12 @@ public class NetworkSessionManager implements SessionManager {
     public @Nullable NetworkClient getSession(Channel channel) {
         return this.channelSessionHolder.get(channel);
     }
+
+    @Override
+    public @Nullable NetworkClient getSession(UUID id) {
+        return this.channelSessionHolder.values().stream()
+                .filter(client -> client.getUuid().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
 }

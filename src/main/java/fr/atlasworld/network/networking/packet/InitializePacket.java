@@ -9,12 +9,6 @@ import java.util.List;
 
 /**
  * Packet received by applications that requires special data from network to properly initialize
- * <p>
- * 0 - Packet ID
- * <p>
- * 1 - Operation (bytes: 0xO1 - ADD | 0x02 - REMOVE | 0x03 - SYNC)
- * <p>
- * 2 - List of Servers
  */
 public class InitializePacket implements NetworkPacket {
     @Override

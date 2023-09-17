@@ -23,6 +23,7 @@ import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.security.authentication.NetworkAuthenticationManager;
 import fr.atlasworld.network.networking.security.encryption.NetworkEncryptionManager;
 import fr.atlasworld.network.networking.session.NetworkSessionManager;
+import fr.atlasworld.network.networking.session.SessionManager;
 import fr.atlasworld.network.networking.settings.NetworkSocketBuilder;
 import fr.atlasworld.network.networking.socket.NetworkSocketManager;
 import fr.atlasworld.network.networking.socket.SocketManager;
@@ -44,6 +45,7 @@ public class AtlasNetwork {
     private static Config config;
     private static SecurityManager securityManager;
     private static DatabaseManager databaseManager;
+    private static SessionManager sessionManager;
     private static ServerManager serverManager;
     private static LoadBalancer loadBalancer;
     private static CommandDispatcher<CommandSource> commandDispatcher;
@@ -71,6 +73,7 @@ public class AtlasNetwork {
         AtlasNetwork.logger.info("Initializing managers..");
         securityManager = new NetworkSecurityManager(config);
         databaseManager = new MongoDatabaseManager(config.database());
+        sessionManager = new NetworkSessionManager();
 
         AtlasNetwork.logger.info("Connecting to the load balancer..");
         try {
@@ -109,7 +112,7 @@ public class AtlasNetwork {
             Database<AuthenticationProfile> authDatabase = databaseManager.getAuthenticationProfileDatabase();
             NetworkSocketBuilder socketSettings = new NetworkSocketBuilder(
                     config,
-                    new NetworkSessionManager(),
+                    sessionManager,
                     () -> new NetworkEncryptionManager(securityManager),
                     () -> new NetworkAuthenticationManager(securityManager, authDatabase),
                     packetManager);
@@ -168,6 +171,14 @@ public class AtlasNetwork {
 
     public static DatabaseManager getDatabaseManager() {
         return databaseManager;
+    }
+
+    public static SessionManager getSessionManager() {
+        return sessionManager;
+    }
+
+    public static LoadBalancer getLoadBalancer() {
+        return loadBalancer;
     }
 
     public static CommandDispatcher<CommandSource> getCommandDispatcher() {

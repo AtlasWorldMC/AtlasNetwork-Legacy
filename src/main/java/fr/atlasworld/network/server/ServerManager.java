@@ -3,9 +3,11 @@ package fr.atlasworld.network.server;
 import fr.atlasworld.network.exceptions.panel.PanelException;
 import fr.atlasworld.network.server.configuration.ServerConfiguration;
 import fr.atlasworld.network.server.entities.PanelServer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * Server Manager, Manages the servers on the panel.
@@ -22,6 +24,13 @@ public interface ServerManager {
      * @return all the available servers
      */
     List<PanelServer> getServers();
+
+    /**
+     * Retrieves a server by an id
+     * @param id id of the server
+     * @return the server, returns null if no server was found with that id.
+     */
+    @Nullable PanelServer getServer(UUID id);
 
     /**
      * Creates a server with a given configuration

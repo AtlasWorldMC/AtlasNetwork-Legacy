@@ -30,6 +30,7 @@ import fr.atlasworld.network.server.configuration.ServerConfiguration;
 import fr.atlasworld.network.server.configuration.ServerFileConfiguration;
 import fr.atlasworld.network.server.entities.PanelServer;
 import fr.atlasworld.network.server.listener.ServerSetupEventListener;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
@@ -203,6 +204,14 @@ public class PteroServerManager implements ServerManager {
     }
 
     @Override
+    public @Nullable PanelServer getServer(UUID id) {
+        return this.servers.stream()
+                .filter(server -> server.id().equals(id))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
     public PanelServer createCustomServer(ServerConfiguration configuration, String name) throws PanelException {
         NodeBalancer balancer = configuration.node().getBalancer();
         int nodeId = configuration.node().nodes()[balancer.selector(configuration.node().nodes())];
@@ -256,10 +265,15 @@ public class PteroServerManager implements ServerManager {
             throw new PanelException("Could not save server to database", e);
         }
 
-        clientServer.getWebSocketBuilder().addEventListeners(new ServerSetupEventListener(this.serverFileConfigurations.get(configuration.id()),
-                this.profileDatabase)).build();
+        clientServer.getWebSocketBuilder().addEventListeners(new ServerSetupEventListener(
+                this.serverFileConfigurations.get(configuration.id()),
+                this.profileDatabase,
+                configuration.equals(this.serverDefault))).build();
 
-        return new PteroServer(clientServer, appServer, configuration, databaseServer);
+        PteroServer server = new PteroServer(clientServer, appServer, configuration, databaseServer);
+        this.servers.add(server);
+
+        return server;
     }
 
     @Override
