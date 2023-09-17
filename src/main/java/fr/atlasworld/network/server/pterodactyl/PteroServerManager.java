@@ -155,7 +155,7 @@ public class PteroServerManager implements ServerManager {
                 PteroServer panelServer = new PteroServer(
                         clientServer,
                         server,
-                        this.serverConfigurations.get(storedServer.getId()),
+                        this.serverConfigurations.get(storedServer.getType()),
                         storedServer);
 
                 this.servers.add(panelServer);

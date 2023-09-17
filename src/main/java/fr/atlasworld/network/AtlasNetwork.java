@@ -17,6 +17,7 @@ import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.exceptions.panel.PanelException;
 import fr.atlasworld.network.exceptions.requests.RequestException;
 import fr.atlasworld.network.networking.packet.HelloWorldPacket;
+import fr.atlasworld.network.networking.packet.InitializePacket;
 import fr.atlasworld.network.networking.packet.NetworkPacketManager;
 import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.security.authentication.NetworkAuthenticationManager;
@@ -140,6 +141,7 @@ public class AtlasNetwork {
 
     private static void registerPackets(PacketManager packetManager) {
         packetManager.register(new HelloWorldPacket());
+        packetManager.register(new InitializePacket());
     }
 
 
