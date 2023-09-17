@@ -53,4 +53,16 @@ public interface ServerManager {
      * @return server configurations
      */
     Map<String, ServerConfiguration> getServerConfigurations();
+
+    /**
+     * Retrieves the server default configuration
+     * @return server default configuration
+     */
+    ServerConfiguration defaultServerConfiguration();
+
+    /**
+     * Retrieves the proxy default configuration
+     * @return proxy default configuration
+     */
+    ServerConfiguration defaultProxyConfiguration();
 }

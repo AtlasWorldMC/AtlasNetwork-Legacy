@@ -290,4 +290,14 @@ public class PteroServerManager implements ServerManager {
     public Map<String, ServerConfiguration> getServerConfigurations() {
         return ImmutableMap.copyOf(this.serverConfigurations);
     }
+
+    @Override
+    public ServerConfiguration defaultServerConfiguration() {
+        return this.serverDefault;
+    }
+
+    @Override
+    public ServerConfiguration defaultProxyConfiguration() {
+        return this.proxyDefault;
+    }
 }

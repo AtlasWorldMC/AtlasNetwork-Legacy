@@ -17,6 +17,15 @@ public class PacketByteBuf {
         this.parent = parent;
     }
 
+    public PacketByteBuf writeByte(byte value) {
+        this.parent.writeByte(value);
+        return this;
+    }
+
+    public byte readByte() {
+        return this.parent.readByte();
+    }
+
     public PacketByteBuf writeShort(short value) {
         this.parent.writeShort(value);
         return this;
