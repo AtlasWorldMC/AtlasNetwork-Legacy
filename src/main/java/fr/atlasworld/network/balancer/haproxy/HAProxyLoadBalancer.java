@@ -58,7 +58,6 @@ public class HAProxyLoadBalancer implements LoadBalancer {
                                 HAProxyServer::name,
                                 server -> server)))
                 .execute();
-        System.out.println(servers);
     }
 
     public HAProxyLoadBalancer(BalancerConfig config) throws RequestException {
