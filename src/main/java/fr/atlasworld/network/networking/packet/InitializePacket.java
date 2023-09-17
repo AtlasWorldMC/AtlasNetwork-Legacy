@@ -33,36 +33,23 @@ public class InitializePacket implements NetworkPacket {
     }
 
     private void initAtlasProxy(NetworkClient client) {
-        System.out.println("init proxy");
-        try {
-            ServerManager serverManager = AtlasNetwork.getServerManager();
-            List<PanelServer> serverToSent = serverManager.getServers().stream()
-                    .filter(server -> server.getConfiguration().equals(serverManager.defaultServerConfiguration()))
-                    .toList();
+        ServerManager serverManager = AtlasNetwork.getServerManager();
+        List<PanelServer> serverToSent = serverManager.getServers().stream()
+                .filter(server -> server.getConfiguration().equals(serverManager.defaultServerConfiguration()))
+                .toList();
 
-            System.out.println("init proxy");
-            PacketByteBuf syncServersPacket = PacketByteBuf.create()
-                    .writeString("update_servers")
-                    .writeByte((byte) 0x03)
-                    .writeInt(serverToSent.size());
+        PacketByteBuf syncServersPacket = PacketByteBuf.create()
+                .writeString("update_servers")
+                .writeByte((byte) 0x03)
+                .writeInt(serverToSent.size());
 
-            System.out.println("init proxy");
-            serverToSent.forEach(server -> {
-                syncServersPacket
-                        .writeString(server.name())
-                        .writeString(server.address().getHostString())
-                        .writeInt(server.address().getPort());
-            });
+        serverToSent.forEach(server -> {
+            syncServersPacket
+                    .writeString(server.name())
+                    .writeString(server.address().getHostString())
+                    .writeInt(server.address().getPort());
+        });
 
-            System.out.println("init proxy");
-            client.sendPacket(syncServersPacket).addListener(future -> {
-                if(!future.isSuccess()) {
-                    AtlasNetwork.logger.error("Could not send init packet", future.cause());
-                }
-            }).syncUninterruptibly();
-            System.out.println("Sent");
-        } catch (Exception e) {
-            AtlasNetwork.logger.error("e", e);
-        }
+        client.sendPacket(syncServersPacket);
     }
 }
