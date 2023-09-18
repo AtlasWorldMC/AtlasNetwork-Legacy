@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -32,11 +33,13 @@ public class ServerSetupEventListener extends ClientSocketListenerAdapter {
     private final ServerFileConfiguration configuration;
     private final Database<AuthenticationProfile> database;
     private final boolean notifyProxies;
+    private final @Nullable UUID requestId;
 
-    public ServerSetupEventListener(ServerFileConfiguration configuration, Database<AuthenticationProfile> database, boolean notifyProxies) {
+    public ServerSetupEventListener(ServerFileConfiguration configuration, Database<AuthenticationProfile> database, boolean notifyProxies, @Nullable UUID requestId) {
         this.configuration = configuration;
         this.database = database;
         this.notifyProxies = notifyProxies;
+        this.requestId = requestId;
     }
 
     @Override
@@ -101,8 +104,8 @@ public class ServerSetupEventListener extends ClientSocketListenerAdapter {
     @Override
     public void onStatusUpdate(StatusUpdateEvent event) {
         switch (event.getState()) {
-            case RUNNING -> this.onServerStarted(event.getServer());
-            case STOPPING -> this.onServerStopping(event.getServer());
+            case RUNNING -> this.onServerStarted(event.retrieveServer().execute());
+            case STOPPING -> this.onServerStopping(event.retrieveServer().execute());
         }
     }
 
@@ -125,6 +128,11 @@ public class ServerSetupEventListener extends ClientSocketListenerAdapter {
                                 .writeString(this.configuration.id())
                                 .writeString(server.getPrimaryAllocation().getIP())
                                 .writeInt(server.getPrimaryAllocation().getPortInt());
+
+                        if (this.requestId != null) {
+                            addServerPacket.writeBoolean(true);
+                            addServerPacket.writeUuid(this.requestId);
+                        }
 
                         client.sendPacket(addServerPacket);
                     });

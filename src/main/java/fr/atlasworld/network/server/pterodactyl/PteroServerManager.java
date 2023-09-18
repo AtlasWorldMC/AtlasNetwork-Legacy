@@ -37,7 +37,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Server Manager implementation for Pterdactyl Panel
+ * Server Manager implementation for Pterodactyl Panel
  * @see ServerManager
  */
 public class PteroServerManager implements ServerManager {
@@ -164,8 +164,8 @@ public class PteroServerManager implements ServerManager {
                 panelServer.addListener(new ServerSetupEventListener(
                         this.serverFileConfigurations.get(configuration.id()),
                         this.profileDatabase,
-                        !configuration.equals(this.proxyDefault)
-                ));
+                        !configuration.equals(this.proxyDefault),
+                        null));
 
                 this.servers.add(panelServer);
             }
@@ -192,7 +192,7 @@ public class PteroServerManager implements ServerManager {
 
         if (server == null) {
             AtlasNetwork.logger.info("No Server found, creating a new one..");
-            this.createDefaultServer("server-0");
+            this.createDefaultServer();
         }
 
         PanelServer proxy = this.servers.stream()
@@ -202,7 +202,7 @@ public class PteroServerManager implements ServerManager {
 
         if (proxy == null) {
             AtlasNetwork.logger.info("No Proxy found, creating a new one..");
-            this.createDefaultProxy("proxy-0");
+            this.createDefaultProxy();
         }
     }
 
@@ -221,6 +221,11 @@ public class PteroServerManager implements ServerManager {
 
     @Override
     public PanelServer createCustomServer(ServerConfiguration configuration, String name) throws PanelException {
+        return this.createCustomServer(configuration, name, null);
+    }
+
+    @Override
+    public PanelServer createCustomServer(ServerConfiguration configuration, String name, UUID requestId) throws PanelException {
         NodeBalancer balancer = configuration.node().getBalancer();
         int nodeId = configuration.node().nodes()[balancer.selector(configuration.node().nodes())];
 
@@ -276,7 +281,9 @@ public class PteroServerManager implements ServerManager {
         clientServer.getWebSocketBuilder().addEventListeners(new ServerSetupEventListener(
                 this.serverFileConfigurations.get(configuration.id()),
                 this.profileDatabase,
-                !configuration.equals(this.proxyDefault))).build(); // Only notify proxies when it's not a proxy that's being created.
+                !configuration.equals(this.proxyDefault), // Only notify proxies when it's not a proxy that's being created.
+                requestId)
+        ).build();
 
         PteroServer server = new PteroServer(clientServer, appServer, configuration, databaseServer);
         this.servers.add(server);
@@ -285,13 +292,23 @@ public class PteroServerManager implements ServerManager {
     }
 
     @Override
-    public PanelServer createDefaultServer(String name) throws PanelException {
-        return this.createCustomServer(this.serverDefault, name);
+    public PanelServer createDefaultServer() throws PanelException {
+        return this.createDefaultServer(null);
     }
 
     @Override
-    public PanelServer createDefaultProxy(String name) throws PanelException {
-        PanelServer server = this.createCustomServer(this.proxyDefault, name);
+    public PanelServer createDefaultServer(UUID requestId) throws PanelException {
+        return this.createCustomServer(this.serverDefault, "server-" + new Random().nextInt(999), requestId);
+    }
+
+    @Override
+    public PanelServer createDefaultProxy() throws PanelException {
+        return this.createDefaultProxy(null);
+    }
+
+    @Override
+    public PanelServer createDefaultProxy(UUID requestId) throws PanelException {
+        PteroServer server = (PteroServer) this.createCustomServer(this.proxyDefault, "proxy-" + new Random().nextInt(999), requestId);
         try {
             this.loadBalancer.addServer(server.name(), server.address());
             return server;
@@ -311,6 +328,11 @@ public class PteroServerManager implements ServerManager {
     @Override
     public Map<String, ServerConfiguration> getServerConfigurations() {
         return ImmutableMap.copyOf(this.serverConfigurations);
+    }
+
+    @Override
+    public @Nullable ServerConfiguration getConfiguration(String id) {
+        return this.serverConfigurations.get(id);
     }
 
     @Override

@@ -137,4 +137,12 @@ public class PteroServer implements PanelServer {
     public void sendCommand(String command) {
         this.clientServer.sendCommand(command);
     }
+
+    public ClientServer getClientServer() {
+        return clientServer;
+    }
+
+    public ApplicationServer getAppServer() {
+        return appServer;
+    }
 }

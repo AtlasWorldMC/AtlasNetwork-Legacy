@@ -42,26 +42,57 @@ public interface ServerManager {
     PanelServer createCustomServer(ServerConfiguration configuration, String name) throws PanelException;
 
     /**
-     * Creates a server using the default server configuration
+     * Creates a server with a given configuration
+     * @param configuration server configuration
      * @param name server name
+     * @param requestId id of the request for the server
      * @return newly created server
      * @throws PanelException if something goes wrong
      */
-    PanelServer createDefaultServer(String name) throws PanelException;
+    PanelServer createCustomServer(ServerConfiguration configuration, String name, UUID requestId) throws PanelException;
+
+    /**
+     * Creates a server using the default server configuration
+     * @return newly created server
+     * @throws PanelException if something goes wrong
+     */
+    PanelServer createDefaultServer() throws PanelException;
+
+    /**
+     * Creates a server using the default server configuration
+     * @param requestId id of the request for the server
+     * @return newly created server
+     * @throws PanelException if something goes wrong
+     */
+    PanelServer createDefaultServer(UUID requestId) throws PanelException;
 
     /**
      * Creates a server using the default proxy configuration, adds the proxy address to the load balancer too
-     * @param name server name
      * @return newly created server
      * @throws PanelException if something goes wrong
      */
-    PanelServer createDefaultProxy(String name) throws PanelException;
+    PanelServer createDefaultProxy() throws PanelException;
+
+    /**
+     * Creates a server using the default server configuration
+     * @param requestId id of the request for the server
+     * @return newly created server
+     * @throws PanelException if something goes wrong
+     */
+    PanelServer createDefaultProxy(UUID requestId) throws PanelException;
 
     /**
      * Gets all the server configurations
      * @return server configurations
      */
     Map<String, ServerConfiguration> getServerConfigurations();
+
+    /**
+     * Retrieves a configuration with its id
+     * @param id config id
+     * @return configuration, null if it doesn't exists
+     */
+    @Nullable ServerConfiguration getConfiguration(String id);
 
     /**
      * Retrieves the server default configuration
