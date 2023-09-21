@@ -34,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 /**
@@ -166,6 +167,16 @@ public class PteroServerManager implements ServerManager {
                         this.profileDatabase,
                         !configuration.equals(this.proxyDefault),
                         null));
+
+                CompletableFuture.runAsync(() -> {
+                    try {
+                        AtlasNetwork.SOCKET_STARTED_LATCH.await();
+                        panelServer.getClientServer().sendCommand("network reconnect").execute();
+                        AtlasNetwork.logger.info("Sent reconnect request to {}", panelServer.name());
+                    } catch (InterruptedException e) {
+                        AtlasNetwork.logger.error("Could not wait on the socket!", e);
+                    }
+                });
 
                 this.servers.add(panelServer);
             }

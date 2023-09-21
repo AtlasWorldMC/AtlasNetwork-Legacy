@@ -117,9 +117,10 @@ public class ServerSetupEventListener extends ClientSocketListenerAdapter {
             serverManager.getServers().stream()
                     .filter(pServer -> pServer.getConfiguration().equals(serverManager.defaultProxyConfiguration()))
                     .filter(proxy -> proxy.status() == ServerStatus.ONLINE)
-                    .map(proxy ->  sessionManager.getSession(proxy.id()))
+                    .map(proxy -> sessionManager.getSession(proxy.id()))
                     .filter(Objects::nonNull)
                     .forEach(client -> {
+                        System.out.println("sent");
                         PacketByteBuf addServerPacket = PacketByteBuf.create()
                                 .writeString("update_servers")
                                 .writeByte((byte) 0x01)
@@ -147,7 +148,7 @@ public class ServerSetupEventListener extends ClientSocketListenerAdapter {
             serverManager.getServers().stream()
                     .filter(pServer -> pServer.getConfiguration().equals(serverManager.defaultProxyConfiguration()))
                     .filter(proxy -> proxy.status() == ServerStatus.ONLINE)
-                    .map(proxy ->  sessionManager.getSession(proxy.id()))
+                    .map(proxy -> sessionManager.getSession(proxy.id()))
                     .filter(Objects::nonNull)
                     .forEach(client -> {
                         PacketByteBuf addServerPacket = PacketByteBuf.create()

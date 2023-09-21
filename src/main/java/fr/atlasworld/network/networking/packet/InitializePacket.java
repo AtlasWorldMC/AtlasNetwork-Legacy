@@ -4,6 +4,7 @@ import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.entities.NetworkClient;
 import fr.atlasworld.network.server.ServerManager;
 import fr.atlasworld.network.server.entities.PanelServer;
+import fr.atlasworld.network.server.entities.ServerStatus;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class InitializePacket implements NetworkPacket {
         ServerManager serverManager = AtlasNetwork.getServerManager();
         List<PanelServer> serverToSent = serverManager.getServers().stream()
                 .filter(server -> !server.getConfiguration().equals(serverManager.defaultProxyConfiguration()))
+                .filter(server -> server.status() == ServerStatus.ONLINE)
                 .toList();
 
         PacketByteBuf syncServersPacket = PacketByteBuf.create()

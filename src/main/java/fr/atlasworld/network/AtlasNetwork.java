@@ -34,9 +34,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.concurrent.CountDownLatch;
 
 public class AtlasNetwork {
     public static final Logger logger = LoggerFactory.getLogger("AtlasNetwork");
+    public static final CountDownLatch SOCKET_STARTED_LATCH = new CountDownLatch(1);
     private static LaunchArgs launchArgs;
     private static SocketManager socket;
     private static Config config;
@@ -125,7 +127,9 @@ public class AtlasNetwork {
         AtlasNetwork.logger.info("Starting socket..");
         registerPackets(packetManager);
         socket.bind().sync();
+        AtlasNetwork.SOCKET_STARTED_LATCH.countDown();
         AtlasNetwork.logger.info("Socket started.");
+
         AtlasNetwork.logger.info("Ready, Waiting for connections.");
 
         //Shutdown Hook
