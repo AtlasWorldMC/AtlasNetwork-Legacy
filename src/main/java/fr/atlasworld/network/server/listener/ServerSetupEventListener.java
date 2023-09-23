@@ -120,7 +120,6 @@ public class ServerSetupEventListener extends ClientSocketListenerAdapter {
                     .map(proxy -> sessionManager.getSession(proxy.id()))
                     .filter(Objects::nonNull)
                     .forEach(client -> {
-                        System.out.println("sent");
                         PacketByteBuf addServerPacket = PacketByteBuf.create()
                                 .writeString("update_servers")
                                 .writeByte((byte) 0x01)
