@@ -1,0 +1,54 @@
+package fr.atlasworld.network.command;
+
+import com.mojang.brigadier.Command;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import fr.atlasworld.network.AtlasNetworkOld;
+
+import java.util.Scanner;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+ * Command Thread, runs the commands that it receives
+ */
+public class CommandThread extends Thread {
+    private final CommandDispatcher<CommandSource> dispatcher;
+    private final ExecutorService executor;
+
+    public CommandThread(CommandDispatcher<CommandSource> dispatcher) {
+        this(dispatcher, Executors.newFixedThreadPool(5));
+    }
+
+    public CommandThread(CommandDispatcher<CommandSource> dispatcher, ExecutorService executor) {
+        this.dispatcher = dispatcher;
+        this.executor = executor;
+    }
+
+    @Override
+    public void run() {
+        AtlasNetworkOld.logger.info("Command thread started.");
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String command = scanner.nextLine();
+
+            if (command.isEmpty()) {
+                continue;
+            }
+
+            this.executor.submit(() -> {
+                try {
+                    int result = this.dispatcher.execute(command.trim(), new CommandSource(AtlasNetworkOld.logger));
+                    if (result != Command.SINGLE_SUCCESS) {
+                        AtlasNetworkOld.logger.error("Something went wrong trying to execute '{}'", command);
+                    }
+                } catch (CommandSyntaxException e) {
+                    AtlasNetworkOld.logger.info("Unknown or incomplete command.");
+                    AtlasNetworkOld.logger.info("{} <--[HERE]", command);
+                } catch (Exception e) {
+                    AtlasNetworkOld.logger.error("Something went wrong with this command: ", e);
+                }
+            });
+        }
+    }
+}

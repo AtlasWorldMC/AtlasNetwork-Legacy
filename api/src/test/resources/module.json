@@ -1,0 +1,6 @@
+{
+  "name": "Test Module",
+  "id": "test-module",
+  "version": "1.0.0",
+  "description": "Test Module, used for testing AtlasNetwork's api."
+}
