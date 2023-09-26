@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'be.raft'
-version = '1.0.0'
+version = "${project_version}"
 
 repositories {
     mavenCentral()
@@ -47,7 +47,7 @@ shadowJar {
     manifest {
         attributes 'Main-Class': "${project_main_class}"
     }
-    archiveBaseName.set('AtlasNetwork-api')
+    archiveBaseName.set('AtlasNetwork')
     archiveClassifier.set('')
 }
 
@@ -57,7 +57,8 @@ jar.enabled = false
 
 tasks.register('run', JavaExec) {
     dependsOn build
-    dependsOn(":api:buildTestPlugin")
+    dependsOn (":api:buildTestModule")
+    
     doFirst {
         File runDir = new File(project.rootDir, "run")
         if (!runDir.exists()) {
@@ -67,5 +68,5 @@ tasks.register('run', JavaExec) {
     }
     mainClass.set("${project_main_class}")
     classpath = files(shadowJar.archiveFile)
-    args '-devEnv' // program arguments go here
+    args "-devEnv", "-add-module", "../api/build/libs/TestModule-${project_version}.jar" // program arguments go here
 }

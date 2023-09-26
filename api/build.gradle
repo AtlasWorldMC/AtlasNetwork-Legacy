@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'fr.atlasworld.network.api'
-version = '1.0.0'
+version = "${project_version}"
 
 repositories {
     mavenCentral()
@@ -24,8 +24,16 @@ compileJava {
     options.encoding = "UTF-8"
 }
 
-tasks.register("buildTestPlugin", Jar) {
+jar {
+    archiveBaseName.set("AtlasNetwork-api")
+}
+
+tasks.register("buildTestModule", Jar) {
     dependsOn 'testClasses'
     from sourceSets.test.output
     archiveBaseName.set("TestModule")
+}
+
+build {
+    dependsOn buildTestModule
 }

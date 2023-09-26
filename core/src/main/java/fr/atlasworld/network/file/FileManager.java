@@ -31,6 +31,23 @@ public class FileManager {
     }
 
     /**
+     * Gets the module directory
+     * @return module directory
+     */
+    public static File getModuleDirectory() {
+        return getWorkingDirectoryFile("modules");
+    }
+
+    /**
+     * Gets a module file
+     * @param filename name of the module file
+     * @return module file
+     */
+    public static File getModule(String filename) {
+        return new File(getModuleDirectory(), filename);
+    }
+
+    /**
      * Gets the configuration file
      * @return configuration file
      */

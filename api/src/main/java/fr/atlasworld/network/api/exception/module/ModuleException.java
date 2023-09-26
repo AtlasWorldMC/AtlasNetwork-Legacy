@@ -1,4 +1,4 @@
-package fr.atlasworld.network.api.exception;
+package fr.atlasworld.network.api.exception.module;
 
 public class ModuleException extends Exception {
     public ModuleException() {

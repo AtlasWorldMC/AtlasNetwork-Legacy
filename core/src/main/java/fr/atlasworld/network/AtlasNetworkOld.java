@@ -28,7 +28,7 @@ import fr.atlasworld.network.security.NetworkSecurityManager;
 import fr.atlasworld.network.security.SecurityManager;
 import fr.atlasworld.network.server.ServerManager;
 import fr.atlasworld.network.server.pterodactyl.PteroServerManager;
-import fr.atlasworld.network.utils.LaunchArgs;
+import fr.atlasworld.network.boot.LaunchArgs;
 import io.netty.util.ResourceLeakDetector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

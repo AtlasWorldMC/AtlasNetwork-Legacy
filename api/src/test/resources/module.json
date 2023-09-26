@@ -1,6 +1,7 @@
 {
   "name": "Test Module",
   "id": "test-module",
+  "mainClass": "fr.atlasworld.network.test.TestModule",
   "version": "1.0.0",
   "description": "Test Module, used for testing AtlasNetwork's api."
 }

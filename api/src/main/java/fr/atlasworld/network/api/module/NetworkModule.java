@@ -1,7 +1,7 @@
 package fr.atlasworld.network.api.module;
 
 import fr.atlasworld.network.api.AtlasNetworkServer;
-import fr.atlasworld.network.api.exception.ModuleException;
+import fr.atlasworld.network.api.exception.module.ModuleException;
 import fr.atlasworld.network.api.logging.LogUtils;
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
