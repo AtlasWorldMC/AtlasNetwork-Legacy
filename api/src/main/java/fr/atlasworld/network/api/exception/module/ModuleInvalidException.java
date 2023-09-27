@@ -1,5 +1,8 @@
 package fr.atlasworld.network.api.exception.module;
 
+/**
+ * Thrown when a module is wrongly configured
+ */
 public class ModuleInvalidException extends ModuleException {
     public ModuleInvalidException() {
         super();

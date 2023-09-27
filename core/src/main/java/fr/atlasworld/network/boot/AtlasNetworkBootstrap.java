@@ -1,6 +1,7 @@
 package fr.atlasworld.network.boot;
 
 import fr.atlasworld.network.AtlasNetwork;
+import fr.atlasworld.network.api.event.server.ServerInitializeEvent;
 import fr.atlasworld.network.api.exception.module.ModuleException;
 import fr.atlasworld.network.api.exception.module.ModuleInvalidClassException;
 import fr.atlasworld.network.api.exception.module.ModuleInvalidException;
@@ -68,5 +69,7 @@ public class AtlasNetworkBootstrap {
         }
 
         AtlasNetwork.logger.info("Loaded {} modules!", moduleHandler.getLoadedModules().size());
+
+        moduleHandler.callEvent(new ServerInitializeEvent(server));
     }
 }

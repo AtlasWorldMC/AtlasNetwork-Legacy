@@ -3,37 +3,45 @@ package fr.atlasworld.network.module;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import fr.atlasworld.network.api.AtlasNetwork;
+import fr.atlasworld.network.api.event.components.CancellableEvent;
+import fr.atlasworld.network.api.event.components.Event;
+import fr.atlasworld.network.api.event.components.EventListener;
+import fr.atlasworld.network.api.event.components.Listener;
 import fr.atlasworld.network.api.exception.module.ModuleException;
 import fr.atlasworld.network.api.exception.module.ModuleInvalidClassException;
 import fr.atlasworld.network.api.exception.module.ModuleInvalidException;
+import fr.atlasworld.network.api.logging.LogUtils;
 import fr.atlasworld.network.api.module.Module;
 import fr.atlasworld.network.api.module.ModuleManager;
 import fr.atlasworld.network.api.module.NetworkModule;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
+import java.util.stream.Collectors;
 
 public class ModuleHandler implements ModuleManager {
     private final List<ModuleInfo> loadedModules;
+    private final Map<Class<? extends Event>, List<Map.Entry<Map.Entry<EventListener, Method>, Listener>>> registeredListeners;
 
-    public ModuleHandler(List<ModuleInfo> loadedModules) {
+
+    public ModuleHandler(List<ModuleInfo> loadedModules, Map<Class<? extends Event>, List<Map.Entry<Map.Entry<EventListener, Method>, Listener>>> registeredListeners) {
         this.loadedModules = loadedModules;
+        this.registeredListeners = registeredListeners;
     }
 
     public ModuleHandler() {
-        this(new ArrayList<>());
+        this(new ArrayList<>(), new HashMap<>());
     }
 
     @Override
@@ -41,12 +49,83 @@ public class ModuleHandler implements ModuleManager {
         return Collections.unmodifiableCollection(this.loadedModules);
     }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    public void registerListener(EventListener listener, Module module) {
+        Class<? extends EventListener> listenerClass = listener.getClass();
+
+        for (Method method : listenerClass.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(Listener.class)) {
+                Listener annotation = method.getAnnotation(Listener.class);
+
+                Class<?>[] parameters = method.getParameterTypes();
+                if (parameters.length != 1) {
+                    throw new IllegalArgumentException("Method '" + method.getName() + "' marked with @Listener from '" + listenerClass.getName() + "' may only take one parameter!");
+                }
+
+                if (!Event.class.isAssignableFrom(parameters[0])) {
+                    throw new IllegalArgumentException("Method '" + method.getName() + "' marked with @Listener from '" + listenerClass.getName() + "' may only take events as parameter!");
+                }
+
+                Class<? extends Event> eventParam = (Class<? extends Event>) parameters[0];
+
+                if (!this.registeredListeners.containsKey(eventParam)) {
+                    this.registeredListeners.put(eventParam, new ArrayList<>());
+                }
+
+                this.registeredListeners.get(eventParam).add(Map.entry(Map.entry(listener, method), annotation));
+            }
+        }
+    }
+
+    @Override
+    public void callEvent(Event event) {
+        Class<? extends Event> eventType = event.getClass();
+        if (this.registeredListeners.containsKey(eventType)) {
+            List<Map.Entry<Map.Entry<EventListener, Method>, Listener>> sortedListeners = this.registeredListeners
+                    .get(eventType)
+                    .stream()
+                    .sorted(Comparator.comparing(entry -> entry.getValue().priority()))
+                    .toList();
+
+            for (Map.Entry<Map.Entry<EventListener, Method>, Listener> entry : sortedListeners) {
+                EventListener listener = entry.getKey().getKey();
+                Method method = entry.getKey().getValue();
+                Listener annotation = entry.getValue();
+
+                if (event instanceof CancellableEvent cancellableEvent) {
+                    if (annotation.ignoreIfCancelled() && cancellableEvent.cancelled()) {
+                        continue;
+                    }
+                }
+
+                try {
+                    method.setAccessible(true);
+                    method.invoke(listener, event);
+                } catch (Exception e) {
+                    LogUtils.getServerLogger().error("Could not pass event '{}' to '{}'", eventType.getSimpleName(),
+                            method.getDeclaringClass().getSimpleName(), e);
+                }
+            }
+        }
+    }
+
+    @Override
+    public CompletableFuture<Event> callEventAsync(Event event) {
+        return CompletableFuture.supplyAsync(() -> {
+            this.callEvent(event);
+            return event;
+        });
+    }
+
+
     /**
      * Load a module from a file
      * @param moduleFile module file
      * @return the loaded module
      * @throws ModuleException if the module could not be loaded, usually caused by the jar not being valid
      */
+    @ApiStatus.Internal
     public ModuleInfo loadModule(File moduleFile) throws ModuleException {
         try (JarFile jarFile = new JarFile(moduleFile)) {
             JarEntry jsonEntry = jarFile.getJarEntry("module.json");
@@ -70,6 +149,7 @@ public class ModuleHandler implements ModuleManager {
         }
     }
 
+    @ApiStatus.Internal
     public URLClassLoader loadModulesToClasspath(File... moduleFiles) throws ModuleException {
         URL[] urls = new URL[moduleFiles.length];
         for (int i = 0; i < moduleFiles.length; i++) {
@@ -83,6 +163,7 @@ public class ModuleHandler implements ModuleManager {
         return new URLClassLoader(urls, ClassLoader.getSystemClassLoader());
     }
 
+    @ApiStatus.Internal
     public void enableModule(ModuleInfo info, ClassLoader loader) throws ModuleException {
         try {
             Class<?> moduleMainClass = Class.forName(info.getMainClass(), true, loader);
@@ -95,14 +176,14 @@ public class ModuleHandler implements ModuleManager {
             module.startModule(AtlasNetwork.getServer(), info);
         } catch (ClassNotFoundException e) {
             throw new ModuleInvalidClassException("Could not find '" + info.getName() + "' main class: " + info.getMainClass());
-        } catch (InvocationTargetException e) {
-            throw new ModuleException("Failed to initialize '" + info.getName() + "': ", e);
         } catch (InstantiationException e) {
             throw new ModuleInvalidClassException("Main class of '" + info.getName() + "' must not be an interface or abstract class!");
         } catch (NoSuchMethodException | IllegalAccessException e) {
             throw new ModuleInvalidClassException("Main class of '" + info.getName() + "' must have a public constructor and must not take any parameters!");
         } catch (IllegalArgumentException e) {
             throw new ModuleInvalidClassException("Main class of '" + info.getName() + "' must not take any constructor parameters!");
+        } catch (Exception e) {
+            throw new ModuleException("Failed to initialize '" + info.getName() + "': ", e);
         }
     }
 }

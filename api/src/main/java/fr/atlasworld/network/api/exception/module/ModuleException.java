@@ -1,5 +1,8 @@
 package fr.atlasworld.network.api.exception.module;
 
+/**
+ * Thrown if something went wrong while initializing the module
+ */
 public class ModuleException extends Exception {
     public ModuleException() {
         super();
