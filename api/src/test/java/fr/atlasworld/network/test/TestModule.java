@@ -17,7 +17,7 @@ public class TestModule extends NetworkModule {
     }
 
     private void registerListeners(ModuleManager manager) {
-        manager.registerListener(new ServerListener(module), this);
+        manager.registerListener(new ServerListener(), this);
     }
 
     public static Logger logger() {
