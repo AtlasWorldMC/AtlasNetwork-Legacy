@@ -1,7 +1,8 @@
 package fr.atlasworld.network.networking.security.encryption;
 
 import fr.atlasworld.network.AtlasNetworkOld;
-import fr.atlasworld.network.networking.packet.PacketByteBuf;
+import fr.atlasworld.network.api.networking.PacketByteBuf;
+import fr.atlasworld.network.networking.packet.PacketByteBufImpl;
 import fr.atlasworld.network.security.SecurityManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -36,7 +37,7 @@ public class NetworkEncryptionManager implements EncryptionManager {
         if (buf.readString().equals("encryption_handshake")) {
             String algorithm = buf.readString();
             byte[] keyBytes = new byte[buf.readInt()];
-            buf.getParent().readBytes(keyBytes);
+            buf.readBytes(keyBytes);
 
             byte[] decryptedBytes = this.decryptKey(keyBytes);
             this.AESSecretKey = new SecretKeySpec(decryptedBytes, algorithm);
@@ -45,14 +46,14 @@ public class NetworkEncryptionManager implements EncryptionManager {
             this.encrypted = true;
             AtlasNetworkOld.logger.info("Encryption established with {}", channel.remoteAddress());
 
-            PacketByteBuf respBuf = PacketByteBuf.create()
+            PacketByteBuf respBuf = new PacketByteBufImpl(channel.alloc().buffer())
                     .writeString("encryption_handshake")
                     .writeBoolean(true);
             channel.writeAndFlush(respBuf);
             return;
         }
 
-        PacketByteBuf response = PacketByteBuf.create()
+        PacketByteBuf response = new PacketByteBufImpl(channel.alloc().buffer())
                 .writeString("request_fail")
                 .writeString("ENCRYPTION_HANDSHAKE_FAIL");
 
@@ -64,9 +65,9 @@ public class NetworkEncryptionManager implements EncryptionManager {
 
     @Override
     public void initHandshake(Channel channel) {
-        PacketByteBuf buf = PacketByteBuf.create()
+        PacketByteBuf buf = new PacketByteBufImpl(channel.alloc().buffer())
                 .writeString("public_key");
-        buf.getParent().writeBytes(this.securityManager.getSecurityPair().getPublic().getEncoded());
+        buf.writeBytes(this.securityManager.getSecurityPair().getPublic().getEncoded());
 
         AtlasNetworkOld.logger.info("Starting handshake with {}", channel.remoteAddress());
 
@@ -85,8 +86,8 @@ public class NetworkEncryptionManager implements EncryptionManager {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.ENCRYPT_MODE, AESSecretKey);
 
-        byte[] inputBytes = new byte[buf.getParent().readableBytes()];
-        buf.getParent().getBytes(buf.getParent().readerIndex(), inputBytes);
+        byte[] inputBytes = new byte[buf.readableBytes()];
+        buf.getBytes(buf.readerIndex(), inputBytes);
 
         byte[] encryptedBytes = cipher.doFinal(inputBytes);
         return Unpooled.wrappedBuffer(encryptedBytes);
@@ -97,10 +98,10 @@ public class NetworkEncryptionManager implements EncryptionManager {
         Cipher cipher = Cipher.getInstance("AES");
         cipher.init(Cipher.DECRYPT_MODE, AESSecretKey);
 
-        byte[] inputBytes = new byte[buf.getParent().readableBytes()];
-        buf.getParent().getBytes(buf.getParent().readerIndex(), inputBytes);
+        byte[] inputBytes = new byte[buf.readableBytes()];
+        buf.getBytes(buf.readerIndex(), inputBytes);
 
         byte[] decryptedBytes = cipher.doFinal(inputBytes);
-        return new PacketByteBuf(Unpooled.wrappedBuffer(decryptedBytes));
+        return new PacketByteBufImpl(Unpooled.wrappedBuffer(decryptedBytes));
     }
 }

@@ -1,10 +1,11 @@
 package fr.atlasworld.network.networking.handler;
 
 import fr.atlasworld.network.AtlasNetworkOld;
+import fr.atlasworld.network.api.networking.PacketByteBuf;
 import fr.atlasworld.network.exceptions.networking.auth.AuthenticationException;
 import fr.atlasworld.network.networking.NetworkErrors;
 import fr.atlasworld.network.networking.entities.NetworkClient;
-import fr.atlasworld.network.networking.packet.PacketByteBuf;
+import fr.atlasworld.network.networking.packet.PacketByteBufImpl;
 import fr.atlasworld.network.networking.security.authentication.AuthenticationManager;
 import fr.atlasworld.network.networking.session.SessionManager;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,7 +33,7 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
         String packet = buf.readString();
         if (packet.equals("auth")) {
             if (this.authenticationManager.isAuthenticated()) {
-                PacketByteBuf response = PacketByteBuf.create()
+                PacketByteBuf response = new PacketByteBufImpl(ctx.alloc().buffer())
                         .writeString("request_fail")
                         .writeString(NetworkErrors.ALREADY_AUTHED);
 
@@ -44,7 +45,7 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
             PacketByteBuf response;
             try {
                 UUID connectionId = this.authenticationManager.authenticate(ctx.channel(), buf);
-                response = PacketByteBuf.create()
+                response = new PacketByteBufImpl(ctx.alloc().buffer())
                         .writeString("auth_response")
                         .writeBoolean(true)
                         .writeString("SUCCESS");
@@ -55,7 +56,7 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
                 this.sessionManager.addSession(ctx.channel(), client);
                 ctx.channel().closeFuture().addListener(future -> this.sessionManager.removeSession(ctx.channel()));
             } catch (AuthenticationException e) {
-                response = PacketByteBuf.create()
+                response = new PacketByteBufImpl(ctx.alloc().buffer())
                         .writeString("auth_response")
                         .writeBoolean(false)
                         .writeString(e.getNetworkFeedback());
@@ -70,7 +71,7 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
 
         if (!this.authenticationManager.isAuthenticated()) {
             AtlasNetworkOld.logger.error("{} tried accessing '{}' while not authenticated!", ctx.channel().remoteAddress(), packet);
-            PacketByteBuf response = PacketByteBuf.create()
+            PacketByteBuf response = new PacketByteBufImpl(ctx.alloc().buffer())
                     .writeString("request_fail")
                     .writeString(NetworkErrors.NOT_AUTHED);
 

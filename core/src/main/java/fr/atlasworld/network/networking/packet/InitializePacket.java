@@ -1,5 +1,6 @@
 package fr.atlasworld.network.networking.packet;
 
+import fr.atlasworld.network.api.networking.PacketByteBuf;
 import fr.atlasworld.network.AtlasNetworkOld;
 import fr.atlasworld.network.networking.entities.NetworkClient;
 import fr.atlasworld.network.server.ServerManager;
@@ -34,7 +35,7 @@ public class InitializePacket implements NetworkPacket {
                 .filter(server -> server.status() == ServerStatus.ONLINE)
                 .toList();
 
-        PacketByteBuf syncServersPacket = PacketByteBuf.create()
+        PacketByteBuf syncServersPacket = new PacketByteBufImpl(client.getChannel().alloc().buffer())
                 .writeString("update_servers")
                 .writeByte((byte) 0x03)
                 .writeInt(serverToSent.size());

@@ -1,8 +1,10 @@
 package fr.atlasworld.network.networking.packet;
 
+import fr.atlasworld.network.api.networking.PacketByteBuf;
 import fr.atlasworld.network.AtlasNetworkOld;
 import fr.atlasworld.network.networking.NetworkErrors;
 import fr.atlasworld.network.networking.entities.NetworkClient;
+
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +34,7 @@ public class NetworkPacketManager implements PacketManager {
         if (!this.packets.containsKey(strPacket)) {
             AtlasNetworkOld.logger.warn("{} requested an unknown packet '{}'", client.remoteAddress(), strPacket);
 
-            PacketByteBuf response = PacketByteBuf.create()
+            PacketByteBuf response = new PacketByteBufImpl(client.getChannel().alloc().buffer())
                     .writeString("request_fail")
                     .writeString(NetworkErrors.UNKNOWN_PACKET);
 

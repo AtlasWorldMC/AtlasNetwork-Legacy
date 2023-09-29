@@ -1,11 +1,11 @@
 package fr.atlasworld.network.networking.security.authentication;
 
+import fr.atlasworld.network.api.networking.PacketByteBuf;
 import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
 import fr.atlasworld.network.exceptions.database.DatabaseException;
 import fr.atlasworld.network.exceptions.networking.auth.AuthenticationException;
 import fr.atlasworld.network.networking.NetworkErrors;
-import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.security.SecurityManager;
 import io.netty.channel.Channel;
 
@@ -33,7 +33,7 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
 
     @Override
     public UUID authenticate(Channel channel, PacketByteBuf buf) throws AuthenticationException {
-        UUID authUuid = buf.readUuid();
+        UUID authUuid = UUID.fromString(buf.readString());
 
         if (this.securityManager.isAuthProfileActive(authUuid)) {
             throw new AuthenticationException("Profile already in use!", NetworkErrors.PROFILE_ALREADY_INUSE);

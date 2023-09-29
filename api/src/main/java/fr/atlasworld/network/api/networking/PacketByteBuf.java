@@ -1,4 +1,4 @@
-package fr.atlasworld.network.api.network;
+package fr.atlasworld.network.api.networking;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -783,6 +783,26 @@ public interface PacketByteBuf extends Comparable<PacketByteBuf> {
     CharSequence readCharSequence(int length, Charset charset);
 
     /**
+     * Utility Method, reads a string using {@link #readCharSequence(int, Charset)}.
+     * It first reads an int for the length than using {@link #readCharSequence(int, Charset)} decodes using UTF-8.
+     *
+     * @return the string
+     * @throws IndexOutOfBoundsException
+     *         if {@code length} is greater than {@code this.readableBytes}
+     */
+    String readString();
+
+    /**
+     * Utility Method, reads a string using {@link #readCharSequence(int, Charset)}.
+     * It first reads an int for the length than using {@link #readCharSequence(int, Charset)} decodes using the specified charset.
+     *
+     * @return the string
+     * @throws IndexOutOfBoundsException
+     *         if {@code length} is greater than {@code this.readableBytes}
+     */
+    String readString(Charset charset);
+
+    /**
      * Increases the current {@code readerIndex} by the specified
      * {@code length} in this buffer.
      *
@@ -945,6 +965,26 @@ public interface PacketByteBuf extends Comparable<PacketByteBuf> {
      * @return the written number of bytes
      */
     int writeCharSequence(CharSequence sequence, Charset charset);
+
+    /**
+     * Utility Method, writes a string using {@link #writeCharSequence(CharSequence, Charset)}.
+     * It first encodes the length of the string in an int
+     * than using {@link #writeCharSequence(CharSequence, Charset)} decodes using UTF-8.
+     *
+     * @throws IndexOutOfBoundsException
+     *         if {@code length} is greater than {@code this.readableBytes}
+     */
+    PacketByteBuf writeString(String value);
+
+    /**
+     * Utility Method, writes a string using {@link #writeCharSequence(CharSequence, Charset)}.
+     * It first encodes the length of the string in an int
+     * than using {@link #writeCharSequence(CharSequence, Charset)} decodes using the specified charset.
+     *
+     * @throws IndexOutOfBoundsException
+     *         if {@code length} is greater than {@code this.readableBytes}
+     */
+    PacketByteBuf writeString(String value, Charset charset);
 
     /**
      * Iterates over the readable bytes of this buffer in ascending order.

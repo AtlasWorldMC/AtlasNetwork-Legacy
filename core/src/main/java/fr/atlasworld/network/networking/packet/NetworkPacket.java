@@ -1,5 +1,6 @@
 package fr.atlasworld.network.networking.packet;
 
+import fr.atlasworld.network.api.networking.PacketByteBuf;
 import fr.atlasworld.network.networking.entities.NetworkClient;
 
 /**

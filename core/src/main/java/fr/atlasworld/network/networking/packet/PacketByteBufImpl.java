@@ -1,6 +1,6 @@
 package fr.atlasworld.network.networking.packet;
 
-import fr.atlasworld.network.api.network.PacketByteBuf;
+import fr.atlasworld.network.api.networking.PacketByteBuf;
 import fr.atlasworld.network.networking.utilities.ForEachByteProcessor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufConvertible;
@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 
 public class PacketByteBufImpl implements ByteBufConvertible, PacketByteBuf, ReferenceCounted {
@@ -409,6 +410,16 @@ public class PacketByteBufImpl implements ByteBufConvertible, PacketByteBuf, Ref
     }
 
     @Override
+    public String readString() {
+        return this.readString(StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public String readString(Charset charset) {
+        return (String) this.readCharSequence(this.readInt(), charset);
+    }
+
+    @Override
     public PacketByteBuf skipBytes(int length) {
         this.parent.skipBytes(length);
         return this;
@@ -500,6 +511,18 @@ public class PacketByteBufImpl implements ByteBufConvertible, PacketByteBuf, Ref
     @Override
     public int writeCharSequence(CharSequence sequence, Charset charset) {
         return this.parent.writeCharSequence(sequence, charset);
+    }
+
+    @Override
+    public PacketByteBuf writeString(String value) {
+         return this.writeString(value, StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public PacketByteBuf writeString(String value, Charset charset) {
+        this.writeInt(value.length());
+        this.writeCharSequence(value, charset);
+        return this;
     }
 
     @Override

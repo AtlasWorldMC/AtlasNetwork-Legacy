@@ -1,6 +1,6 @@
 package fr.atlasworld.network.networking.security.encryption;
 
-import fr.atlasworld.network.networking.packet.PacketByteBuf;
+import fr.atlasworld.network.api.networking.PacketByteBuf;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 

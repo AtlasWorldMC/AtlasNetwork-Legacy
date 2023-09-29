@@ -1,5 +1,6 @@
 package fr.atlasworld.network.networking.packet;
 
+import fr.atlasworld.network.api.networking.PacketByteBuf;
 import fr.atlasworld.network.AtlasNetworkOld;
 import fr.atlasworld.network.exceptions.panel.PanelException;
 import fr.atlasworld.network.networking.NetworkErrors;
@@ -36,7 +37,7 @@ public class CreateServerPacket implements NetworkPacket {
 
     private void createProxy(PacketByteBuf buf, NetworkClient client) {
         try {
-            this.serverManager.createDefaultProxy(buf.readUuid());
+            this.serverManager.createDefaultProxy(UUID.fromString(buf.readString()));
         } catch (PanelException e) {
             this.respondFailure(client, e);
         }
@@ -44,24 +45,24 @@ public class CreateServerPacket implements NetworkPacket {
 
     private void createServer(PacketByteBuf buf, NetworkClient client) {
         try {
-            this.serverManager.createDefaultServer(buf.readUuid());
+            this.serverManager.createDefaultServer(UUID.fromString(buf.readString()));
         } catch (Exception e) {
             this.respondFailure(client, e);
         }
     }
 
     private void createCustom(PacketByteBuf buf, NetworkClient client) {
-        UUID requestId = buf.readUuid();
+        UUID requestId = UUID.fromString(buf.readString());
         String name = buf.readString();
         String configId = buf.readString();
 
         ServerConfiguration configuration = this.serverManager.getConfiguration(configId);
         if (configuration == null) {
             AtlasNetworkOld.logger.warn("Unknown server configuration: {}", configId);
-            PacketByteBuf response = PacketByteBuf.create()
+            PacketByteBuf response = new PacketByteBufImpl(client.getChannel().alloc().buffer())
                     .writeString("request_fail")
                     .writeString("create_server")
-                    .writeUuid(requestId)
+                    .writeString(requestId.toString())
                     .writeString("UNKNOWN_SERVER_CONFIGURATION");
 
             client.sendPacket(response);
@@ -76,7 +77,7 @@ public class CreateServerPacket implements NetworkPacket {
 
     private void respondFailure(NetworkClient client, Exception e) {
         AtlasNetworkOld.logger.error("Could not fulfill server creation request!", e);
-        PacketByteBuf failureResponse = PacketByteBuf.create()
+        PacketByteBuf failureResponse = new PacketByteBufImpl(client.getChannel().alloc().buffer())
                 .writeString("request_fail")
                 .writeString(NetworkErrors.INTERNAL_EXCEPTION);
 

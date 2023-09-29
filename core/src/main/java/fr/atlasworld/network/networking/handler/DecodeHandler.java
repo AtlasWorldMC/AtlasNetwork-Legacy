@@ -1,7 +1,8 @@
 package fr.atlasworld.network.networking.handler;
 
 import fr.atlasworld.network.AtlasNetworkOld;
-import fr.atlasworld.network.networking.packet.PacketByteBuf;
+import fr.atlasworld.network.api.networking.PacketByteBuf;
+import fr.atlasworld.network.networking.packet.PacketByteBufImpl;
 import fr.atlasworld.network.networking.security.encryption.EncryptionManager;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,7 +21,7 @@ public class DecodeHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
-        PacketByteBuf rawBuf = new PacketByteBuf((ByteBuf) msg);
+        PacketByteBuf rawBuf = new PacketByteBufImpl((ByteBuf) msg);
 
         if (!this.encryptionManager.isEncrypted()) {
             String packet = rawBuf.readString();
