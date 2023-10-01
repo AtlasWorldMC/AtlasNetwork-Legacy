@@ -3,19 +3,17 @@ package fr.atlasworld.network.boot;
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.api.event.server.ServerInitializeEvent;
 import fr.atlasworld.network.api.exception.module.ModuleException;
-import fr.atlasworld.network.api.exception.module.ModuleInvalidClassException;
 import fr.atlasworld.network.api.exception.module.ModuleInvalidException;
-import fr.atlasworld.network.api.module.Module;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.logging.InternalLogUtils;
 import fr.atlasworld.network.module.ModuleHandler;
 import fr.atlasworld.network.module.ModuleInfo;
+import io.netty.channel.nio.NioEventLoopGroup;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URLClassLoader;
 import java.util.Arrays;
-import java.util.List;
 
 public class AtlasNetworkBootstrap {
     public static void main(String[] args) {
@@ -27,7 +25,7 @@ public class AtlasNetworkBootstrap {
         AtlasNetwork.logger.info("Starting AtlasNetwork..");
         ModuleHandler moduleHandler = new ModuleHandler();
 
-        AtlasNetwork server = new AtlasNetwork(moduleHandler);
+        AtlasNetwork server = new AtlasNetwork(moduleHandler, new NioEventLoopGroup());
         fr.atlasworld.network.api.AtlasNetwork.setServer(server);
 
         AtlasNetwork.logger.info("Discovering modules..");

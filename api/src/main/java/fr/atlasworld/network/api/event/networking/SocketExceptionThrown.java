@@ -1,4 +1,4 @@
 package fr.atlasworld.network.api.event.networking;
 
-public class PacketReceivedEvent {
+public class SocketExceptionThrown {
 }

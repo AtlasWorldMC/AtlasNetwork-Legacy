@@ -1,7 +1,7 @@
 package fr.atlasworld.network.networking.handler;
 
 import fr.atlasworld.network.networking.entities.NetworkClient;
-import fr.atlasworld.network.api.networking.PacketByteBuf;
+import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.session.SessionManager;
 import io.netty.channel.ChannelHandler;

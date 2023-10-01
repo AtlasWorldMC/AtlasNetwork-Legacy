@@ -1,6 +1,6 @@
 package fr.atlasworld.network.networking.packet;
 
-import fr.atlasworld.network.api.networking.PacketByteBuf;
+import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.AtlasNetworkOld;
 import fr.atlasworld.network.exceptions.panel.PanelException;
 import fr.atlasworld.network.networking.NetworkErrors;

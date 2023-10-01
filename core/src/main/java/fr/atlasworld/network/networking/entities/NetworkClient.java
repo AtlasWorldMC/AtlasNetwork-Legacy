@@ -1,7 +1,7 @@
 package fr.atlasworld.network.networking.entities;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
-import fr.atlasworld.network.api.networking.PacketByteBuf;
+import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 

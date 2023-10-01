@@ -1,6 +1,6 @@
 package fr.atlasworld.network.networking.security.authentication;
 
-import fr.atlasworld.network.api.networking.PacketByteBuf;
+import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
 import fr.atlasworld.network.exceptions.database.DatabaseException;

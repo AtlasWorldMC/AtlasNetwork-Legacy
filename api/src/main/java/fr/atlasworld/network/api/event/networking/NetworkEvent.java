@@ -1,20 +1,16 @@
 package fr.atlasworld.network.api.event.networking;
 
-import fr.atlasworld.network.api.event.components.CancellableEvent;
 import fr.atlasworld.network.api.event.components.Event;
+import fr.atlasworld.network.api.networking.NetworkSocket;
 
-public class NetworkEvent implements Event, CancellableEvent {
-    private boolean cancelled = false;
+public class NetworkEvent implements Event {
+    private final NetworkSocket socket;
 
-
-
-    @Override
-    public boolean cancelled() {
-        return this.cancelled;
+    public NetworkEvent(NetworkSocket socket) {
+        this.socket = socket;
     }
 
-    @Override
-    public void setCancelled(boolean cancelled) {
-        this.cancelled = cancelled;
+    public NetworkSocket getSocket() {
+        return socket;
     }
 }

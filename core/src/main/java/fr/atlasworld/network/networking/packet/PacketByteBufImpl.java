@@ -1,6 +1,6 @@
 package fr.atlasworld.network.networking.packet;
 
-import fr.atlasworld.network.api.networking.PacketByteBuf;
+import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.networking.utilities.ForEachByteProcessor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufConvertible;

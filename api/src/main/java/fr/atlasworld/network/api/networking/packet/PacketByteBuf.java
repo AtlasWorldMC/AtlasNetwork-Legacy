@@ -1,4 +1,4 @@
-package fr.atlasworld.network.api.networking;
+package fr.atlasworld.network.api.networking.packet;
 
 import org.jetbrains.annotations.NotNull;
 
