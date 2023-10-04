@@ -7,5 +7,6 @@ package fr.atlasworld.network.config;
  * @param host database host
  * @param port database port
  */
+@Deprecated
 public record DatabaseConfig(String username, String password, String host, int port) {
 }

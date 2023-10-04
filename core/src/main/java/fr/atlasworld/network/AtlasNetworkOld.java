@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.CountDownLatch;
 
+@Deprecated
 public class AtlasNetworkOld {
     public static final Logger logger = LoggerFactory.getLogger("AtlasNetwork");
     public static final CountDownLatch SOCKET_STARTED_LATCH = new CountDownLatch(1);

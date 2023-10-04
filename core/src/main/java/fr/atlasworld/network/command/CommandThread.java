@@ -3,6 +3,7 @@ package fr.atlasworld.network.command;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.AtlasNetworkOld;
 
 import java.util.Scanner;
@@ -27,7 +28,7 @@ public class CommandThread extends Thread {
 
     @Override
     public void run() {
-        AtlasNetworkOld.logger.info("Command thread started.");
+        AtlasNetwork.logger.info("Command thread started.");
         Scanner scanner = new Scanner(System.in);
         while (scanner.hasNextLine()) {
             String command = scanner.nextLine();
@@ -40,13 +41,13 @@ public class CommandThread extends Thread {
                 try {
                     int result = this.dispatcher.execute(command.trim(), new CommandSource(AtlasNetworkOld.logger));
                     if (result != Command.SINGLE_SUCCESS) {
-                        AtlasNetworkOld.logger.error("Something went wrong trying to execute '{}'", command);
+                        AtlasNetwork.logger.error("Something went wrong trying to execute '{}'", command);
                     }
                 } catch (CommandSyntaxException e) {
-                    AtlasNetworkOld.logger.info("Unknown or incomplete command.");
-                    AtlasNetworkOld.logger.info("{} <--[HERE]", command);
+                    AtlasNetwork.logger.info("Unknown or incomplete command.");
+                    AtlasNetwork.logger.info("{} <--[HERE]", command);
                 } catch (Exception e) {
-                    AtlasNetworkOld.logger.error("Something went wrong with this command: ", e);
+                    AtlasNetwork.logger.error("Something went wrong with this command: ", e);
                 }
             });
         }

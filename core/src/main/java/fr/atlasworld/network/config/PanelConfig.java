@@ -7,6 +7,8 @@ package fr.atlasworld.network.config;
  * @param userId account id
  * @param defaults default configurations
  */
+
+@Deprecated
 public record PanelConfig(String url, String token, long userId, Defaults defaults) {
 
     /**

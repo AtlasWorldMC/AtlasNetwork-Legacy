@@ -10,6 +10,7 @@ import fr.atlasworld.network.command.CommandSource;
  * Usage:
  * <li>stop - Stops AtlasNetwork</li>
  */
+@Deprecated
 public class StopCommand {
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(LiteralArgumentBuilder.<CommandSource>literal("stop")

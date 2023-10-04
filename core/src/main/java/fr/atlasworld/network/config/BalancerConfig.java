@@ -9,5 +9,6 @@ import com.google.gson.annotations.SerializedName;
  * @param username load balancer username
  * @param password load balancer password
  */
+@Deprecated
 public record BalancerConfig(String url, @SerializedName("backend_name") String backendName, String username, String password) {
 }
