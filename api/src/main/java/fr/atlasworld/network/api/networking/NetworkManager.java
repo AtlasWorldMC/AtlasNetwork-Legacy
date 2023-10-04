@@ -1,10 +1,10 @@
 package fr.atlasworld.network.api.networking;
 
-import fr.atlasworld.network.api.concurrent.Future;
 import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.api.networking.packet.SentPacket;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public interface NetworkManager {
     /**
@@ -17,5 +17,5 @@ public interface NetworkManager {
      * @param buf packet
      * @return future of the sent packet request
      */
-    Future<SentPacket> sendPacketToAllClients(PacketByteBuf buf);
+    CompletableFuture<SentPacket> sendPacketToAllClients(PacketByteBuf buf);
 }

@@ -1,7 +1,6 @@
 package fr.atlasworld.network;
 
 import fr.atlasworld.network.api.AtlasNetworkServer;
-import fr.atlasworld.network.api.concurrent.Future;
 import fr.atlasworld.network.api.module.ModuleManager;
 import fr.atlasworld.network.api.networking.NetworkSocket;
 import fr.atlasworld.network.logging.InternalLogUtils;
@@ -31,11 +30,6 @@ public class AtlasNetwork implements AtlasNetworkServer {
 
     @Override
     public NetworkSocket getSocket() {
-        return null;
-    }
-
-    @Override
-    public Future<Void> runLater(Runnable runnable, long time) {
         return null;
     }
 }

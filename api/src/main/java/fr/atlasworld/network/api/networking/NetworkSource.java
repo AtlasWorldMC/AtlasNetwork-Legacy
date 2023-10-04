@@ -1,11 +1,11 @@
 package fr.atlasworld.network.api.networking;
 
 import fr.atlasworld.network.api.NetworkEntity;
-import fr.atlasworld.network.api.concurrent.Future;
 import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.api.networking.packet.SentPacket;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Network source is a wrapper for a client connected on the socket
@@ -16,7 +16,7 @@ public interface NetworkSource extends NetworkEntity {
      * @param buf packet data
      * @return the sent packet future
      */
-    Future<SentPacket> sendPacket(PacketByteBuf buf);
+    CompletableFuture<SentPacket> sendPacket(PacketByteBuf buf);
 
     /**
      * Retrieve the remote address
