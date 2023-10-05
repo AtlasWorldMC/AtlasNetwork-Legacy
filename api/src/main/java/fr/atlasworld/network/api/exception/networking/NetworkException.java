@@ -5,6 +5,7 @@ package fr.atlasworld.network.api.exception.networking;
  */
 public class NetworkException extends Exception {
     public NetworkException() {
+        super();
     }
 
     public NetworkException(String message) {

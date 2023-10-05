@@ -70,7 +70,7 @@ public class AtlasNetworkOld {
         }
 
         AtlasNetworkOld.logger.info("Loading Configuration..");
-        config = Config.getSettings();
+        config = Config.getConfig();
 
         AtlasNetworkOld.logger.info("Initializing managers..");
         securityManager = new NetworkSecurityManager(config);
@@ -118,7 +118,7 @@ public class AtlasNetworkOld {
                     () -> new NetworkEncryptionManager(securityManager),
                     () -> new NetworkAuthenticationManager(securityManager, authDatabase),
                     packetManager);
-            socket = new NetworkSocketManager(socketSettings);
+            socket = new NetworkSocketManager(socketSettings, securityManager);
         } catch (Exception e) {
             AtlasNetworkOld.logger.error("Unable to start socket", e);
             System.exit(-1);

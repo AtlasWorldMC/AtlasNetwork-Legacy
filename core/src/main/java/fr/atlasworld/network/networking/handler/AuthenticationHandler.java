@@ -52,7 +52,7 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
                 AtlasNetworkOld.logger.info("{} was successfully authenticated!", ctx.channel().remoteAddress());
                 ctx.fireChannelActive();
 
-                NetworkClient client = new NetworkClient(ctx.channel(), connectionId);
+                NetworkClient client = new NetworkClient(connectionId, ctx.channel());
                 this.sessionManager.addSession(ctx.channel(), client);
                 ctx.channel().closeFuture().addListener(future -> this.sessionManager.removeSession(ctx.channel()));
             } catch (AuthenticationException e) {

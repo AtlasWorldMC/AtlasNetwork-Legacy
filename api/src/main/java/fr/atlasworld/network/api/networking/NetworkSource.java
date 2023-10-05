@@ -1,5 +1,6 @@
 package fr.atlasworld.network.api.networking;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import fr.atlasworld.network.api.NetworkEntity;
 import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.api.networking.packet.SentPacket;
@@ -16,6 +17,7 @@ public interface NetworkSource extends NetworkEntity {
      * @param buf packet data
      * @return the sent packet future
      */
+    @CanIgnoreReturnValue
     CompletableFuture<SentPacket> sendPacket(PacketByteBuf buf);
 
     /**
@@ -26,7 +28,7 @@ public interface NetworkSource extends NetworkEntity {
     /**
      * Disconnects a client.
      * @param reason reason for disconnecting the client.
-     * @return true if the client has been successfully disconnected;
+     * @return true if the client has been successfully disconnected.
      */
     boolean disconnect(String reason);
 }

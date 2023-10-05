@@ -1,66 +1,56 @@
 package fr.atlasworld.network.networking.entities;
 
-import com.google.errorprone.annotations.CanIgnoreReturnValue;
+import fr.atlasworld.network.api.networking.NetworkSource;
 import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
+import fr.atlasworld.network.api.networking.packet.SentPacket;
+import fr.atlasworld.network.networking.packet.SentPacketImpl;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 
 /**
  * Network client, 'holder' for managing socket channels more easily using Network's Packet based API
  */
-public class NetworkClient {
+public class NetworkClient implements NetworkSource {
+    private final UUID id;
     private final Channel channel;
-    private final UUID uuid;
 
-    public NetworkClient(Channel channel, UUID uuid) {
+    public NetworkClient(UUID id, Channel channel) {
+        this.id = id;
         this.channel = channel;
-        this.uuid = uuid;
     }
 
-    /**
-     * Sends a packet
-     * @param buf packet data
-     * @return future result of the async operation
-     */
-    @CanIgnoreReturnValue
-    public ChannelFuture sendPacket(PacketByteBuf buf) {
-        return this.channel.writeAndFlush(buf);
+    @Override
+    public UUID getId() {
+        return this.id;
     }
 
-    /**
-     * Ends connection with the remote
-     * @return future result of the async operation
-     */
-    @CanIgnoreReturnValue
-    public ChannelFuture disconnect() {
-        return this.channel.disconnect();
+    @Override
+    public CompletableFuture<SentPacket> sendPacket(PacketByteBuf buf) {
+        CompletableFuture<SentPacket> future = new CompletableFuture<>();
+
+        this.channel.writeAndFlush(buf).addListener((ChannelFuture cFuture) -> {
+            if (cFuture.isSuccess()) {
+                future.complete(new SentPacketImpl(buf, this));
+            } else {
+                future.completeExceptionally(cFuture.cause());
+            }
+        });
+
+        return future;
     }
 
-    /**
-     * Retrieves the remote address of the remote
-     * @return remote connection address
-     */
+    @Override
     public InetSocketAddress remoteAddress() {
         return (InetSocketAddress) this.channel.remoteAddress();
     }
 
-    /**
-     * Gets the netty channel
-     * @return netty io channel
-     */
-    public Channel getChannel() {
-        return channel;
-    }
-
-    /**
-     * Gets the connection id
-     * @return connection id
-     */
-    public UUID getUuid() {
-        return uuid;
+    @Override
+    public boolean disconnect(String reason) {
+        return this.channel.disconnect().syncUninterruptibly().isSuccess();
     }
 }

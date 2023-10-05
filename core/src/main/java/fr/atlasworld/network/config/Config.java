@@ -22,7 +22,7 @@ import fr.atlasworld.network.file.loader.GsonFileLoader;
 public record Config(String socketHost, int socketPort, @SerializedName("hash_salt") String hashSalt, DatabaseConfig database, PanelConfig panel, BalancerConfig balancer) {
     private static Config config;
 
-    public static Config getSettings() {
+    public static Config getConfig() {
         if (config == null) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             GsonFileLoader<Config> configLoader = new GsonFileLoader<>(FileManager.getConfigFile(), gson, Config.class);

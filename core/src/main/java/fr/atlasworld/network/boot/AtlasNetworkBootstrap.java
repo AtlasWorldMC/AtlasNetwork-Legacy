@@ -5,11 +5,15 @@ import fr.atlasworld.network.api.event.server.ServerInitializeEvent;
 import fr.atlasworld.network.api.event.server.ServerStoppingEvent;
 import fr.atlasworld.network.api.exception.module.ModuleException;
 import fr.atlasworld.network.api.exception.module.ModuleInvalidException;
+import fr.atlasworld.network.config.Config;
 import fr.atlasworld.network.file.FileManager;
 import fr.atlasworld.network.logging.InternalLogUtils;
 import fr.atlasworld.network.module.ModuleHandler;
 import fr.atlasworld.network.module.ModuleInfo;
-import io.netty.channel.nio.NioEventLoopGroup;
+import fr.atlasworld.network.networking.SocketManager;
+import fr.atlasworld.network.networking.socket.NetworkSocketManager;
+import fr.atlasworld.network.security.NetworkSecurityManager;
+import fr.atlasworld.network.security.SecurityManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -23,11 +27,24 @@ public class AtlasNetworkBootstrap {
             InternalLogUtils.enableConsoleDebug();
         }
 
-        AtlasNetwork.logger.info("Starting AtlasNetwork..");
-        ModuleHandler moduleHandler = new ModuleHandler();
+        Config config = Config.getConfig();
 
-        AtlasNetwork server = new AtlasNetwork(moduleHandler, new NioEventLoopGroup());
-        fr.atlasworld.network.api.AtlasNetwork.setServer(server);
+        AtlasNetwork.logger.info("Starting AtlasNetwork..");
+
+        try {
+            // Managers
+            ModuleHandler moduleHandler = new ModuleHandler();
+            SecurityManager securityManager = new NetworkSecurityManager(config);
+            SocketManager socketManager = new NetworkSocketManager(securityManager, config.socketPort(), config.socketHost());
+
+            AtlasNetwork server = new AtlasNetwork(moduleHandler, socketManager, securityManager);
+            fr.atlasworld.network.api.AtlasNetwork.setServer(server);
+        } catch (Exception e) {
+            AtlasNetwork.logger.error("Unable to start AtlasNetwork", e);
+            System.exit(-1);
+        }
+
+
 
         // Shutdown hook
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
