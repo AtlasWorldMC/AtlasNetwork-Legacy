@@ -12,11 +12,9 @@ public class AtlasNetwork implements AtlasNetworkServer {
     public static final Logger logger = InternalLogUtils.getServerLogger();
 
     private final ModuleHandler moduleHandler;
-    private final EventLoopGroup loopGroup;
 
-    public AtlasNetwork(ModuleHandler moduleHandler, EventLoopGroup loopGroup) {
+    public AtlasNetwork(ModuleHandler moduleHandler) {
         this.moduleHandler = moduleHandler;
-        this.loopGroup = loopGroup;
     }
 
     public ModuleHandler getModuleHandler() {

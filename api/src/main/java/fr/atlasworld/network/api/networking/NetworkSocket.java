@@ -1,5 +1,7 @@
 package fr.atlasworld.network.api.networking;
 
+import fr.atlasworld.network.api.exception.networking.unchecked.NetworkSocketClosedException;
+
 import java.net.InetSocketAddress;
 
 public interface NetworkSocket {
@@ -13,7 +15,11 @@ public interface NetworkSocket {
      * @throws fr.atlasworld.network.api.exception.networking.unchecked.NetworkSocketClosedException
      *          in case that the socket isn't running.
      */
-    void ensureSocketRunning();
+    default void ensureSocketRunning() {
+        if (!this.isRunning()) {
+            throw new NetworkSocketClosedException("Socket closed!");
+        }
+    }
 
     /**
      * Get the bound address of the socket
@@ -24,4 +30,9 @@ public interface NetworkSocket {
      * Retrieve the network manager
      */
     NetworkManager getNetworkManager();
+
+    /**
+     * Stops the socket, Starting the socket can only be done internally.
+     */
+    void stop();
 }

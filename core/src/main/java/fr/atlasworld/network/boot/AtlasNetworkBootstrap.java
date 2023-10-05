@@ -2,6 +2,7 @@ package fr.atlasworld.network.boot;
 
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.api.event.server.ServerInitializeEvent;
+import fr.atlasworld.network.api.event.server.ServerStoppingEvent;
 import fr.atlasworld.network.api.exception.module.ModuleException;
 import fr.atlasworld.network.api.exception.module.ModuleInvalidException;
 import fr.atlasworld.network.file.FileManager;
@@ -27,6 +28,20 @@ public class AtlasNetworkBootstrap {
 
         AtlasNetwork server = new AtlasNetwork(moduleHandler, new NioEventLoopGroup());
         fr.atlasworld.network.api.AtlasNetwork.setServer(server);
+
+        // Shutdown hook
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            AtlasNetwork.logger.info("AtlasNetwork is shutting down.");
+
+            AtlasNetwork.logger.info("Notifying modules..");
+            moduleHandler.callEvent(new ServerStoppingEvent(server));
+
+            AtlasNetwork.logger.info("Shutting socket down..");
+            server.getSocket().stop();
+            AtlasNetwork.logger.info("Socket stopped.");
+
+            AtlasNetwork.logger.info("Bye bye!");
+        }, "AtlasNetwork-Bootstrap-Shutdown-Hook"));
 
         AtlasNetwork.logger.info("Discovering modules..");
         File modulesDirectory = FileManager.getModuleDirectory();
