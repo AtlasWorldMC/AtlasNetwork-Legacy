@@ -1,6 +1,6 @@
 package fr.atlasworld.network.security;
 
-import fr.atlasworld.network.AtlasNetworkOld;
+import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.config.Config;
 
 import java.security.*;
@@ -58,7 +58,7 @@ public class NetworkSecurityManager implements SecurityManager {
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
-            AtlasNetworkOld.logger.error("Unable to hash token", e);
+            AtlasNetwork.logger.error("Unable to hash token", e);
         }
         return null;
     }

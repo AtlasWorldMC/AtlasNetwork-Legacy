@@ -53,4 +53,9 @@ public class NetworkClient implements NetworkSource {
     public boolean disconnect(String reason) {
         return this.channel.disconnect().syncUninterruptibly().isSuccess();
     }
+
+    @Override
+    public String toString() {
+        return this.id + "(" + this.channel.remoteAddress() + ")";
+    }
 }

@@ -1,7 +1,6 @@
 package fr.atlasworld.network.networking.security.encryption;
 
 import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 
 import java.security.GeneralSecurityException;
@@ -33,11 +32,12 @@ public interface EncryptionManager {
 
     /**
      * Encrypts a data buffer with the AES key established with the client
+     *
      * @param buf data to encrypt
      * @return encrypted data buffer
      * @throws GeneralSecurityException if the data could not be encrypted
      */
-    ByteBuf encrypt(PacketByteBuf buf) throws GeneralSecurityException;
+    PacketByteBuf encrypt(PacketByteBuf buf) throws GeneralSecurityException;
 
     /**
      * Decrypts a data buffer with the AES key established with the client

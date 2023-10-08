@@ -1,9 +1,10 @@
 package fr.atlasworld.network.networking.handler;
 
-import fr.atlasworld.network.AtlasNetworkOld;
+import fr.atlasworld.network.AtlasNetwork;
+import fr.atlasworld.network.api.exception.networking.requests.RequestFailException;
+import fr.atlasworld.network.api.exception.networking.authentication.AlreadyAuthenticatedException;
 import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
-import fr.atlasworld.network.exceptions.networking.auth.AuthenticationException;
-import fr.atlasworld.network.networking.NetworkErrors;
+import fr.atlasworld.network.networking.NetworkUtilities;
 import fr.atlasworld.network.networking.entities.NetworkClient;
 import fr.atlasworld.network.networking.packet.PacketByteBufImpl;
 import fr.atlasworld.network.networking.security.authentication.AuthenticationManager;
@@ -33,54 +34,33 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
         String packet = buf.readString();
         if (packet.equals("auth")) {
             if (this.authenticationManager.isAuthenticated()) {
-                PacketByteBuf response = new PacketByteBufImpl(ctx.alloc().buffer())
-                        .writeString("request_fail")
-                        .writeString(NetworkErrors.ALREADY_AUTHED);
-
-                ctx.channel().writeAndFlush(response);
-                buf.release();
-                return;
+                throw new AlreadyAuthenticatedException();
             }
 
-            PacketByteBuf response;
-            try {
-                UUID connectionId = this.authenticationManager.authenticate(ctx.channel(), buf);
-                response = new PacketByteBufImpl(ctx.alloc().buffer())
-                        .writeString("auth_response")
-                        .writeBoolean(true)
-                        .writeString("SUCCESS");
-                AtlasNetworkOld.logger.info("{} was successfully authenticated!", ctx.channel().remoteAddress());
-                ctx.fireChannelActive();
+            UUID connectionId = this.authenticationManager.authenticate(ctx.channel(), buf);
+            PacketByteBuf response = new PacketByteBufImpl(ctx.alloc().buffer())
+                    .writeString("auth_response")
+                    .writeBoolean(true)
+                    .writeString("SUCCESS");
 
-                NetworkClient client = new NetworkClient(connectionId, ctx.channel());
-                this.sessionManager.addSession(ctx.channel(), client);
-                ctx.channel().closeFuture().addListener(future -> this.sessionManager.removeSession(ctx.channel()));
-            } catch (AuthenticationException e) {
-                response = new PacketByteBufImpl(ctx.alloc().buffer())
-                        .writeString("auth_response")
-                        .writeBoolean(false)
-                        .writeString(e.getNetworkFeedback());
-                AtlasNetworkOld.logger.warn("{} authentication has failed: ", ctx.channel().remoteAddress(), e);
-            }
+            AtlasNetwork.logger.info("{} was successfully authenticated!", ctx.channel().remoteAddress());
 
-            ctx.channel().writeAndFlush(response);
-            buf.release();
+            NetworkClient client = new NetworkClient(connectionId, ctx.channel());
+            this.sessionManager.addSession(client);
 
+            ctx.channel().attr(NetworkUtilities.SESSION_ATTR_KEY).set(client);
+            ctx.channel().closeFuture().addListener(future -> this.sessionManager.removeSession(connectionId));
+            ctx.channel().writeAndFlush(response).addListener(NetworkUtilities.cleanUpChannelSentPacket(buf));
+
+            ctx.fireChannelActive();
             return;
         }
 
         if (!this.authenticationManager.isAuthenticated()) {
-            AtlasNetworkOld.logger.error("{} tried accessing '{}' while not authenticated!", ctx.channel().remoteAddress(), packet);
-            PacketByteBuf response = new PacketByteBufImpl(ctx.alloc().buffer())
-                    .writeString("request_fail")
-                    .writeString(NetworkErrors.NOT_AUTHED);
-
-            ctx.channel().writeAndFlush(response);
-            buf.release();
-            return;
+            throw new RequestFailException(ctx.channel().remoteAddress() + " tried accessing '" + packet + "' while not authenticated!", "NOT_AUTHED");
         }
 
-        buf.readerIndex(0);
+        buf.clear();
         super.channelRead(ctx, buf);
     }
 

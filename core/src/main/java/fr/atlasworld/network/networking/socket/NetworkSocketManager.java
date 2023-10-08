@@ -1,8 +1,10 @@
 package fr.atlasworld.network.networking.socket;
 
+import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.api.networking.NetworkManager;
 import fr.atlasworld.network.networking.SocketManager;
 import fr.atlasworld.network.networking.handler.*;
+import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.security.authentication.AuthenticationManager;
 import fr.atlasworld.network.networking.security.authentication.NetworkAuthenticationManager;
 import fr.atlasworld.network.networking.security.encryption.EncryptionManager;
@@ -29,23 +31,24 @@ import java.net.InetSocketAddress;
 public class NetworkSocketManager implements SocketManager {
     private final EventLoopGroup bossGroup, workerGroup;
     private final SecurityManager securityManager;
+    private final PacketManager packetManager;
     private final int port;
     private final String address;
 
-    private boolean bound;
+    private boolean bound = false;
     private Channel serverChannel;
 
-    public NetworkSocketManager(SecurityManager securityManager, int port, String address) {
+    public NetworkSocketManager(SecurityManager securityManager, PacketManager packetManager, int port, String address) {
         this.securityManager = securityManager;
+        this.packetManager = packetManager;
         this.port = port;
         this.address = address;
-        this.bound = false;
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup();
     }
 
-    public NetworkSocketManager(InetSocketAddress address, SecurityManager securityManager) {
-        this(securityManager, address.getPort(), address.getHostName());
+    public NetworkSocketManager(InetSocketAddress address, SecurityManager securityManager, PacketManager packetManager) {
+        this(securityManager, packetManager, address.getPort(), address.getHostName());
     }
 
     @Override
@@ -93,28 +96,42 @@ public class NetworkSocketManager implements SocketManager {
                         ch.pipeline().addLast(new DecodeHandler(new NetworkEncryptionManager(securityManager)));
                         ch.pipeline().addLast(new AuthenticationHandler(authHandler, sessionManager));
                         ch.pipeline().addLast(new PacketHandler(packetManager, sessionManager));
-                        ch.pipeline().addLast(new ExceptionHandler());
+                        ch.pipeline().addLast(new ResourcesHandler());
 
                         //Out
                         ch.pipeline().addFirst(new EncodeHandler(encryptionManager));
                     }
                 });
 
-        return boot;
+        return boot.bind(this.address, this.port).addListener((ChannelFuture future) -> {
+            if (future.isSuccess()) {
+                this.bound = true;
+                future.channel().closeFuture().addListener(closeFuture -> {
+                    this.bound = false;
+                });
+            } else {
+                AtlasNetwork.logger.error("Could not start socket!", future.cause());
+            }
+        });
     }
 
     @Override
     public int getPort() {
-        return 0;
+        return this.port;
     }
 
     @Override
     public String getAddress() {
-        return null;
+        return this.address;
     }
 
     @Override
     public InetSocketAddress localAddress() {
-        return null;
+        return new InetSocketAddress(this.address, this.port);
+    }
+
+    @Override
+    public PacketManager getPacketManager() {
+        return this.packetManager;
     }
 }

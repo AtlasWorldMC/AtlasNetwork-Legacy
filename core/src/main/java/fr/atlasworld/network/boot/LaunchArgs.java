@@ -1,7 +1,6 @@
 package fr.atlasworld.network.boot;
 
 import fr.atlasworld.network.AtlasNetwork;
-import fr.atlasworld.network.AtlasNetworkOld;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ public class LaunchArgs {
         this.devEnv = argsList.contains(DEV_ENV_ARG);
 
         if (this.devEnv) {
-            AtlasNetworkOld.logger.warn("Launching AtlasNetwork in dev environment. Remove '{}' launch argument to launch normally.", DEV_ENV_ARG);
+            AtlasNetwork.logger.warn("Launching AtlasNetwork in dev environment. Remove '{}' launch argument to launch normally.", DEV_ENV_ARG);
         }
 
         if (argsList.contains(ADD_MODULE_ARG)) {

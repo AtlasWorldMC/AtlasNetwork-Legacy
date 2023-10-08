@@ -1,6 +1,8 @@
 package fr.atlasworld.network.api;
 
 import fr.atlasworld.network.api.module.ModuleManager;
+import fr.atlasworld.network.api.networking.NetworkSocket;
+import fr.atlasworld.network.api.services.ServiceManager;
 
 public final class AtlasNetwork {
     private static AtlasNetworkServer server;
@@ -19,5 +21,13 @@ public final class AtlasNetwork {
 
     public static ModuleManager getModuleManager() {
         return server.getModuleManager();
+    }
+
+    public static NetworkSocket getSocket() {
+        return server.getSocket();
+    }
+
+    public static ServiceManager getServiceManager() {
+        return server.getServiceManager();
     }
 }

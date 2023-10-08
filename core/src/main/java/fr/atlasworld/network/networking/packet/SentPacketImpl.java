@@ -15,8 +15,8 @@ public class SentPacketImpl implements SentPacket {
 
     @Override
     public void cleanUpResources() {
-        while (buffer.isAccessible()) {
-            buffer.release();
+        while (this.buffer.isAccessible()) {
+            this.buffer.release();
         }
     }
 

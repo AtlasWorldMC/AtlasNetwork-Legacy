@@ -4,7 +4,6 @@ import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import fr.atlasworld.network.AtlasNetwork;
-import fr.atlasworld.network.AtlasNetworkOld;
 
 import java.util.Scanner;
 import java.util.concurrent.ExecutorService;
@@ -39,7 +38,7 @@ public class CommandThread extends Thread {
 
             this.executor.submit(() -> {
                 try {
-                    int result = this.dispatcher.execute(command.trim(), new CommandSource(AtlasNetworkOld.logger));
+                    int result = this.dispatcher.execute(command.trim(), new CommandSource(AtlasNetwork.logger));
                     if (result != Command.SINGLE_SUCCESS) {
                         AtlasNetwork.logger.error("Something went wrong trying to execute '{}'", command);
                     }

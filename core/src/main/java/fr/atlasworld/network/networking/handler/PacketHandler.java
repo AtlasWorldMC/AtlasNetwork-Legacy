@@ -1,5 +1,6 @@
 package fr.atlasworld.network.networking.handler;
 
+import fr.atlasworld.network.networking.NetworkUtilities;
 import fr.atlasworld.network.networking.entities.NetworkClient;
 import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.networking.packet.PacketManager;
@@ -26,7 +27,7 @@ public class PacketHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(@NotNull ChannelHandlerContext ctx, @NotNull Object msg) throws Exception {
         PacketByteBuf buf = (PacketByteBuf) msg;
-        NetworkClient session = this.sessionManager.getSession(ctx.channel());
+        NetworkClient session = ctx.channel().attr(NetworkUtilities.SESSION_ATTR_KEY).get();
         this.packetManager.execute(buf.readString(), session, buf);
     }
 }

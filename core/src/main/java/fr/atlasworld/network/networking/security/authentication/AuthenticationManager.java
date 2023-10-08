@@ -1,6 +1,7 @@
 package fr.atlasworld.network.networking.security.authentication;
 
-import fr.atlasworld.network.exceptions.networking.auth.AuthenticationException;
+import fr.atlasworld.network.api.exception.networking.requests.RequestFailException;
+import fr.atlasworld.network.api.exception.networking.authentication.AuthenticationException;
 import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
 import io.netty.channel.Channel;
 
@@ -23,5 +24,5 @@ public interface AuthenticationManager {
      * @return Connection UUID
      * @throws AuthenticationException if the authentication fails
      */
-    UUID authenticate(Channel channel, PacketByteBuf buf) throws AuthenticationException;
+    UUID authenticate(Channel channel, PacketByteBuf buf) throws AuthenticationException, RequestFailException;
 }
