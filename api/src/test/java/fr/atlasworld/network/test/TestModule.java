@@ -5,6 +5,7 @@ import fr.atlasworld.network.api.exception.module.ModuleException;
 import fr.atlasworld.network.api.module.ModuleManager;
 import fr.atlasworld.network.api.module.NetworkModule;
 import fr.atlasworld.network.test.listeners.ServerListener;
+import fr.atlasworld.network.test.service.database.LocalFileDatabaseService;
 import org.slf4j.Logger;
 
 public class TestModule extends NetworkModule {
@@ -13,6 +14,9 @@ public class TestModule extends NetworkModule {
     @Override
     protected void initialize(AtlasNetworkServer server) throws ModuleException {
         logger = this.getLogger();
+
+        server.getServiceManager().registerDatabaseService(new LocalFileDatabaseService());
+
         this.registerListeners(server.getModuleManager());
     }
 

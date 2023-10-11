@@ -25,7 +25,7 @@ public class NetworkClient implements NetworkSource {
     }
 
     @Override
-    public UUID getId() {
+    public UUID id() {
         return this.id;
     }
 

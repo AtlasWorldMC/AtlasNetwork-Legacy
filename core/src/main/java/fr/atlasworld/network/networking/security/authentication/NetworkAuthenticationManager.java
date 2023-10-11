@@ -4,12 +4,12 @@ import fr.atlasworld.network.api.exception.networking.requests.InternalRequestFa
 import fr.atlasworld.network.api.exception.networking.requests.RequestFailException;
 import fr.atlasworld.network.api.exception.networking.authentication.ProfileAlreadyInuseException;
 import fr.atlasworld.network.api.exception.networking.authentication.AuthenticationFailedException;
+import fr.atlasworld.network.api.exception.services.database.DatabaseException;
 import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
-import fr.atlasworld.network.database.Database;
-import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
-import fr.atlasworld.network.exceptions.database.DatabaseException;
+import fr.atlasworld.network.api.services.database.Database;
+import fr.atlasworld.network.entities.authentification.AuthenticationProfile;
 import fr.atlasworld.network.api.exception.networking.authentication.AuthenticationException;
-import fr.atlasworld.network.security.SecurityManager;
+import fr.atlasworld.network.networking.security.SecurityManager;
 import io.netty.channel.Channel;
 
 import java.util.UUID;
@@ -43,7 +43,7 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
         }
 
         try {
-            if (!this.database.has(authUuid.toString())) {
+            if (!this.database.has(authUuid)) {
                 throw new AuthenticationFailedException("unknown profile request");
             }
         } catch (DatabaseException e) {
@@ -51,11 +51,11 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
         }
 
         try {
-            AuthenticationProfile profile = this.database.get(authUuid.toString());
+            AuthenticationProfile profile = this.database.load(authUuid);
             String token = buf.readString();
             String hashedToken = this.securityManager.hash(token);
 
-            if (!profile.hashedToken().equals(hashedToken)) {
+            if (!profile.hash().equals(hashedToken)) {
                 throw new AuthenticationFailedException("invalid profile token");
             }
 

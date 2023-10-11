@@ -11,7 +11,7 @@ import fr.atlasworld.network.logging.InternalLogUtils;
 import fr.atlasworld.network.module.ModuleHandler;
 import fr.atlasworld.network.module.ModuleInfo;
 import fr.atlasworld.network.networking.SocketManager;
-import fr.atlasworld.network.security.SecurityManager;
+import fr.atlasworld.network.networking.security.SecurityManager;
 import io.netty.channel.ChannelFuture;
 import org.slf4j.Logger;
 
@@ -57,8 +57,11 @@ public class AtlasNetwork extends ModuleInfo implements AtlasNetworkServer {
             connectionFuture.syncUninterruptibly();
         }
 
-        this.moduleHandler.callEvent(new ServerInitializeEvent(this));
         this.initialized = true;
+        AtlasNetwork.logger.info("Initialization finished.");
+        this.moduleHandler.callEvent(new ServerInitializeEvent(this));
+
+        AtlasNetwork.logger.info("Ready! Waiting for connections..");
     }
 
     public ModuleHandler getModuleHandler() {

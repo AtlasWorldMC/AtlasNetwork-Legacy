@@ -3,7 +3,7 @@ package fr.atlasworld.network.networking.security.encryption;
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.api.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.networking.packet.PacketByteBufImpl;
-import fr.atlasworld.network.security.SecurityManager;
+import fr.atlasworld.network.networking.security.SecurityManager;
 import io.netty.channel.Channel;
 
 import javax.crypto.Cipher;

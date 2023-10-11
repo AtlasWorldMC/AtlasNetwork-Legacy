@@ -30,15 +30,15 @@ public class NetworkSessionManager implements SessionManager {
 
     @Override
     public void addSession(NetworkClient session) throws SessionException {
-        if (this.channelSessionHolder.containsKey(session.getId())) {
+        if (this.channelSessionHolder.containsKey(session.id())) {
             throw new SessionAlreadyInUseException(String.valueOf(session.remoteAddress()));
         }
-        this.channelSessionHolder.put(session.getId(), session);
+        this.channelSessionHolder.put(session.id(), session);
     }
 
     @Override
     public void removeSession(NetworkClient session) throws SessionException {
-        this.removeSession(session.getId());
+        this.removeSession(session.id());
     }
 
     @Override

@@ -3,8 +3,8 @@ package fr.atlasworld.network.config;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
-import fr.atlasworld.network.file.FileManager;
-import fr.atlasworld.network.file.loader.GsonFileLoader;
+import fr.atlasworld.network.api.file.FileManager;
+import fr.atlasworld.network.api.file.loader.GsonFileLoader;
 
 /**
  * Base Configuration file

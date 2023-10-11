@@ -4,9 +4,8 @@ import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.api.event.server.ServerStoppingEvent;
 import fr.atlasworld.network.api.exception.module.ModuleException;
 import fr.atlasworld.network.api.exception.module.ModuleInvalidException;
-import fr.atlasworld.network.api.services.ServiceManager;
 import fr.atlasworld.network.config.Config;
-import fr.atlasworld.network.file.FileManager;
+import fr.atlasworld.network.api.file.FileManager;
 import fr.atlasworld.network.logging.InternalLogUtils;
 import fr.atlasworld.network.module.ModuleHandler;
 import fr.atlasworld.network.module.ModuleInfo;
@@ -14,8 +13,8 @@ import fr.atlasworld.network.networking.SocketManager;
 import fr.atlasworld.network.networking.packet.ExecutorPoolPacketManager;
 import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.socket.NetworkSocketManager;
-import fr.atlasworld.network.security.NetworkSecurityManager;
-import fr.atlasworld.network.security.SecurityManager;
+import fr.atlasworld.network.networking.security.NetworkSecurityManager;
+import fr.atlasworld.network.networking.security.SecurityManager;
 import fr.atlasworld.network.services.NetworkServiceManager;
 
 import java.io.File;
@@ -47,20 +46,6 @@ public class AtlasNetworkBootstrap {
             fr.atlasworld.network.api.AtlasNetwork.setServer(server);
 
             moduleHandler.registerListener(serviceManager, server);
-
-            // Shutdown hook
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {  
-                AtlasNetwork.logger.info("AtlasNetwork is shutting down.");
-
-                AtlasNetwork.logger.info("Notifying modules..");
-                moduleHandler.callEvent(new ServerStoppingEvent(server));
-
-                AtlasNetwork.logger.info("Shutting socket down..");
-                server.getSocket().stop();
-                AtlasNetwork.logger.info("Socket stopped.");
-
-                AtlasNetwork.logger.info("Bye bye!");
-            }, "AtlasNetwork-Bootstrap-Shutdown-Hook"));
 
             AtlasNetwork.logger.info("Discovering modules..");
             File modulesDirectory = FileManager.getModuleDirectory();
@@ -102,6 +87,21 @@ public class AtlasNetworkBootstrap {
 
             AtlasNetwork.logger.info("Loaded {} modules!", moduleHandler.getLoadedModules().size());
             server.initialize();
+
+            // Shutdown hook
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                AtlasNetwork.logger.info("AtlasNetwork is shutting down.");
+
+                AtlasNetwork.logger.info("Notifying modules..");
+                moduleHandler.callEvent(new ServerStoppingEvent(server));
+
+                AtlasNetwork.logger.info("Shutting socket down..");
+                server.getSocket().stop();
+                AtlasNetwork.logger.info("Socket stopped.");
+
+                AtlasNetwork.logger.info("Bye bye!");
+            }, "AtlasNetwork-Bootstrap-Shutdown-Hook"));
+
         } catch (Exception e) {
             AtlasNetwork.logger.error("Unable to start AtlasNetwork", e);
             System.exit(-1);

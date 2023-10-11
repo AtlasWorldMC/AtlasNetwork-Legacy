@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -150,6 +151,7 @@ public class ModuleHandler implements ModuleManager {
     }
 
     @ApiStatus.Internal
+    @SuppressWarnings("unchecked")
     public URLClassLoader loadModulesToClasspath(File... moduleFiles) throws ModuleException {
         URL[] urls = new URL[moduleFiles.length];
         for (int i = 0; i < moduleFiles.length; i++) {
@@ -160,7 +162,23 @@ public class ModuleHandler implements ModuleManager {
             }
         }
 
-        return new URLClassLoader(urls, ClassLoader.getSystemClassLoader());
+        URLClassLoader loader = new URLClassLoader(urls, ClassLoader.getSystemClassLoader());
+
+        try {
+            Class<?> classLoaderClass = ClassLoader.class;
+            Field classesField = classLoaderClass.getDeclaredField("classes");
+            classesField.setAccessible(true);
+
+            Vector<Class<?>> classesVector = (Vector<Class<?>>) classesField.get(loader);
+            for (Class<?> clazz : classesVector) {
+                loader.loadClass(clazz.getName());
+            }
+        }  catch (Exception e) {
+            throw new ModuleException("Unable to load classes", e);
+        }
+
+        Thread.currentThread().setContextClassLoader(loader);
+        return loader;
     }
 
     @ApiStatus.Internal

@@ -11,7 +11,7 @@ import fr.atlasworld.network.networking.security.encryption.EncryptionManager;
 import fr.atlasworld.network.networking.security.encryption.NetworkEncryptionManager;
 import fr.atlasworld.network.networking.session.NetworkSessionManager;
 import fr.atlasworld.network.networking.session.SessionManager;
-import fr.atlasworld.network.security.SecurityManager;
+import fr.atlasworld.network.networking.security.SecurityManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -52,22 +52,22 @@ public class NetworkSocketManager implements SocketManager {
     }
 
     @Override
-    public boolean isRunning() {
+    public synchronized boolean isRunning() {
         return this.bound;
     }
 
     @Override
-    public InetSocketAddress getBoundAddress() {
+    public synchronized InetSocketAddress getBoundAddress() {
         return new InetSocketAddress(this.address, this.port);
     }
 
     @Override
-    public NetworkManager getNetworkManager() {
+    public synchronized NetworkManager getNetworkManager() {
         return null;
     }
 
     @Override
-    public void stop() {
+    public synchronized void stop() {
         if (!this.bound) {
             throw new UnsupportedOperationException("Socket can only be stopped when running!");
         }
@@ -80,7 +80,7 @@ public class NetworkSocketManager implements SocketManager {
     }
 
     @Override
-    public ChannelFuture start() {
+    public synchronized ChannelFuture start() {
         ServerBootstrap boot = new ServerBootstrap();
         boot.group(this.bossGroup, this.workerGroup)
                 .channel(NioServerSocketChannel.class)

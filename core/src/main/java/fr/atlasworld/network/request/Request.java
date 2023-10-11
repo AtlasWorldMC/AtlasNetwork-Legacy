@@ -6,7 +6,7 @@ import com.squareup.okhttp.Headers;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
-import fr.atlasworld.network.exceptions.requests.RequestException;
+import fr.atlasworld.network.networking.exceptions.requests.RequestException;
 
 import java.io.IOException;
 import java.util.HashMap;
