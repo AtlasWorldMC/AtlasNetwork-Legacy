@@ -2,7 +2,7 @@
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>[%d{HH:mm:ss}] %highlight([%logger{36}/%level]){FATAL=white, ERROR=red, WARN=blue, INFO=black, DEBUG=green, TRACE=blue} %msg%n</pattern>
+            <pattern>[%d{HH:mm:ss}] %highlight([%thread] [%logger{36}/%level]) %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -13,7 +13,7 @@
             <TimeBasedFileNamingAndTriggeringPolicy class="fr.atlasworld.network.logging.StartupTimeBasedTriggeringPolicy" />
         </rollingPolicy>
         <encoder>
-            <pattern>[%d{HH:mm:ss}] [%t/%level]: %msg%n</pattern>
+            <pattern>[%d{HH:mm:ss}] %highlight([%thread] [%logger{36}/%level]) %msg%n</pattern>
         </encoder>
     </appender>
 

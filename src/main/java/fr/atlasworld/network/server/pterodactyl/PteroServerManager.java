@@ -29,7 +29,6 @@ import fr.atlasworld.network.server.configuration.NodeBalancer;
 import fr.atlasworld.network.server.configuration.ServerConfiguration;
 import fr.atlasworld.network.server.configuration.ServerFileConfiguration;
 import fr.atlasworld.network.server.entities.PanelServer;
-import fr.atlasworld.network.server.listener.ServerSetupEventListener;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
@@ -162,20 +161,10 @@ public class PteroServerManager implements ServerManager {
                         configuration,
                         storedServer);
 
-                panelServer.addListener(new ServerSetupEventListener(
-                        this.serverFileConfigurations.get(configuration.id()),
-                        this.profileDatabase,
-                        !configuration.equals(this.proxyDefault),
-                        null));
-
                 CompletableFuture.runAsync(() -> {
-                    try {
-                        AtlasNetwork.SOCKET_STARTED_LATCH.await();
-                        panelServer.getClientServer().sendCommand("network reconnect").execute();
-                        AtlasNetwork.logger.info("Sent reconnect request to {}", panelServer.name());
-                    } catch (InterruptedException e) {
-                        AtlasNetwork.logger.error("Could not wait on the socket!", e);
-                    }
+                    panelServer.getClientServer().sendCommand("network reconnect").execute();
+                    AtlasNetwork.logger.info("Sent reconnect request to {}", panelServer.name());      panelServer.getClientServer().sendCommand("network reconnect").execute();
+                    AtlasNetwork.logger.info("Sent reconnect request to {}", panelServer.name());
                 });
 
                 this.servers.add(panelServer);
@@ -288,13 +277,6 @@ public class PteroServerManager implements ServerManager {
         } catch (DatabaseException e) {
             throw new PanelException("Could not save server to database", e);
         }
-
-        clientServer.getWebSocketBuilder().addEventListeners(new ServerSetupEventListener(
-                this.serverFileConfigurations.get(configuration.id()),
-                this.profileDatabase,
-                !configuration.equals(this.proxyDefault), // Only notify proxies when it's not a proxy that's being created.
-                requestId)
-        ).build();
 
         PteroServer server = new PteroServer(clientServer, appServer, configuration, databaseServer);
         this.servers.add(server);
