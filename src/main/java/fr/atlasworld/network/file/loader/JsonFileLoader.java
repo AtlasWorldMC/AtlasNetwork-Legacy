@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 import java.io.File;
+import java.io.IOException;
 
 /**
  * Loads the file as a json
@@ -27,12 +28,12 @@ public class JsonFileLoader extends FileLoader<JsonElement> {
     }
 
     @Override
-    public JsonElement load() {
+    public JsonElement load() throws IOException {
         return JsonParser.parseString(new StringFileLoader(file).load());
     }
 
     @Override
-    public void save(JsonElement value) {
+    public void save(JsonElement value) throws IOException {
         StringFileLoader loader = new StringFileLoader(file);
         GsonBuilder builder = new GsonBuilder();
         if (prettyPrint) {
@@ -43,7 +44,7 @@ public class JsonFileLoader extends FileLoader<JsonElement> {
     }
 
     @Override
-    public void createFile() {
+    public void createFile() throws IOException {
         super.createFile();
         this.save(new JsonObject());
     }

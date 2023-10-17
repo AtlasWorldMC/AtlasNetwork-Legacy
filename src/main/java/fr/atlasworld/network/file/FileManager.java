@@ -11,8 +11,6 @@ import java.util.zip.ZipOutputStream;
  * Utility class, for file managing
  */
 public class FileManager {
-    public static final String CONFIG = "config.json";
-
     /**
      * Gets the current working directory
      * @return current working directory
@@ -34,8 +32,8 @@ public class FileManager {
      * Gets the configuration file
      * @return configuration file
      */
-    public static File getConfigFile() {
-        return getWorkingDirectoryFile(CONFIG);
+    public static File getConfigDirectory() {
+        return getWorkingDirectoryFile("configuration");
     }
 
     /**

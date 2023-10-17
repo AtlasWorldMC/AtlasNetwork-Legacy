@@ -18,20 +18,16 @@ public class StringFileLoader extends FileLoader<String> {
     }
 
     @Override
-    public String load() {
-        try {
-            return Files.readString(file.toPath(), StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to load file '" + this.file + "':", e);
-        }
+    public String load() throws IOException {
+        return Files.readString(file.toPath(), StandardCharsets.UTF_8);
     }
 
     @Override
-    public void save(String value) {
+    public void save(String value) throws IOException {
         try (FileWriter writer = new FileWriter(this.file)) {
             writer.write(value);
         } catch (IOException e) {
-            throw new RuntimeException("Unable to save file '" + this.file + "':", e);
+            throw e;
         }
     }
 }

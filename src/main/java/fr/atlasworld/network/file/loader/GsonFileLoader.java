@@ -3,6 +3,7 @@ package fr.atlasworld.network.file.loader;
 import com.google.gson.Gson;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Type;
 
 /**
@@ -29,12 +30,12 @@ public class GsonFileLoader<T> extends FileLoader<T> {
     }
 
     @Override
-    public T load() {
+    public T load() throws IOException {
         return this.gson.fromJson(new StringFileLoader(this.file).load(), this.type);
     }
 
     @Override
-    public void save(T value) {
+    public void save(T value) throws IOException {
         new StringFileLoader(this.file).save(this.gson.toJson(value));
     }
 }
