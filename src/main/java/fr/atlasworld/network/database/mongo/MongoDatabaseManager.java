@@ -7,7 +7,7 @@ import com.mongodb.MongoTimeoutException;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.model.Filters;
-import fr.atlasworld.network.config.DatabaseConfig;
+import fr.atlasworld.network.config.files.DatabaseConfiguration;
 import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.DatabaseManager;
 import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
@@ -29,7 +29,7 @@ public class MongoDatabaseManager implements DatabaseManager {
     private final MongoClient client;
     private final MongoDatabaseSerializer serializer;
 
-    public MongoDatabaseManager(DatabaseConfig config, MongoDatabaseSerializer serializer) {
+    public MongoDatabaseManager(DatabaseConfiguration config, MongoDatabaseSerializer serializer) {
         String connectionString =
                 "mongodb://" + config.username() + ":" + config.password() + "@" +
                         config.host() + ":" + config.port() + "/";
@@ -38,7 +38,7 @@ public class MongoDatabaseManager implements DatabaseManager {
         this.serializer = serializer;
     }
 
-    public MongoDatabaseManager(DatabaseConfig config) {
+    public MongoDatabaseManager(DatabaseConfiguration config) {
         this(config, new MongoDatabaseSerializer());
     }
 

@@ -1,7 +1,7 @@
 package fr.atlasworld.network.security;
 
 import fr.atlasworld.network.AtlasNetwork;
-import fr.atlasworld.network.config.Config;
+import fr.atlasworld.network.config.files.SecurityConfiguration;
 
 import java.security.*;
 import java.util.Base64;
@@ -25,7 +25,7 @@ public class NetworkSecurityManager implements SecurityManager {
     private final String hashSalt;
     private final Set<UUID> activeProfiles;
 
-    public NetworkSecurityManager(Config config) throws NoSuchAlgorithmException {
+    public NetworkSecurityManager(SecurityConfiguration config) throws NoSuchAlgorithmException {
         this.sessionKeyPair = this.generateKeyPair();
         this.hashSalt = config.hashSalt();
         this.activeProfiles = new HashSet<>();
