@@ -13,7 +13,7 @@
             <TimeBasedFileNamingAndTriggeringPolicy class="fr.atlasworld.network.logging.StartupTimeBasedTriggeringPolicy" />
         </rollingPolicy>
         <encoder>
-            <pattern>[%d{HH:mm:ss}] %highlight([%thread] [%logger{36}/%level]) %msg%n</pattern>
+            <pattern>[%d{HH:mm:ss}] [%thread] [%logger{36}/%level] %msg%n</pattern>
         </encoder>
     </appender>
 
