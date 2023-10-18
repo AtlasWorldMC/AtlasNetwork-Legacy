@@ -1,5 +1,6 @@
 package fr.atlasworld.network.networking.packet;
 
+import fr.atlasworld.network.networking.processor.ForEachByteProcessor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.util.ByteProcessor;
@@ -15,11 +16,13 @@ import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.ScatteringByteChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.function.Function;
 
 public class PacketByteBuf extends ByteBuf {
     private final ByteBuf parent;
 
     public PacketByteBuf(ByteBuf parent) {
+        super();
         this.parent = parent;
     }
     
@@ -312,18 +315,6 @@ public class PacketByteBuf extends ByteBuf {
         return this;
     }
 
-    public PacketByteBuf getBytes(int index, PacketByteBuf dst) {
-        return this.getBytes(index, dst.asByteBuf());
-    }
-
-    public PacketByteBuf getBytes(int index, PacketByteBuf dst, int length) {
-        return this.getBytes(index, dst.asByteBuf(), length);
-    }
-
-    public PacketByteBuf getBytes(int index, PacketByteBuf dst, int dstIndex, int length) {
-        return this.getBytes(index, dst.asByteBuf(), dstIndex, length);
-    }
-
     @Override
     public PacketByteBuf getBytes(int index, byte[] dst) {
         this.parent.getBytes(index, dst);
@@ -365,7 +356,7 @@ public class PacketByteBuf extends ByteBuf {
 
     public String getString(int index, Charset charset) {
         int length = this.getInt(index);
-        return (String) this.getCharSequence((index + Integer.SIZE), length, charset);
+        return (String) this.getCharSequence((index + Integer.BYTES), length, charset);
     }
 
     public String getString(int index) {
@@ -374,612 +365,715 @@ public class PacketByteBuf extends ByteBuf {
 
     @Override
     public PacketByteBuf setBoolean(int index, boolean value) {
-        return null;
+        this.parent.setBoolean(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setByte(int index, int value) {
-        return null;
+        this.parent.setByte(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setShort(int index, int value) {
-        return null;
+        this.parent.setShort(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setShortLE(int index, int value) {
-        return null;
+        this.parent.setShortLE(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setMedium(int index, int value) {
-        return null;
+        this.parent.setMedium(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setMediumLE(int index, int value) {
-        return null;
+        this.parent.setMediumLE(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setInt(int index, int value) {
-        return null;
+        this.parent.setInt(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setIntLE(int index, int value) {
-        return null;
+        this.parent.setIntLE(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setLong(int index, long value) {
-        return null;
+        this.parent.setLong(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setLongLE(int index, long value) {
-        return null;
+        this.parent.setLongLE(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setChar(int index, int value) {
-        return null;
+        this.parent.setChar(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setFloat(int index, float value) {
-        return null;
+        this.parent.setFloat(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setDouble(int index, double value) {
-        return null;
+        this.parent.setDouble(index, value);
+        return this;
     }
 
     @Override
     public PacketByteBuf setBytes(int index, ByteBuf src) {
-        return null;
+        this.parent.setBytes(index, src);
+        return this;
     }
 
     @Override
     public PacketByteBuf setBytes(int index, ByteBuf src, int length) {
-        return null;
+        this.parent.setBytes(index, src, length);
+        return this;
     }
 
     @Override
     public PacketByteBuf setBytes(int index, ByteBuf src, int srcIndex, int length) {
-        return null;
+        this.parent.setBytes(index, src, srcIndex, length);
+        return this;
     }
 
     @Override
     public PacketByteBuf setBytes(int index, byte[] src) {
-        return null;
+        this.parent.setBytes(index, src);
+        return this;
     }
 
     @Override
     public PacketByteBuf setBytes(int index, byte[] src, int srcIndex, int length) {
-        return null;
+        this.parent.setBytes(index, src, srcIndex, length);
+        return this;
     }
 
     @Override
     public PacketByteBuf setBytes(int index, ByteBuffer src) {
-        return null;
+        this.parent.setBytes(index, src);
+        return this;
     }
 
     @Override
     public int setBytes(int index, InputStream in, int length) throws IOException {
-        return 0;
+        return this.parent.setBytes(index, in, length);
     }
 
     @Override
     public int setBytes(int index, ScatteringByteChannel in, int length) throws IOException {
-        return 0;
+        return this.parent.setBytes(index, in, length);
     }
 
     @Override
     public int setBytes(int index, FileChannel in, long position, int length) throws IOException {
-        return 0;
+        return this.parent.setBytes(index, in, position, length);
     }
 
     @Override
     public PacketByteBuf setZero(int index, int length) {
-        return null;
+        this.parent.setZero(index, length);
+        return this;
     }
 
     @Override
     public int setCharSequence(int index, CharSequence sequence, Charset charset) {
-        return 0;
+        return this.parent.setCharSequence(index, sequence, charset);
+    }
+
+    public PacketByteBuf setString(int index, String value, Charset charset) {
+        this.setInt(index, value.length());
+        this.setCharSequence(index + Integer.BYTES, value, charset);
+        return this;
+    }
+
+    public PacketByteBuf setString(int index, String value) {
+        return this.setString(index, value, StandardCharsets.UTF_8);
     }
 
     @Override
     public boolean readBoolean() {
-        return false;
+        return this.parent.readBoolean();
     }
 
     @Override
     public byte readByte() {
-        return 0;
+        return this.parent.readByte();
     }
 
     @Override
     public short readUnsignedByte() {
-        return 0;
+        return this.parent.readUnsignedByte();
     }
 
     @Override
     public short readShort() {
-        return 0;
+        return this.parent.readShort();
     }
 
     @Override
     public short readShortLE() {
-        return 0;
+        return this.parent.readShortLE();
     }
 
     @Override
     public int readUnsignedShort() {
-        return 0;
+        return this.parent.readUnsignedShort();
     }
 
     @Override
     public int readUnsignedShortLE() {
-        return 0;
+        return this.parent.readUnsignedShortLE();
     }
 
     @Override
     public int readMedium() {
-        return 0;
+        return this.parent.readMedium();
     }
 
     @Override
     public int readMediumLE() {
-        return 0;
+        return this.parent.readMediumLE();
     }
 
     @Override
     public int readUnsignedMedium() {
-        return 0;
+        return this.parent.readUnsignedMedium();
     }
 
     @Override
     public int readUnsignedMediumLE() {
-        return 0;
+        return this.parent.readUnsignedMediumLE();
     }
 
     @Override
     public int readInt() {
-        return 0;
+        return this.parent.readInt();
     }
 
     @Override
     public int readIntLE() {
-        return 0;
+        return this.parent.readIntLE();
     }
 
     @Override
     public long readUnsignedInt() {
-        return 0;
+        return this.parent.readUnsignedInt();
     }
 
     @Override
     public long readUnsignedIntLE() {
-        return 0;
+        return this.parent.readUnsignedIntLE();
     }
 
     @Override
     public long readLong() {
-        return 0;
+        return this.parent.readLong();
     }
 
     @Override
     public long readLongLE() {
-        return 0;
+        return this.parent.readLongLE();
     }
 
     @Override
     public char readChar() {
-        return 0;
+        return this.parent.readChar();
     }
 
     @Override
     public float readFloat() {
-        return 0;
+        return this.parent.readFloat();
     }
 
     @Override
     public double readDouble() {
-        return 0;
+        return this.parent.readDouble();
     }
 
     @Override
     public PacketByteBuf readBytes(int length) {
-        return null;
+        return new PacketByteBuf(this.parent.readBytes(length));
     }
 
     @Override
     public PacketByteBuf readSlice(int length) {
-        return null;
+        return new PacketByteBuf(this.parent.readSlice(length));
     }
 
     @Override
     public PacketByteBuf readRetainedSlice(int length) {
-        return null;
+        return new PacketByteBuf(this.parent.readRetainedSlice(length));
     }
 
     @Override
     public PacketByteBuf readBytes(ByteBuf dst) {
-        return null;
+        this.parent.readBytes(dst);
+        return this;
     }
 
     @Override
     public PacketByteBuf readBytes(ByteBuf dst, int length) {
-        return null;
+        this.parent.readBytes(dst, length);
+        return this;
     }
 
     @Override
     public PacketByteBuf readBytes(ByteBuf dst, int dstIndex, int length) {
-        return null;
+        this.parent.readBytes(dst, dstIndex, length);
+        return this;
     }
 
     @Override
     public PacketByteBuf readBytes(byte[] dst) {
-        return null;
+        this.parent.readBytes(dst);
+        return this;
     }
 
     @Override
     public PacketByteBuf readBytes(byte[] dst, int dstIndex, int length) {
-        return null;
+        this.parent.readBytes(dst, dstIndex, length);
+        return this;
     }
 
     @Override
     public PacketByteBuf readBytes(ByteBuffer dst) {
-        return null;
+        this.parent.readBytes(dst);
+        return this;
     }
 
     @Override
     public PacketByteBuf readBytes(OutputStream out, int length) throws IOException {
-        return null;
+        this.parent.readBytes(out, length);
+        return this;
     }
 
     @Override
     public int readBytes(GatheringByteChannel out, int length) throws IOException {
-        return 0;
-    }
-
-    @Override
-    public CharSequence readCharSequence(int length, Charset charset) {
-        return null;
+        return this.parent.readBytes(out, length);
     }
 
     @Override
     public int readBytes(FileChannel out, long position, int length) throws IOException {
-        return 0;
+        return this.parent.readBytes(out, position, length);
+    }
+
+    @Override
+    public CharSequence readCharSequence(int length, Charset charset) {
+        return this.parent.readCharSequence(length, charset);
+    }
+
+    public String readString(Charset charset) {
+        return (String) this.readCharSequence(this.readInt(), charset);
+    }
+
+    public String readString() {
+        return this.readString(StandardCharsets.UTF_8);
     }
 
     @Override
     public PacketByteBuf skipBytes(int length) {
-        return null;
+        this.parent.skipBytes(length);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeBoolean(boolean value) {
-        return null;
+        this.parent.writeBoolean(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeByte(int value) {
-        return null;
+        this.parent.writeByte(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeShort(int value) {
-        return null;
+        this.parent.writeShort(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeShortLE(int value) {
-        return null;
+        this.parent.writeShortLE(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeMedium(int value) {
-        return null;
+        this.parent.writeMedium(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeMediumLE(int value) {
-        return null;
+        this.parent.writeMediumLE(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeInt(int value) {
-        return null;
+        this.parent.writeInt(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeIntLE(int value) {
-        return null;
+        this.parent.writeIntLE(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeLong(long value) {
-        return null;
+        this.parent.writeLong(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeLongLE(long value) {
-        return null;
+        this.parent.writeLongLE(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeChar(int value) {
-        return null;
+        this.parent.writeChar(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeFloat(float value) {
-        return null;
+        this.parent.writeFloat(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeDouble(double value) {
-        return null;
+        this.parent.writeDouble(value);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeBytes(ByteBuf src) {
-        return null;
+        this.parent.writeBytes(src);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeBytes(ByteBuf src, int length) {
-        return null;
+        this.parent.writeBytes(src, length);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeBytes(ByteBuf src, int srcIndex, int length) {
-        return null;
+        this.parent.writeBytes(src, srcIndex, length);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeBytes(byte[] src) {
-        return null;
+        this.parent.writeBytes(src);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeBytes(byte[] src, int srcIndex, int length) {
-        return null;
+        this.parent.writeBytes(src, srcIndex, length);
+        return this;
     }
 
     @Override
     public PacketByteBuf writeBytes(ByteBuffer src) {
-        return null;
+        this.parent.writeBytes(src);
+        return this;
     }
 
     @Override
     public int writeBytes(InputStream in, int length) throws IOException {
-        return 0;
+        return this.parent.writeBytes(in, length);
     }
 
     @Override
     public int writeBytes(ScatteringByteChannel in, int length) throws IOException {
-        return 0;
+        return this.parent.writeBytes(in, length);
     }
 
     @Override
     public int writeBytes(FileChannel in, long position, int length) throws IOException {
-        return 0;
+        return this.parent.writeBytes(in, position, length);
     }
 
     @Override
     public PacketByteBuf writeZero(int length) {
-        return null;
+        this.parent.writeZero(length);
+        return this;
     }
 
     @Override
     public int writeCharSequence(CharSequence sequence, Charset charset) {
-        return 0;
+        return this.parent.writeCharSequence(sequence, charset);
+    }
+
+    public PacketByteBuf writeString(String value, Charset charset) {
+        this.writeInt(value.length());
+        this.writeCharSequence(value, charset);
+        return this;
     }
 
     @Override
     public int indexOf(int fromIndex, int toIndex, byte value) {
-        return 0;
+        return this.parent.indexOf(fromIndex, toIndex, value);
     }
 
     @Override
     public int bytesBefore(byte value) {
-        return 0;
+        return this.parent.bytesBefore(value);
     }
 
     @Override
     public int bytesBefore(int length, byte value) {
-        return 0;
+        return this.parent.bytesBefore(length, value);
     }
 
     @Override
     public int bytesBefore(int index, int length, byte value) {
-        return 0;
+        return this.parent.bytesBefore(index, length, value);
     }
 
     @Override
     public int forEachByte(ByteProcessor processor) {
-        return 0;
+        return this.parent.forEachByte(processor);
+    }
+
+    public int forEachByte(Function<Byte, Boolean> func) {
+        return this.forEachByte(new ForEachByteProcessor(func));
     }
 
     @Override
     public int forEachByte(int index, int length, ByteProcessor processor) {
-        return 0;
+        return this.parent.forEachByte(index, length, processor);
+    }
+
+    public int forEachByte(int index, int length, Function<Byte, Boolean> func) {
+        return this.forEachByte(index, length, new ForEachByteProcessor(func));
     }
 
     @Override
     public int forEachByteDesc(ByteProcessor processor) {
-        return 0;
+        return this.parent.forEachByteDesc(processor);
+    }
+
+    public int forEachByteDesc(Function<Byte, Boolean> func) {
+        return this.forEachByteDesc(new ForEachByteProcessor(func));
     }
 
     @Override
     public int forEachByteDesc(int index, int length, ByteProcessor processor) {
-        return 0;
+        return this.parent.forEachByteDesc(index, length, processor);
+    }
+
+    public int forEachByteDesc(int index, int length, Function<Byte, Boolean> func) {
+        return this.forEachByteDesc(index, length, new ForEachByteProcessor(func));
     }
 
     @Override
     public PacketByteBuf copy() {
-        return null;
+        return new PacketByteBuf(this.parent.copy());
     }
 
     @Override
     public PacketByteBuf copy(int index, int length) {
-        return null;
+        return new PacketByteBuf(this.parent.copy(index, length));
     }
 
     @Override
     public PacketByteBuf slice() {
-        return null;
+        return new PacketByteBuf(this.parent.slice());
     }
 
     @Override
     public PacketByteBuf retainedSlice() {
-        return null;
+        return new PacketByteBuf(this.parent.retainedSlice());
     }
 
     @Override
     public PacketByteBuf slice(int index, int length) {
-        return null;
+        return new PacketByteBuf(this.parent.slice(index, length));
     }
 
     @Override
     public PacketByteBuf retainedSlice(int index, int length) {
-        return null;
+        return new PacketByteBuf(this.parent.retainedSlice(index, length));
     }
 
     @Override
     public PacketByteBuf duplicate() {
-        return null;
+        return new PacketByteBuf(this.parent.duplicate());
     }
 
     @Override
     public PacketByteBuf retainedDuplicate() {
-        return null;
+        return new PacketByteBuf(this.parent.retainedDuplicate());
     }
 
     @Override
     public int nioBufferCount() {
-        return 0;
+        return this.parent.nioBufferCount();
     }
 
     @Override
     public ByteBuffer nioBuffer() {
-        return null;
+        return this.parent.nioBuffer();
     }
 
     @Override
     public ByteBuffer nioBuffer(int index, int length) {
-        return null;
+        return this.parent.nioBuffer(index, length);
     }
 
     @Override
     public ByteBuffer internalNioBuffer(int index, int length) {
-        return null;
+        return this.parent.internalNioBuffer(index, length);
     }
 
     @Override
     public ByteBuffer[] nioBuffers() {
-        return new ByteBuffer[0];
+        return this.parent.nioBuffers();
     }
 
     @Override
     public ByteBuffer[] nioBuffers(int index, int length) {
-        return new ByteBuffer[0];
+        return this.parent.nioBuffers(index, length);
     }
 
     @Override
     public boolean hasArray() {
-        return false;
+        return this.parent.hasArray();
     }
 
     @Override
     public byte[] array() {
-        return new byte[0];
+        return this.parent.array();
     }
 
     @Override
     public int arrayOffset() {
-        return 0;
+        return this.parent.arrayOffset();
     }
 
     @Override
     public boolean hasMemoryAddress() {
-        return false;
+        return this.parent.hasMemoryAddress();
     }
 
     @Override
     public long memoryAddress() {
-        return 0;
+        return this.parent.memoryAddress();
     }
 
     @Override
     public String toString(Charset charset) {
-        return null;
+        return this.parent.toString(charset);
     }
 
     @NotNull
     @Override
     public String toString(int index, int length, Charset charset) {
-        return null;
+        return this.parent.toString(index, length, charset);
     }
 
     @Override
     public int hashCode() {
-        return 0;
+        return this.parent.hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        return false;
+        if (obj instanceof PacketByteBuf pBuf) {
+            return this.parent.equals(pBuf.parent);
+        }
+
+        return this.parent.equals(obj);
     }
 
     @Override
     public int compareTo(ByteBuf buffer) {
-        return 0;
+        return this.parent.compareTo(buffer);
     }
 
     @Override
     public String toString() {
-        return null;
+        return this.parent.toString();
     }
 
     @Override
     public PacketByteBuf retain(int increment) {
-        return null;
-    }
-
-    @Override
-    public int refCnt() {
-        return 0;
+        this.parent.retain(increment);
+        return this;
     }
 
     @Override
     public PacketByteBuf retain() {
-        return null;
+        this.parent.retain();
+        return this;
     }
 
     @Override
     public PacketByteBuf touch() {
-        return null;
+        this.parent.touch();
+        return this;
     }
 
     @Override
     public PacketByteBuf touch(Object hint) {
-        return null;
+        this.parent.touch(hint);
+        return this;
     }
 
     @Override
     public boolean release() {
-        return false;
+        return this.parent.release();
     }
 
     @Override
     public boolean release(int decrement) {
-        return false;
+        return this.parent.release(decrement);
     }
+
+    @Override
+    public int refCnt() {
+        return this.parent.refCnt();
+    }
+
+    @Override
+    public ByteBuf asByteBuf() {
+        return this.parent;
+    }
+
+
 }
