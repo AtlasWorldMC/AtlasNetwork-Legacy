@@ -65,7 +65,6 @@ public class NetworkBootstrap {
 
         AtlasNetwork.logger.info("Ready! Waiting for connections..");
 
-
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             AtlasNetwork.logger.info("Stopping AtlasNetwork..");
             server.stop();

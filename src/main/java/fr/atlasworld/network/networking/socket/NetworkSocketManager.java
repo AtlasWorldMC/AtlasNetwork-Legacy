@@ -120,10 +120,11 @@ public class NetworkSocketManager implements SocketManager {
             throw new UnsupportedOperationException("Socket can only be stopped when running!");
         }
 
+        this.serverChannel.disconnect().syncUninterruptibly();
+
         this.bossGroup.shutdownGracefully().syncUninterruptibly();
         this.workerGroup.shutdownGracefully().syncUninterruptibly();
 
-        this.serverChannel.disconnect().syncUninterruptibly();
         this.serverChannel = null;
     }
 
