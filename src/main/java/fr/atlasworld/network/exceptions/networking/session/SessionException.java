@@ -1,6 +1,6 @@
 package fr.atlasworld.network.exceptions.networking.session;
 
-import fr.atlasworld.network.exceptions.networking.NetworkException;
+import fr.atlasworld.network.networking.exceptions.NetworkException;
 
 /**
  * SessionException, thrown when something related to sessions fails

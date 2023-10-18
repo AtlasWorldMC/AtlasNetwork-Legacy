@@ -24,7 +24,7 @@ public class NetworkPacketManager implements PacketManager {
     }
 
     public NetworkPacketManager() {
-        this(Executors.newFixedThreadPool(32), new HashMap<>());
+        this(Executors.newFixedThreadPool(8), new HashMap<>());
     }
 
     @Override

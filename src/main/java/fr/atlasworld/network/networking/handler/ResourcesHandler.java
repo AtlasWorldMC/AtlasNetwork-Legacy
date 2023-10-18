@@ -9,7 +9,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
  * Handles exception thrown on the socket handler pipeline
  */
 @ChannelHandler.Sharable
-public class ExceptionHandler extends ChannelInboundHandlerAdapter {
+public class ResourcesHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         if (cause.getMessage().equals("Connection reset")) {

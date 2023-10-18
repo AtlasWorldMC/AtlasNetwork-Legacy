@@ -6,6 +6,12 @@ import fr.atlasworld.network.config.exceptions.ConfigurationException;
 import fr.atlasworld.network.config.files.DatabaseConfiguration;
 import fr.atlasworld.network.config.files.SecurityConfiguration;
 import fr.atlasworld.network.config.files.SocketConfiguration;
+import fr.atlasworld.network.networking.packet.NetworkPacketManager;
+import fr.atlasworld.network.networking.packet.PacketManager;
+import fr.atlasworld.network.networking.socket.NetworkSocketManager;
+import fr.atlasworld.network.networking.socket.SocketManager;
+import fr.atlasworld.network.security.NetworkSecurityManager;
+import fr.atlasworld.network.security.SecurityManager;
 
 public class NetworkBootstrap {
     public static void main(String[] args) {
@@ -18,18 +24,41 @@ public class NetworkBootstrap {
         NetworkBootstrap.registerConfigurations(configurationManager);
 
         try {
+            AtlasNetwork.logger.info("Loading configuration..");
             configurationManager.loadConfigurations();
+            AtlasNetwork.logger.info("Configuration loaded successfully.");
         } catch (ConfigurationException e) {
             AtlasNetwork.logger.error("Failed to load configuration.");
             NetworkBootstrap.crash(e);
         }
 
-        AtlasNetwork server = new AtlasNetwork();
+        SecurityConfiguration securityConfiguration = configurationManager.getConfiguration("security.json", SecurityConfiguration.class);
+        SocketConfiguration socketConfiguration = configurationManager.getConfiguration("socket.json", SocketConfiguration.class);
+
+        SecurityManager securityManager = null;
+        PacketManager packetManager = null;
+        SocketManager socketManager = null;
+
+        try {
+            AtlasNetwork.logger.info("Initializing managers..");
+            securityManager = new NetworkSecurityManager(securityConfiguration);
+            packetManager = new NetworkPacketManager();
+            socketManager = new NetworkSocketManager(socketConfiguration, securityManager, packetManager);
+        } catch (NullPointerException e) {
+            AtlasNetwork.logger.error("Unable to process configuration files, this is an internal issue. Please open an issue on the project with the full log.");
+            NetworkBootstrap.crash(e);
+        } catch (Exception e) {
+            AtlasNetwork.logger.error("Failed to initialize managers.");
+            NetworkBootstrap.crash(e);
+        }
+
+        AtlasNetwork server = new AtlasNetwork(configurationManager, socketManager, securityManager, packetManager);
 
         try {
             AtlasNetwork.logger.info("Initializing AtlasNetwork..");
-            server.initialize();
-        } catch (Exception e) {
+            server.start();
+            AtlasNetwork.logger.info("AtlasNetwork Initialized successfully.");
+        } catch (Throwable e) {
             AtlasNetwork.logger.error("Could not initialize AtlasNetwork.");
             NetworkBootstrap.crash(e);
         }
@@ -39,6 +68,8 @@ public class NetworkBootstrap {
 
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             AtlasNetwork.logger.info("Stopping AtlasNetwork..");
+            server.stop();
+            AtlasNetwork.logger.info("Bye, bye!");
         }, "shutdown-hook"));
     }
 
