@@ -34,8 +34,6 @@ public class NetworkBootstrap {
             NetworkBootstrap.crash(e);
         }
 
-        AtlasNetwork.logger.info("Initialization finished, cleaning up..");
-
         AtlasNetwork.logger.info("Ready! Waiting for connections..");
 
 
