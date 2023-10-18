@@ -1,5 +1,6 @@
 package fr.atlasworld.network.networking.packet;
 
+import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.processor.ForEachByteProcessor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
@@ -24,6 +25,12 @@ public class PacketByteBuf extends ByteBuf {
     public PacketByteBuf(ByteBuf parent) {
         super();
         this.parent = parent;
+
+        AtlasNetwork.logger.debug("New PacketByteBuf created: [memory_address: {}, direct: {}, capacity: {}, max_capacity: {}]",
+                this.hasMemoryAddress() ? this.memoryAddress() : null,
+                this.isDirect(),
+                this.capacity(),
+                this.maxCapacity());
     }
     
     @Override
