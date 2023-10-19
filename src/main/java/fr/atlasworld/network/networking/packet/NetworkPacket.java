@@ -17,5 +17,5 @@ public interface NetworkPacket {
      * @param client remote that sent the packet
      * @param packet packet data
      */
-    void onReceive(NetworkClient client, PacketByteBuf packet);
+    void onReceive(NetworkClient client, PacketByteBuf packet) throws Throwable;
 }

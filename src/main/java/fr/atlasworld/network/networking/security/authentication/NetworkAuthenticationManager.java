@@ -3,9 +3,11 @@ package fr.atlasworld.network.networking.security.authentication;
 import fr.atlasworld.network.database.Database;
 import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
 import fr.atlasworld.network.exceptions.database.DatabaseException;
-import fr.atlasworld.network.exceptions.networking.auth.AuthenticationException;
-import fr.atlasworld.network.networking.NetworkErrors;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
+import fr.atlasworld.network.networking.security.authentication.exceptions.AuthenticationException;
+import fr.atlasworld.network.networking.security.authentication.exceptions.InternalAuthenticationException;
+import fr.atlasworld.network.networking.security.authentication.exceptions.ProfileAlreadyUsedException;
+import fr.atlasworld.network.networking.security.authentication.exceptions.InvalidAuthenticationCredentials;
 import fr.atlasworld.network.security.SecurityManager;
 import io.netty.channel.Channel;
 
@@ -33,27 +35,23 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
 
     @Override
     public UUID authenticate(Channel channel, PacketByteBuf buf) throws AuthenticationException {
-        UUID authUuid = buf.readUuid();
+        UUID authUuid = UUID.fromString(buf.readString());
 
         if (this.securityManager.isAuthProfileActive(authUuid)) {
-            throw new AuthenticationException("Profile already in use!", NetworkErrors.PROFILE_ALREADY_INUSE);
-        }
-
-        try {
-            if (!this.database.has(authUuid.toString())) {
-                throw new AuthenticationException("Profile does not exist!", NetworkErrors.UNKNOWN_OR_MISSING_PROFILE);
-            }
-        } catch (DatabaseException e) {
-            throw new AuthenticationException("Cannot fetch authentication profile", NetworkErrors.INTERNAL_EXCEPTION, e);
+            throw new ProfileAlreadyUsedException("Profile(" + authUuid + ") is already connected!");
         }
 
         try {
             AuthenticationProfile profile = this.database.get(authUuid.toString());
+            if (profile == null) {
+                throw new InvalidAuthenticationCredentials("Profile(" + authUuid + ") does not exist!");
+            }
+
             String token = buf.readString();
             String hashedToken = this.securityManager.hash(token);
 
             if (!profile.hashedToken().equals(hashedToken)) {
-                throw new AuthenticationException("Invalid token!", NetworkErrors.INVALID_TOKEN);
+                throw new InvalidAuthenticationCredentials("Provided invalid token for profile(" + authUuid + ")");
             }
 
             this.authenticated = true;
@@ -61,7 +59,7 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
             channel.closeFuture().addListener(future -> this.securityManager.deactivateAuthProfile(authUuid));
             return authUuid;
         } catch (DatabaseException e) {
-            throw new AuthenticationException("Cannot fetch authentication profile", NetworkErrors.INTERNAL_EXCEPTION, e);
+            throw new InternalAuthenticationException("Could not fetch database", e);
         }
     }
 }

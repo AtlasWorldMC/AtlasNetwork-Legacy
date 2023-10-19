@@ -2,14 +2,14 @@ package fr.atlasworld.network.networking.security.encryption;
 
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
+import fr.atlasworld.network.networking.security.encryption.exceptions.EncryptionException;
+import fr.atlasworld.network.networking.security.encryption.exceptions.InternalEncryptionException;
 import fr.atlasworld.network.security.SecurityManager;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import org.jetbrains.annotations.NotNull;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import javax.crypto.*;
 import java.security.GeneralSecurityException;
 
 /**
@@ -17,90 +17,86 @@ import java.security.GeneralSecurityException;
  * @see EncryptionManager
  */
 public class NetworkEncryptionManager implements EncryptionManager {
-    private boolean encrypted;
     private final SecurityManager securityManager;
-    private SecretKey AESSecretKey;
+
+    private Cipher encryptionCipher;
+    private Cipher decryptionCipher;
+    private boolean encryptionEnabled;
 
     public NetworkEncryptionManager(SecurityManager securityManager) {
-        this.encrypted = false;
+        this.encryptionEnabled = false;
         this.securityManager = securityManager;
     }
 
     @Override
-    public boolean isEncrypted() {
-        return this.encrypted;
+    public boolean isEncryptionEnabled() {
+        return this.encryptionEnabled;
     }
 
     @Override
-    public void handleHandshake(Channel channel, PacketByteBuf buf) throws GeneralSecurityException {
-        if (buf.readString().equals("encryption_handshake")) {
-            String algorithm = buf.readString();
-            byte[] keyBytes = new byte[buf.readInt()];
-            buf.getParent().readBytes(keyBytes);
+    public void enableEncryption(@NotNull SecretKey AESKey) throws EncryptionException {
+        try {
+            this.encryptionCipher = Cipher.getInstance("AES");
+            this.encryptionCipher.init(Cipher.ENCRYPT_MODE, AESKey);
 
-            byte[] decryptedBytes = this.decryptKey(keyBytes);
-            this.AESSecretKey = new SecretKeySpec(decryptedBytes, algorithm);
+            AtlasNetwork.logger.debug("Encryption Cipher initialized.");
 
-            //Encryption was successful
-            this.encrypted = true;
-            AtlasNetwork.logger.info("Encryption established with {}", channel.remoteAddress());
+            this.decryptionCipher = Cipher.getInstance("AES");
+            this.decryptionCipher.init(Cipher.DECRYPT_MODE, AESKey);
 
-            PacketByteBuf respBuf = PacketByteBuf.create()
-                    .writeString("encryption_handshake")
-                    .writeBoolean(true);
-            channel.writeAndFlush(respBuf);
-            return;
+            AtlasNetwork.logger.debug("Decryption Cipher initialized.");
+
+            this.encryptionEnabled = true;
+        } catch (GeneralSecurityException e) {
+            throw new InternalEncryptionException("Could not enable encryption", e);
+        }
+    }
+
+    @Override
+    public PacketByteBuf encrypt(PacketByteBuf buf) throws EncryptionException {
+        if (!this.encryptionEnabled) {
+            throw new UnsupportedOperationException("Encrypt/Decrypt methods can only be called once the encryption is enabled.");
         }
 
-        PacketByteBuf response = PacketByteBuf.create()
-                .writeString("request_fail")
-                .writeString("ENCRYPTION_HANDSHAKE_FAIL");
-
-        AtlasNetwork.logger.error("Encryption failed with {}, terminating connection..", channel.remoteAddress());
-
-        channel.writeAndFlush(response);
-        channel.disconnect();
+        try {
+            byte[] encryptedData = this.encryptionCipher.doFinal(buf.asByteArray());
+            return PacketByteBuf.fromBytes(encryptedData, buf.alloc());
+        } catch (IllegalBlockSizeException | BadPaddingException e) {
+            throw new InternalEncryptionException("Could not encrypt data", e);
+        }
     }
 
     @Override
-    public void initHandshake(Channel channel) {
-        PacketByteBuf buf = PacketByteBuf.create()
-                .writeString("public_key");
-        buf.getParent().writeBytes(this.securityManager.getSecurityPair().getPublic().getEncoded());
+    public PacketByteBuf decrypt(PacketByteBuf buf) throws EncryptionException {
+        if (!this.encryptionEnabled) {
+            throw new UnsupportedOperationException("Encrypt/Decrypt methods can only be called once the encryption is enabled.");
+        }
 
-        AtlasNetwork.logger.info("Starting handshake with {}", channel.remoteAddress());
-
-        channel.writeAndFlush(buf);
-    }
-
-    public byte[] decryptKey(byte[] bytes) throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance(this.securityManager.getSecurityPair().getPrivate().getAlgorithm());
-        cipher.init(Cipher.DECRYPT_MODE, this.securityManager.getSecurityPair().getPrivate());
-
-        return cipher.doFinal(bytes);
+        try {
+            byte[] decryptedData = this.decryptionCipher.doFinal(buf.asByteArray());
+            return PacketByteBuf.fromBytes(decryptedData, buf.alloc());
+        } catch (IllegalBlockSizeException | BadPaddingException e) {
+            throw new InternalEncryptionException("Could not encrypt data", e);
+        }
     }
 
     @Override
-    public ByteBuf encrypt(PacketByteBuf buf) throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.ENCRYPT_MODE, AESSecretKey);
+    public ChannelFuture sendPublicKey(Channel channel) {
+        PacketByteBuf packet = new PacketByteBuf(channel.alloc().buffer());
+        packet.writeBytes(this.securityManager.getSecurityPair().getPublic().getEncoded());
 
-        byte[] inputBytes = new byte[buf.getParent().readableBytes()];
-        buf.getParent().getBytes(buf.getParent().readerIndex(), inputBytes);
-
-        byte[] encryptedBytes = cipher.doFinal(inputBytes);
-        return Unpooled.wrappedBuffer(encryptedBytes);
+        return channel.writeAndFlush(packet); // send the key
     }
 
     @Override
-    public PacketByteBuf decrypt(PacketByteBuf buf) throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance("AES");
-        cipher.init(Cipher.DECRYPT_MODE, AESSecretKey);
+    public byte[] decryptWithPrivateKey(byte[] bytes) throws EncryptionException {
+        try {
+            Cipher cipher = Cipher.getInstance(this.securityManager.getSecurityPair().getPrivate().getAlgorithm());
+            cipher.init(Cipher.DECRYPT_MODE, this.securityManager.getSecurityPair().getPrivate());
 
-        byte[] inputBytes = new byte[buf.getParent().readableBytes()];
-        buf.getParent().getBytes(buf.getParent().readerIndex(), inputBytes);
-
-        byte[] decryptedBytes = cipher.doFinal(inputBytes);
-        return new PacketByteBuf(Unpooled.wrappedBuffer(decryptedBytes));
+            return cipher.doFinal(bytes);
+        } catch (GeneralSecurityException e) {
+            throw new InternalEncryptionException("Failed to decrypt data with private key.", e);
+        }
     }
 }

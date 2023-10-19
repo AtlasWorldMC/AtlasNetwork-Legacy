@@ -1,7 +1,7 @@
 package fr.atlasworld.network.networking.security.authentication;
 
-import fr.atlasworld.network.exceptions.networking.auth.AuthenticationException;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
+import fr.atlasworld.network.networking.security.authentication.exceptions.AuthenticationException;
 import io.netty.channel.Channel;
 
 import java.util.UUID;

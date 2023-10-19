@@ -69,10 +69,11 @@ public class NetworkSocketManager implements SocketManager {
                         ch.pipeline().addLast(new DecodeHandler(new NetworkEncryptionManager(securityManager)));
                         ch.pipeline().addLast(new AuthenticationHandler(authHandler, sessionManager));
                         ch.pipeline().addLast(new PacketHandler(packetManager, sessionManager));
-                        ch.pipeline().addLast(new ResourcesHandler());
+                        ch.pipeline().addLast(new InboundExceptionHandler());
 
                         //Out
-                        ch.pipeline().addFirst(new EncodeHandler(encryptionManager));
+                        ch.pipeline().addLast(new EncodeHandler(encryptionManager));
+                        ch.pipeline().addLast(new OutboundExceptionHandler());
                     }
                 });
 

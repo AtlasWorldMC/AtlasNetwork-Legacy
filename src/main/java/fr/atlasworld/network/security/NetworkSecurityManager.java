@@ -46,21 +46,7 @@ public class NetworkSecurityManager implements SecurityManager {
 
     @Override
     public String hash(String str) {
-        try {
-            MessageDigest md = MessageDigest.getInstance(HASHING_ALGORITHM);
-            String saltedStr = this.hashSalt + str;
-            byte[] bytes = md.digest(saltedStr.getBytes());
-
-            StringBuilder sb = new StringBuilder();
-            for (byte aByte : bytes) {
-                sb.append(Integer.toString((aByte & 0xff) + 0x100, 16)
-                        .substring(1));
-            }
-            return sb.toString();
-        } catch (NoSuchAlgorithmException e) {
-            AtlasNetwork.logger.error("Unable to hash token", e);
-        }
-        return null;
+        return Base64.getEncoder().encodeToString(SecurityUtilities.hash(str.toCharArray(), Base64.getDecoder().decode(this.hashSalt)));
     }
 
     @Override

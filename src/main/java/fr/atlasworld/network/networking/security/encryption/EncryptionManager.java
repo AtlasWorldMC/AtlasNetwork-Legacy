@@ -1,10 +1,13 @@
 package fr.atlasworld.network.networking.security.encryption;
 
+import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
+import fr.atlasworld.network.networking.security.encryption.exceptions.EncryptionException;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 
-import java.security.GeneralSecurityException;
+import javax.crypto.SecretKey;
 
 /**
  * Manages the encryption of a connection
@@ -14,36 +17,40 @@ public interface EncryptionManager {
      * Checks if the connection is encrypted, value can only be changed internally using the handleHandshake function
      * @return true if the connection is encrypted
      */
-    boolean isEncrypted();
+    boolean isEncryptionEnabled();
 
     /**
-     * Handle the handshake request of the client, should normally be invoked after that the client has received
-     * the packet of initHandshake function
-     * @param channel channel to encrypt
-     * @param buf request data
-     * @throws GeneralSecurityException if the encryption could not be established
+     * Enables encryption for this connection.
+     * @throws EncryptionException if encryption could not be enabled.
      */
-    void handleHandshake(Channel channel, PacketByteBuf buf) throws GeneralSecurityException;
-
-    /**
-     * Initializes the encryption handshake, should be executed before anything else when starting encryption
-     * @param channel channel to encrypt
-     */
-    void initHandshake(Channel channel);
+    void enableEncryption(SecretKey AESKey) throws EncryptionException;
 
     /**
      * Encrypts a data buffer with the AES key established with the client
      * @param buf data to encrypt
      * @return encrypted data buffer
-     * @throws GeneralSecurityException if the data could not be encrypted
+     * @throws EncryptionException if the data could not be encrypted
      */
-    ByteBuf encrypt(PacketByteBuf buf) throws GeneralSecurityException;
+    PacketByteBuf encrypt(PacketByteBuf buf) throws EncryptionException;
 
     /**
      * Decrypts a data buffer with the AES key established with the client
      * @param buf data to decrypt
      * @return decrypted data buffer
-     * @throws GeneralSecurityException if the data could not be decrypted
+     * @throws EncryptionException if the data could not be decrypted
      */
-    PacketByteBuf decrypt(PacketByteBuf buf) throws GeneralSecurityException;
+    PacketByteBuf decrypt(PacketByteBuf buf) throws EncryptionException;
+
+    /**
+     * Sends the public key to the specified connection.
+     * @return future operation of the sent data.
+     */
+    @CanIgnoreReturnValue
+    ChannelFuture sendPublicKey(Channel channel);
+
+    /**
+     * Decrypts bytes encrypted with the public key, using the private key.
+     * @return decrypted bytes.
+     */
+    byte[] decryptWithPrivateKey(byte[] bytes) throws EncryptionException;
 }

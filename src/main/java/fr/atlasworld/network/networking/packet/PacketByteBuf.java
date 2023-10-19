@@ -4,6 +4,7 @@ import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.networking.processor.ForEachByteProcessor;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.Unpooled;
 import io.netty.util.ByteProcessor;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,15 +23,29 @@ import java.util.function.Function;
 public class PacketByteBuf extends ByteBuf {
     private final ByteBuf parent;
 
+    public static PacketByteBuf fromUnpooled() {
+        return new PacketByteBuf(Unpooled.buffer());
+    }
+
+    public static PacketByteBuf fromBytes(byte[] data) {
+        return PacketByteBuf.fromUnpooled().writeBytes(data);
+    }
+
+    public static PacketByteBuf fromBytes(byte[] data, ByteBufAllocator alloc) {
+        return new PacketByteBuf(alloc.buffer()).writeBytes(data);
+    }
+
     public PacketByteBuf(ByteBuf parent) {
         super();
         this.parent = parent;
 
-        AtlasNetwork.logger.debug("New PacketByteBuf created: [memory_address: {}, direct: {}, capacity: {}, max_capacity: {}]",
+        AtlasNetwork.logger.debug("New PacketByteBuf created: [memory_address: {}, direct: {}, capacity: {}, max_capacity: {}, recursive: {}]",
                 this.hasMemoryAddress() ? this.memoryAddress() : null,
                 this.isDirect(),
                 this.capacity(),
-                this.maxCapacity());
+                this.maxCapacity(),
+                this.parent instanceof PacketByteBuf
+        );
     }
     
     @Override
@@ -852,6 +867,10 @@ public class PacketByteBuf extends ByteBuf {
         return this;
     }
 
+    public PacketByteBuf writeString(String value) {
+        return this.writeString(value, StandardCharsets.UTF_8);
+    }
+
     @Override
     public int indexOf(int fromIndex, int toIndex, byte value) {
         return this.parent.indexOf(fromIndex, toIndex, value);
@@ -1072,6 +1091,10 @@ public class PacketByteBuf extends ByteBuf {
         return this.parent.release(decrement);
     }
 
+    public boolean releaseFully() {
+        return this.release(this.refCnt());
+    }
+
     @Override
     public int refCnt() {
         return this.parent.refCnt();
@@ -1079,8 +1102,20 @@ public class PacketByteBuf extends ByteBuf {
 
     @Override
     public ByteBuf asByteBuf() {
+        if (this.parent instanceof PacketByteBuf) {
+            return this.parent.asByteBuf();
+        }
+
         return this.parent;
     }
 
-
+    public byte[] asByteArray() {
+        if (this.hasArray()) {
+            return this.array();
+        } else {
+            byte[] data = new byte[this.readableBytes()];
+            this.readBytes(data);
+            return data;
+        }
+    }
 }

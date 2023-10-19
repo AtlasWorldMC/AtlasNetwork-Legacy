@@ -1,4 +1,4 @@
-package fr.atlasworld.network.networking.security.authentication.exception;
+package fr.atlasworld.network.networking.security.authentication.exceptions;
 
 import fr.atlasworld.network.networking.exceptions.NetworkException;
 
@@ -22,5 +22,9 @@ public class AuthenticationException extends NetworkException {
     public AuthenticationException(Throwable cause, String networkFeedback) {
         super(cause);
         this.networkFeedback = networkFeedback;
+    }
+
+    public String getNetworkFeedback() {
+        return networkFeedback;
     }
 }
