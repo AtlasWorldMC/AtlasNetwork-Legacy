@@ -49,7 +49,6 @@ public class NetworkPacketManager implements PacketManager {
             } catch (Throwable e) {
                 PacketExecutionException ex = new PacketExecutionException(e);
                 AtlasNetwork.logger.error("Failed to execute '{}'", strPacket, ex);
-
             }
         });
     }

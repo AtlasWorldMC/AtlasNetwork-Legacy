@@ -1,6 +1,5 @@
 package fr.atlasworld.network.networking.session;
 
-import fr.atlasworld.network.exceptions.networking.session.SessionException;
 import fr.atlasworld.network.networking.entities.NetworkClient;
 import io.netty.channel.Channel;
 import org.jetbrains.annotations.Nullable;
@@ -14,16 +13,13 @@ import java.util.UUID;
 public interface SessionManager {
     /**
      * Registers a session
-     * @param channel Connection IO Channel
-     * @param session Connection Placeholder
      */
-    void addSession(Channel channel, NetworkClient session) throws SessionException;
+    void addSession(NetworkClient session);
 
     /**
      * Unregisters a session, should only be used when the connection closes
-     * @param channel Connection IO Channel
      */
-    void removeSession(Channel channel) throws SessionException;
+    void removeSession(NetworkClient session);
 
     /**
      * Gets all the active sessions

@@ -1,8 +1,5 @@
 package fr.atlasworld.network.networking.session;
 
-import fr.atlasworld.network.exceptions.networking.session.SessionAlreadyInUseException;
-import fr.atlasworld.network.exceptions.networking.session.SessionException;
-import fr.atlasworld.network.exceptions.networking.session.SessionNotUsedException;
 import fr.atlasworld.network.networking.entities.NetworkClient;
 import io.netty.channel.Channel;
 import org.jetbrains.annotations.Nullable;
@@ -14,10 +11,10 @@ import java.util.*;
  * @see NetworkSessionManager
  */
 public class NetworkSessionManager implements SessionManager {
-    private final Map<Channel, NetworkClient> channelSessionHolder;
+    private final Map<UUID, NetworkClient> sessionHolder;
 
-    public NetworkSessionManager(Map<Channel, NetworkClient> channelSessionHolder) {
-        this.channelSessionHolder = channelSessionHolder;
+    public NetworkSessionManager(Map<UUID, NetworkClient> sessionHolder) {
+        this.sessionHolder = sessionHolder;
     }
 
     public NetworkSessionManager() {
@@ -25,35 +22,33 @@ public class NetworkSessionManager implements SessionManager {
     }
 
     @Override
-    public void addSession(Channel channel, NetworkClient session) throws SessionException {
-        if (this.channelSessionHolder.containsKey(channel)) {
-            throw new SessionAlreadyInUseException(String.valueOf(channel.remoteAddress()));
+    public void addSession(NetworkClient session) {
+        if (this.sessionHolder.containsKey(session.getId())) {
+            throw new IllegalArgumentException("Sessions can only be saved once!");
         }
-        this.channelSessionHolder.put(channel, session);
+
+        this.sessionHolder.put(session.getId(), session);
     }
 
     @Override
-    public void removeSession(Channel channel) throws SessionException {
-        if (!this.channelSessionHolder.containsKey(channel)) {
-            throw new SessionNotUsedException(String.valueOf(channel.remoteAddress()));
-        }
-        this.channelSessionHolder.remove(channel);
+    public void removeSession(Channel channel) {
+        this.sessionHolder.remove(channel);
     }
 
     @Override
     public Set<NetworkClient> getSessions() {
-        return new HashSet<>(this.channelSessionHolder.values());
+        return new HashSet<>(this.sessionHolder.values());
     }
 
     @Override
     public @Nullable NetworkClient getSession(Channel channel) {
-        return this.channelSessionHolder.get(channel);
+        return this.sessionHolder.get(channel);
     }
 
     @Override
     public @Nullable NetworkClient getSession(UUID id) {
-        return this.channelSessionHolder.values().stream()
-                .filter(client -> client.getUuid().equals(id))
+        return this.sessionHolder.values().stream()
+                .filter(client -> client.getId().equals(id))
                 .findFirst()
                 .orElse(null);
     }
