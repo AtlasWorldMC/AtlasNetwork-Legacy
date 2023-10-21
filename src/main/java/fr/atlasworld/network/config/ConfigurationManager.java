@@ -65,7 +65,7 @@ public class ConfigurationManager {
     }
 
     @SuppressWarnings("unchecked")
-    public @Nullable <T extends IConfiguration> T getConfiguration(String filename, Class<T> configClass) {
+    public <T extends IConfiguration> T getConfiguration(String filename, Class<T> configClass) {
         if (!this.loaded) {
             throw new UnsupportedOperationException("Configuration files not yet loaded!");
         }
