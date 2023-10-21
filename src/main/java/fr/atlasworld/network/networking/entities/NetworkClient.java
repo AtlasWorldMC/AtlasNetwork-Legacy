@@ -4,6 +4,7 @@ import com.mongodb.lang.Nullable;
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.INetworkEntity;
 import fr.atlasworld.network.networking.packet.DisconnectPacket;
+import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -92,6 +93,15 @@ public class NetworkClient implements INetworkEntity, INetworkSource, INetworkSe
 
         Attribute<T> attribute = this.channel.attr(AttributeKey.valueOf(key));
         return attribute.get();
+    }
+
+    @Override
+    public PacketByteBuf createPacket() {
+        return new PacketByteBuf(this.channel.alloc().buffer());
+    }
+
+    public Channel getChannel() {
+        return this.channel;
     }
 
     @Override

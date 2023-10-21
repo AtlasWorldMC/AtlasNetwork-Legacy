@@ -47,8 +47,9 @@ public class AuthenticationHandler extends ChannelInboundHandlerAdapter {
 
             NetworkClient client = new NetworkClient(ctx.channel(), connectionId);
 
-            this.sessionManager.addSession(ctx.channel(), client);
-            ctx.channel().closeFuture().addListener(future -> this.sessionManager.removeSession(ctx.channel()));
+            this.sessionManager.addSession(client);
+            client.attachData("conn_id", connectionId);
+            client.onDisconnect(source -> this.sessionManager.removeSession(client));
 
             return;
         }

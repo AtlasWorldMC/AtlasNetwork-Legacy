@@ -2,6 +2,7 @@ package fr.atlasworld.network.networking.entities;
 
 import com.google.errorprone.annotations.CanIgnoreReturnValue;
 import com.mongodb.lang.Nullable;
+import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 
@@ -45,8 +46,13 @@ public interface INetworkSource {
     void attachData(String key, Object data);
 
     /**
-     * Retrieve attached data from the source
+     * Retrieve attached data from the source.
      */
     @Nullable
     <T> T getData(String key);
+
+    /**
+     * Creates an empty packet buffer.
+     */
+    PacketByteBuf createPacket();
 }

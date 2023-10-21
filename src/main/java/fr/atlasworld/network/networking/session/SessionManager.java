@@ -1,5 +1,7 @@
 package fr.atlasworld.network.networking.session;
 
+import fr.atlasworld.network.networking.entities.INetworkSession;
+import fr.atlasworld.network.networking.entities.INetworkSource;
 import fr.atlasworld.network.networking.entities.NetworkClient;
 import io.netty.channel.Channel;
 import org.jetbrains.annotations.Nullable;
@@ -14,30 +16,23 @@ public interface SessionManager {
     /**
      * Registers a session
      */
-    void addSession(NetworkClient session);
+    void addSession(INetworkSession session);
 
     /**
      * Unregisters a session, should only be used when the connection closes
      */
-    void removeSession(NetworkClient session);
+    void removeSession(INetworkSession session);
 
     /**
      * Gets all the active sessions
      * @return active sessions
      */
-    Set<NetworkClient> getSessions();
-
-    /**
-     * Gets the session for a specific channel
-     * @param channel Connection IO Channel
-     * @return Connection Placeholder
-     */
-    @Nullable NetworkClient getSession(Channel channel);
+    Set<INetworkSession> getSessions();
 
     /**
      * Gets the session for specific id
      * @param id session id
      * @return Connection Placeholder
      */
-    @Nullable NetworkClient getSession(UUID id);
+    @Nullable INetworkSession getSession(UUID id);
 }

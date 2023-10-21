@@ -7,11 +7,13 @@ import fr.atlasworld.network.config.files.DatabaseConfiguration;
 import fr.atlasworld.network.config.files.SecurityConfiguration;
 import fr.atlasworld.network.config.files.SocketConfiguration;
 import fr.atlasworld.network.networking.packet.NetworkPacketManager;
+import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.socket.NetworkSocketManager;
 import fr.atlasworld.network.networking.socket.SocketManager;
 import fr.atlasworld.network.security.NetworkSecurityManager;
 import fr.atlasworld.network.security.SecurityManager;
+import io.netty.buffer.Unpooled;
 
 public class NetworkBootstrap {
     public static void main(String[] args) {

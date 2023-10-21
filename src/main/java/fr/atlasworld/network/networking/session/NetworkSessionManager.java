@@ -1,7 +1,6 @@
 package fr.atlasworld.network.networking.session;
 
-import fr.atlasworld.network.networking.entities.NetworkClient;
-import io.netty.channel.Channel;
+import fr.atlasworld.network.networking.entities.INetworkSession;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -11,9 +10,9 @@ import java.util.*;
  * @see NetworkSessionManager
  */
 public class NetworkSessionManager implements SessionManager {
-    private final Map<UUID, NetworkClient> sessionHolder;
+    private final Map<UUID, INetworkSession> sessionHolder;
 
-    public NetworkSessionManager(Map<UUID, NetworkClient> sessionHolder) {
+    public NetworkSessionManager(Map<UUID, INetworkSession> sessionHolder) {
         this.sessionHolder = sessionHolder;
     }
 
@@ -22,7 +21,7 @@ public class NetworkSessionManager implements SessionManager {
     }
 
     @Override
-    public void addSession(NetworkClient session) {
+    public void addSession(INetworkSession session) {
         if (this.sessionHolder.containsKey(session.getId())) {
             throw new IllegalArgumentException("Sessions can only be saved once!");
         }
@@ -31,22 +30,21 @@ public class NetworkSessionManager implements SessionManager {
     }
 
     @Override
-    public void removeSession(Channel channel) {
-        this.sessionHolder.remove(channel);
+    public void removeSession(INetworkSession session) {
+        if (!this.sessionHolder.containsKey(session.getId())) {
+            throw new IllegalArgumentException("Session '" + session.getId() + "' does not exist!");
+        }
+
+        this.sessionHolder.remove(session.getId());
     }
 
     @Override
-    public Set<NetworkClient> getSessions() {
+    public Set<INetworkSession> getSessions() {
         return new HashSet<>(this.sessionHolder.values());
     }
 
     @Override
-    public @Nullable NetworkClient getSession(Channel channel) {
-        return this.sessionHolder.get(channel);
-    }
-
-    @Override
-    public @Nullable NetworkClient getSession(UUID id) {
+    public @Nullable INetworkSession getSession(UUID id) {
         return this.sessionHolder.values().stream()
                 .filter(client -> client.getId().equals(id))
                 .findFirst()
