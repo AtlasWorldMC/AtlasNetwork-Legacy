@@ -29,7 +29,7 @@ public class NetworkClient implements INetworkEntity, INetworkSource, INetworkSe
     }
 
     @Override
-    public UUID getId() {
+    public UUID id() {
         return this.uuid;
     }
 

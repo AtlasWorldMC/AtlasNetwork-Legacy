@@ -22,20 +22,20 @@ public class NetworkSessionManager implements SessionManager {
 
     @Override
     public void addSession(INetworkSession session) {
-        if (this.sessionHolder.containsKey(session.getId())) {
+        if (this.sessionHolder.containsKey(session.id())) {
             throw new IllegalArgumentException("Sessions can only be saved once!");
         }
 
-        this.sessionHolder.put(session.getId(), session);
+        this.sessionHolder.put(session.id(), session);
     }
 
     @Override
     public void removeSession(INetworkSession session) {
-        if (!this.sessionHolder.containsKey(session.getId())) {
-            throw new IllegalArgumentException("Session '" + session.getId() + "' does not exist!");
+        if (!this.sessionHolder.containsKey(session.id())) {
+            throw new IllegalArgumentException("Session '" + session.id() + "' does not exist!");
         }
 
-        this.sessionHolder.remove(session.getId());
+        this.sessionHolder.remove(session.id());
     }
 
     @Override
@@ -46,7 +46,7 @@ public class NetworkSessionManager implements SessionManager {
     @Override
     public @Nullable INetworkSession getSession(UUID id) {
         return this.sessionHolder.values().stream()
-                .filter(client -> client.getId().equals(id))
+                .filter(client -> client.id().equals(id))
                 .findFirst()
                 .orElse(null);
     }

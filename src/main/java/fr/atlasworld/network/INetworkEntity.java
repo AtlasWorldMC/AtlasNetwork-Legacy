@@ -9,5 +9,5 @@ public interface INetworkEntity {
     /**
      * Retrieve the unique id of the entity
      */
-    UUID getId();
+    UUID id();
 }

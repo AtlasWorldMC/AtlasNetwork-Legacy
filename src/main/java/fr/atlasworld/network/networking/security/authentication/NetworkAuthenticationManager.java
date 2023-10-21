@@ -1,14 +1,14 @@
 package fr.atlasworld.network.networking.security.authentication;
 
-import fr.atlasworld.network.database.Database;
-import fr.atlasworld.network.database.entities.authentification.AuthenticationProfile;
-import fr.atlasworld.network.exceptions.database.DatabaseException;
+import fr.atlasworld.network.networking.entities.data.AuthenticationProfile;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import fr.atlasworld.network.networking.security.authentication.exceptions.AuthenticationException;
 import fr.atlasworld.network.networking.security.authentication.exceptions.InternalAuthenticationException;
 import fr.atlasworld.network.networking.security.authentication.exceptions.ProfileAlreadyUsedException;
 import fr.atlasworld.network.networking.security.authentication.exceptions.InvalidAuthenticationCredentials;
 import fr.atlasworld.network.security.SecurityManager;
+import fr.atlasworld.network.services.database.Database;
+import fr.atlasworld.network.services.database.exceptions.DatabaseException;
 import io.netty.channel.Channel;
 
 import java.util.UUID;
@@ -42,7 +42,7 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
         }
 
         try {
-            AuthenticationProfile profile = this.database.get(authUuid.toString());
+            AuthenticationProfile profile = this.database.load(authUuid);
             if (profile == null) {
                 throw new InvalidAuthenticationCredentials("Profile(" + authUuid + ") does not exist!");
             }
@@ -50,7 +50,7 @@ public class NetworkAuthenticationManager implements AuthenticationManager {
             String token = buf.readString();
             String hashedToken = this.securityManager.hash(token);
 
-            if (!profile.hashedToken().equals(hashedToken)) {
+            if (!profile.tokenHash().equals(hashedToken)) {
                 throw new InvalidAuthenticationCredentials("Provided invalid token for profile(" + authUuid + ")");
             }
 
