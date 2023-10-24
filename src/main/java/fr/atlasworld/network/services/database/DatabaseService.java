@@ -1,6 +1,5 @@
 package fr.atlasworld.network.services.database;
 
-import fr.atlasworld.network.INetworkEntity;
 import fr.atlasworld.network.services.database.exceptions.DatabaseException;
 import fr.atlasworld.network.services.database.exceptions.unchecked.DatabaseConnectionClosedException;
 
@@ -13,7 +12,7 @@ public interface DatabaseService {
      * @param type type of data to parse from the database
      * @return The specified database
      */
-    <T extends INetworkEntity> Database<T> getDatabase(String name, Type type) throws DatabaseException;
+    <T extends IDatabaseEntity<T>> Database<T> getDatabase(String name, DatabaseEntityFactory<T> factory) throws DatabaseException;
 
     /**
      * Closes the connection with the database

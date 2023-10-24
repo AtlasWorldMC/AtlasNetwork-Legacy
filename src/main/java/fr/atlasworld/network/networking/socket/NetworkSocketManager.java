@@ -3,15 +3,20 @@ package fr.atlasworld.network.networking.socket;
 import fr.atlasworld.network.AtlasNetwork;
 import fr.atlasworld.network.boot.NetworkBootstrap;
 import fr.atlasworld.network.config.files.SocketConfiguration;
+import fr.atlasworld.network.networking.entities.data.AuthenticationProfile;
 import fr.atlasworld.network.networking.handler.*;
 import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.security.authentication.AuthenticationManager;
 import fr.atlasworld.network.networking.security.authentication.NetworkAuthenticationManager;
+import fr.atlasworld.network.networking.security.authentication.exceptions.InternalAuthenticationException;
 import fr.atlasworld.network.networking.security.encryption.EncryptionManager;
 import fr.atlasworld.network.networking.security.encryption.NetworkEncryptionManager;
 import fr.atlasworld.network.networking.session.NetworkSessionManager;
 import fr.atlasworld.network.networking.session.SessionManager;
 import fr.atlasworld.network.security.SecurityManager;
+import fr.atlasworld.network.services.database.Database;
+import fr.atlasworld.network.services.database.DatabaseService;
+import fr.atlasworld.network.services.database.exceptions.DatabaseException;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -33,20 +38,22 @@ public class NetworkSocketManager implements SocketManager {
     private final SecurityManager securityManager;
     private final PacketManager packetManager;
     private final SocketConfiguration configuration;
+    private final DatabaseService databaseService;
 
     private Channel serverChannel;
     private boolean bound;
 
-    public NetworkSocketManager(EventLoopGroup bossGroup, EventLoopGroup workerGroup, SecurityManager securityManager, PacketManager packetManager, SocketConfiguration configuration) {
+    public NetworkSocketManager(EventLoopGroup bossGroup, EventLoopGroup workerGroup, SecurityManager securityManager, PacketManager packetManager, SocketConfiguration configuration, DatabaseService databaseService) {
         this.bossGroup = bossGroup;
         this.workerGroup = workerGroup;
         this.securityManager = securityManager;
         this.packetManager = packetManager;
         this.configuration = configuration;
+        this.databaseService = databaseService;
     }
 
-    public NetworkSocketManager(SocketConfiguration config, SecurityManager securityManager, PacketManager packetManager) {
-        this(new NioEventLoopGroup(), new NioEventLoopGroup(), securityManager, packetManager, config);
+    public NetworkSocketManager(SocketConfiguration config, SecurityManager securityManager, PacketManager packetManager, DatabaseService databaseService) {
+        this(new NioEventLoopGroup(), new NioEventLoopGroup(), securityManager, packetManager, config, databaseService);
     }
 
     @Override
@@ -61,8 +68,16 @@ public class NetworkSocketManager implements SocketManager {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(@NotNull SocketChannel ch) throws Exception {
+                        Database<AuthenticationProfile> authDatabase;
+
+                        try {
+                            authDatabase = databaseService.getDatabase("authentication", AuthenticationProfile.AuthenticationProfileFactory.getFactory());
+                        } catch (DatabaseException e) {
+                            throw new InternalAuthenticationException("Could not fetch authentication database!", e);
+                        }
+
                         EncryptionManager encryptionManager = new NetworkEncryptionManager(securityManager);
-                        AuthenticationManager authHandler = new NetworkAuthenticationManager(securityManager, null);
+                        AuthenticationManager authHandler = new NetworkAuthenticationManager(securityManager, authDatabase);
                         SessionManager sessionManager = new NetworkSessionManager();
 
                         //In

@@ -16,23 +16,38 @@ public class LaunchArgs {
      */
     public static final String DEV_ENV_ARG = "-devEnv";
 
+    /**
+     * Enables Network's database monitoring, this will log every command it sends to the database.
+     */
+    public static final String DATABASE_MONITORING = "-enableDatabaseMonitoring";
 
-    private final boolean devEnv;
+    private boolean devEnv;
+    private boolean databaseMonitoring;
 
-    private LaunchArgs(String[] lau) {
-        List<String> argsList = Arrays.asList(lau);
+    private LaunchArgs(String[] args) {
+        List<String> argsList = Arrays.asList(args);
         this.devEnv = argsList.contains(DEV_ENV_ARG);
+        this.databaseMonitoring = argsList.contains(DATABASE_MONITORING);
 
         //Messages
         if (this.devEnv) {
             AtlasNetwork.logger.warn("Launching AtlasNetwork in dev environment. Remove '{}' launch argument to launch normally.", DEV_ENV_ARG);
             LogUtils.enableDebugLogging();
             ResourceLeakDetector.setLevel(ResourceLeakDetector.Level.PARANOID);
+            this.databaseMonitoring = true;
+        }
+
+        if (this.databaseMonitoring) {
+            AtlasNetwork.logger.info("Database monitoring enabled. Every command will be logged.");
         }
     }
 
     public boolean isDevEnv() {
-        return devEnv;
+        return this.devEnv;
+    }
+
+    public boolean databaseMonitoringEnabled() {
+        return this.databaseMonitoring;
     }
 
     private static LaunchArgs launchArgs;

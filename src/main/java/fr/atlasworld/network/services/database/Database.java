@@ -14,6 +14,12 @@ public interface Database<T> {
     void save(T value) throws DatabaseException;
 
     /**
+     * Replaces/Updates data in the database.
+     * @throws DatabaseException in case something went wrong while updating data.
+     */
+    void update(T value) throws DatabaseException;
+
+    /**
      * Deletes the specified data with the give id.
      * @throws DatabaseException in case something went wrong while deleting data.
      * @throws fr.atlasworld.network.services.database.exceptions.unchecked.NoSuchDatabaseKeyException if the give id could not be found.
