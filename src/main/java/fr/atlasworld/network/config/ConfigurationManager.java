@@ -17,13 +17,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurationManager {
-    private final Map<String, IConfigurationSchema<? extends IConfiguration>> registeredConfigurationSchemas;
-    private final Map<String, IConfiguration> loadedConfigurations;
+    private final Map<String, IConfigurationSchema<? extends Configuration>> registeredConfigurationSchemas;
+    private final Map<String, Configuration> loadedConfigurations;
     private final Gson gson;
 
     private boolean loaded = false;
 
-    public ConfigurationManager(Map<String, IConfigurationSchema<? extends IConfiguration>> registeredConfigurationSchemas, Map<String, IConfiguration> loadedConfigurations, Gson gson) {
+    public ConfigurationManager(Map<String, IConfigurationSchema<? extends Configuration>> registeredConfigurationSchemas, Map<String, Configuration> loadedConfigurations, Gson gson) {
         this.registeredConfigurationSchemas = registeredConfigurationSchemas;
         this.loadedConfigurations = loadedConfigurations;
         this.gson = gson;
@@ -33,7 +33,7 @@ public class ConfigurationManager {
         this(new HashMap<>(), new HashMap<>(), new GsonBuilder().setPrettyPrinting().create());
     }
 
-    public void registerSchema(@NotNull IConfigurationSchema<? extends IConfiguration> schema) {
+    public void registerSchema(@NotNull IConfigurationSchema<? extends Configuration> schema) {
         if (this.loaded) {
             throw new UnsupportedOperationException("Configuration schemas must be registered before loading configuration.");
         }
@@ -65,12 +65,12 @@ public class ConfigurationManager {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends IConfiguration> T getConfiguration(String filename, Class<T> configClass) {
+    public <T extends Configuration> T getConfiguration(String filename, Class<T> configClass) {
         if (!this.loaded) {
             throw new UnsupportedOperationException("Configuration files not yet loaded!");
         }
 
-        IConfiguration configuration = this.loadedConfigurations.get(filename);
+        Configuration configuration = this.loadedConfigurations.get(filename);
         if (configuration == null) {
             return null;
         }
@@ -83,7 +83,7 @@ public class ConfigurationManager {
         }
     }
 
-    public @Nullable <T extends IConfiguration> T getConfiguration(IConfigurationSchema<?> schema, Class<T> configClass) {
+    public @Nullable <T extends Configuration> T getConfiguration(IConfigurationSchema<?> schema, Class<T> configClass) {
         return this.getConfiguration(schema.filename(), configClass);
     }
 
@@ -98,7 +98,7 @@ public class ConfigurationManager {
                 JsonObject json = new JsonObject();
                 json.addProperty("version", schema.configurationVersion());
 
-                IConfiguration configuration = schema.defaultConfiguration();
+                Configuration configuration = schema.defaultConfiguration();
 
                 JsonElement configJson = this.gson.toJsonTree(configuration);
                 json.add("config", configJson);
@@ -121,7 +121,7 @@ public class ConfigurationManager {
                 loader.save(this.gson.toJson(configJson));
             }
 
-            IConfiguration configuration = this.gson.fromJson(configJson, schema.configurationClass());
+            Configuration configuration = this.gson.fromJson(configJson, schema.configurationClass());
 
             this.loadedConfigurations.put(schema.filename(), configuration);
         } catch (IOException e) {

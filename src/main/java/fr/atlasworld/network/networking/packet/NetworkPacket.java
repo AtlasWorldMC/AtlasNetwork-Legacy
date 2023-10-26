@@ -1,6 +1,6 @@
 package fr.atlasworld.network.networking.packet;
 
-import fr.atlasworld.network.networking.entities.INetworkSource;
+import fr.atlasworld.network.networking.entities.NetworkSource;
 
 /**
  * Network Packet, implement this interface and register it to create a new packet
@@ -17,5 +17,5 @@ public interface NetworkPacket {
      * @param client remote that sent the packet
      * @param packet packet data
      */
-    void onReceive(INetworkSource source, PacketByteBuf packet) throws Throwable;
+    void onReceive(NetworkSource source, PacketByteBuf packet) throws Throwable;
 }

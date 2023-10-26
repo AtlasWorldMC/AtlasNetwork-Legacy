@@ -2,7 +2,7 @@ package fr.atlasworld.network.networking.entities;
 
 import com.mongodb.lang.Nullable;
 import fr.atlasworld.network.AtlasNetwork;
-import fr.atlasworld.network.INetworkEntity;
+import fr.atlasworld.network.NetworkEntity;
 import fr.atlasworld.network.networking.packet.DisconnectPacket;
 import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import io.netty.buffer.ByteBuf;
@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 /**
  * Network client, 'holder' for managing socket channels more easily using Network's Packet based API
  */
-public class NetworkClient implements INetworkEntity, INetworkSource, INetworkSession {
+public class NetworkClient implements NetworkEntity, NetworkSource, NetworkSession {
     private final Channel channel;
     private final UUID uuid;
 
@@ -61,7 +61,7 @@ public class NetworkClient implements INetworkEntity, INetworkSource, INetworkSe
     }
 
     @Override
-    public void onDisconnect(Consumer<INetworkSource> listener) {
+    public void onDisconnect(Consumer<NetworkSource> listener) {
         this.channel.closeFuture().addListener(future -> listener.accept(this));
     }
 

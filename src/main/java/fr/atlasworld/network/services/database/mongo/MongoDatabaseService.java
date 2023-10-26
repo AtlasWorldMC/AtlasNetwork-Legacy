@@ -6,7 +6,7 @@ import com.mongodb.client.MongoClients;
 import fr.atlasworld.network.config.files.DatabaseConfiguration;
 import fr.atlasworld.network.services.database.Database;
 import fr.atlasworld.network.services.database.DatabaseEntityFactory;
-import fr.atlasworld.network.services.database.IDatabaseEntity;
+import fr.atlasworld.network.services.database.DatabaseEntity;
 import fr.atlasworld.network.services.database.DatabaseService;
 import fr.atlasworld.network.services.database.exceptions.DatabaseException;
 import fr.atlasworld.network.services.database.exceptions.DatabaseIOException;
@@ -56,7 +56,7 @@ public class MongoDatabaseService implements DatabaseService {
     }
 
     @Override
-    public <T extends IDatabaseEntity<T>> Database<T> getDatabase(String name, DatabaseEntityFactory<T> factory) throws DatabaseException {
+    public <T extends DatabaseEntity<T>> Database<T> getDatabase(String name, DatabaseEntityFactory<T> factory) throws DatabaseException {
         this.ensureNotClosed();
         try {
             return new MongoDatabase<>(this.client.getDatabase(SERVER_DATABASE).getCollection(name), factory);

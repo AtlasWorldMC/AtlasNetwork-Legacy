@@ -6,11 +6,10 @@ import fr.atlasworld.network.networking.packet.PacketByteBuf;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFuture;
 
-import java.lang.reflect.Type;
 import java.net.InetSocketAddress;
 import java.util.function.Consumer;
 
-public interface INetworkSource {
+public interface NetworkSource {
     /**
      * Sends a packet to the source
      */
@@ -36,9 +35,9 @@ public interface INetworkSource {
 
     /**
      * Adds a listener to the source when it disconnects.
-     * Terminating a connection with {@link INetworkSource#terminate()} will also trigger this listener.
+     * Terminating a connection with {@link NetworkSource#terminate()} will also trigger this listener.
      */
-    void onDisconnect(Consumer<INetworkSource> listener);
+    void onDisconnect(Consumer<NetworkSource> listener);
 
     /**
      * Attach data to the source.

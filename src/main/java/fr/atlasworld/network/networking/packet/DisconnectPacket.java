@@ -1,7 +1,6 @@
 package fr.atlasworld.network.networking.packet;
 
-import fr.atlasworld.network.networking.entities.INetworkSource;
-import fr.atlasworld.network.networking.entities.NetworkClient;
+import fr.atlasworld.network.networking.entities.NetworkSource;
 import io.netty.buffer.ByteBufAllocator;
 
 public class DisconnectPacket implements NetworkPacket {
@@ -14,7 +13,7 @@ public class DisconnectPacket implements NetworkPacket {
     }
 
     @Override
-    public void onReceive(INetworkSource source, PacketByteBuf packet) throws Throwable {
+    public void onReceive(NetworkSource source, PacketByteBuf packet) throws Throwable {
         String reason = packet.readString();
 
         source.attachData(DisconnectPacket.DISCONNECT_REASON_VALUE_KEY, reason);

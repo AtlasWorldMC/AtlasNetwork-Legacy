@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.connection.ClusterConnectionMode;
-import fr.atlasworld.network.config.IConfiguration;
+import fr.atlasworld.network.config.Configuration;
 import fr.atlasworld.network.config.IConfigurationSchema;
 import fr.atlasworld.network.config.exceptions.unchecked.UnsupportedConfigurationVersionException;
 import fr.atlasworld.network.services.database.mongo.exceptions.unchecked.UnsupportedMongoDBAuthenticationMechanism;
@@ -21,7 +21,7 @@ public record DatabaseConfiguration(String docs,
                                     @SerializedName("connection") DatabaseConnectionSettings connectionPoolSettings,
                                     @SerializedName("server") DatabaseServerSettings serverSettings,
                                     @SerializedName("socket") DatabaseSocketSettings socketSettings
-                                    ) implements IConfiguration {
+                                    ) implements Configuration {
     public static class DatabaseConfigurationSchema implements IConfigurationSchema<DatabaseConfiguration> {
         @Override
         public @NotNull String filename() {

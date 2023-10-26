@@ -6,7 +6,7 @@ import com.mongodb.client.model.Filters;
 import fr.atlasworld.network.services.database.Database;
 import fr.atlasworld.network.services.database.DatabaseData;
 import fr.atlasworld.network.services.database.DatabaseEntityFactory;
-import fr.atlasworld.network.services.database.IDatabaseEntity;
+import fr.atlasworld.network.services.database.DatabaseEntity;
 import fr.atlasworld.network.services.database.exceptions.DatabaseDataParsingException;
 import fr.atlasworld.network.services.database.exceptions.DatabaseException;
 import fr.atlasworld.network.services.database.exceptions.DatabaseIOException;
@@ -21,7 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class MongoDatabase<T extends IDatabaseEntity<T>> implements Database<T> {
+public class MongoDatabase<T extends DatabaseEntity<T>> implements Database<T> {
     private final MongoCollection<Document> collection;
     private final DatabaseEntityFactory<T> factory;
 
@@ -125,7 +125,7 @@ public class MongoDatabase<T extends IDatabaseEntity<T>> implements Database<T> 
         return Filters.eq("_id", new ObjectId(id.toString()));
     }
 
-    private Document parse(IDatabaseEntity<T> entity) throws DatabaseDataParsingException {
+    private Document parse(DatabaseEntity<T> entity) throws DatabaseDataParsingException {
         DatabaseData data = entity.asData();
         if (data.has("_id")) {
             throw new DatabaseDataParsingException("'_id' Property may not be override!");

@@ -4,6 +4,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public interface DatabaseEntityFactory<T extends IDatabaseEntity<T>> {
+public interface DatabaseEntityFactory<T extends DatabaseEntity<T>> {
     @NotNull T create(DatabaseData data, UUID id);
 }

@@ -2,12 +2,12 @@ package fr.atlasworld.network.config.files;
 
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
-import fr.atlasworld.network.config.IConfiguration;
+import fr.atlasworld.network.config.Configuration;
 import fr.atlasworld.network.config.IConfigurationSchema;
 import fr.atlasworld.network.config.exceptions.unchecked.UnsupportedConfigurationVersionException;
 import org.jetbrains.annotations.NotNull;
 
-public record SocketConfiguration(String host, int port, @SerializedName("restart_when_closed") boolean restartWhenClosed) implements IConfiguration {
+public record SocketConfiguration(String host, int port, @SerializedName("restart_when_closed") boolean restartWhenClosed) implements Configuration {
     public static class SocketConfigurationSchema implements IConfigurationSchema<SocketConfiguration> {
 
         @Override

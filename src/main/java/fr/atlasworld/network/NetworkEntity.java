@@ -5,7 +5,7 @@ import java.util.UUID;
 /**
  * Helper Interface for making managing of non-persistent(Like: Data, Session, ect..) objects in the application
  */
-public interface INetworkEntity {
+public interface NetworkEntity {
     /**
      * Retrieve the unique id of the entity
      */

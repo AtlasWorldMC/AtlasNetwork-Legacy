@@ -1,6 +1,6 @@
 package fr.atlasworld.network.networking.session;
 
-import fr.atlasworld.network.networking.entities.INetworkSession;
+import fr.atlasworld.network.networking.entities.NetworkSession;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -10,9 +10,9 @@ import java.util.*;
  * @see NetworkSessionManager
  */
 public class NetworkSessionManager implements SessionManager {
-    private final Map<UUID, INetworkSession> sessionHolder;
+    private final Map<UUID, NetworkSession> sessionHolder;
 
-    public NetworkSessionManager(Map<UUID, INetworkSession> sessionHolder) {
+    public NetworkSessionManager(Map<UUID, NetworkSession> sessionHolder) {
         this.sessionHolder = sessionHolder;
     }
 
@@ -21,7 +21,7 @@ public class NetworkSessionManager implements SessionManager {
     }
 
     @Override
-    public void addSession(INetworkSession session) {
+    public void addSession(NetworkSession session) {
         if (this.sessionHolder.containsKey(session.id())) {
             throw new IllegalArgumentException("Sessions can only be saved once!");
         }
@@ -30,7 +30,7 @@ public class NetworkSessionManager implements SessionManager {
     }
 
     @Override
-    public void removeSession(INetworkSession session) {
+    public void removeSession(NetworkSession session) {
         if (!this.sessionHolder.containsKey(session.id())) {
             throw new IllegalArgumentException("Session '" + session.id() + "' does not exist!");
         }
@@ -39,12 +39,12 @@ public class NetworkSessionManager implements SessionManager {
     }
 
     @Override
-    public Set<INetworkSession> getSessions() {
+    public Set<NetworkSession> getSessions() {
         return new HashSet<>(this.sessionHolder.values());
     }
 
     @Override
-    public @Nullable INetworkSession getSession(UUID id) {
+    public @Nullable NetworkSession getSession(UUID id) {
         return this.sessionHolder.values().stream()
                 .filter(client -> client.id().equals(id))
                 .findFirst()
