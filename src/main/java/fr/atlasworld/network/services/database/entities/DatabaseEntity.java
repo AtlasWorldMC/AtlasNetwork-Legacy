@@ -1,4 +1,4 @@
-package fr.atlasworld.network.services.database;
+package fr.atlasworld.network.services.database.entities;
 
 import fr.atlasworld.network.NetworkEntity;
 import org.jetbrains.annotations.NotNull;

@@ -4,7 +4,7 @@ import fr.atlasworld.network.services.exception.ServiceException;
 
 public class DatabaseException extends ServiceException {
     public DatabaseException() {
-        super(  );
+        super();
     }
 
     public DatabaseException(String message) {

@@ -17,13 +17,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigurationManager {
-    private final Map<String, IConfigurationSchema<? extends Configuration>> registeredConfigurationSchemas;
+    private final Map<String, ConfigurationSchema<? extends Configuration>> registeredConfigurationSchemas;
     private final Map<String, Configuration> loadedConfigurations;
     private final Gson gson;
 
     private boolean loaded = false;
 
-    public ConfigurationManager(Map<String, IConfigurationSchema<? extends Configuration>> registeredConfigurationSchemas, Map<String, Configuration> loadedConfigurations, Gson gson) {
+    public ConfigurationManager(Map<String, ConfigurationSchema<? extends Configuration>> registeredConfigurationSchemas, Map<String, Configuration> loadedConfigurations, Gson gson) {
         this.registeredConfigurationSchemas = registeredConfigurationSchemas;
         this.loadedConfigurations = loadedConfigurations;
         this.gson = gson;
@@ -33,7 +33,7 @@ public class ConfigurationManager {
         this(new HashMap<>(), new HashMap<>(), new GsonBuilder().setPrettyPrinting().create());
     }
 
-    public void registerSchema(@NotNull IConfigurationSchema<? extends Configuration> schema) {
+    public void registerSchema(@NotNull ConfigurationSchema<? extends Configuration> schema) {
         if (this.loaded) {
             throw new UnsupportedOperationException("Configuration schemas must be registered before loading configuration.");
         }
@@ -57,7 +57,7 @@ public class ConfigurationManager {
             configurationDirectory.mkdirs();
         }
 
-        for (IConfigurationSchema<?> schema : this.registeredConfigurationSchemas.values()) {
+        for (ConfigurationSchema<?> schema : this.registeredConfigurationSchemas.values()) {
             this.loadConfiguration(configurationDirectory, schema);
         }
 
@@ -83,11 +83,11 @@ public class ConfigurationManager {
         }
     }
 
-    public @Nullable <T extends Configuration> T getConfiguration(IConfigurationSchema<?> schema, Class<T> configClass) {
+    public @Nullable <T extends Configuration> T getConfiguration(ConfigurationSchema<?> schema, Class<T> configClass) {
         return this.getConfiguration(schema.filename(), configClass);
     }
 
-    private void loadConfiguration(File configurationDirectory, IConfigurationSchema<?> schema) throws ConfigurationLoadingException, ConfigurationParsingException {
+    private void loadConfiguration(File configurationDirectory, ConfigurationSchema<?> schema) throws ConfigurationLoadingException, ConfigurationParsingException {
         StringFileLoader loader = new StringFileLoader(new File(configurationDirectory, schema.filename()));
 
         try {

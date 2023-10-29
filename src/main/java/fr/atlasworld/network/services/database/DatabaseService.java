@@ -1,5 +1,6 @@
 package fr.atlasworld.network.services.database;
 
+import fr.atlasworld.network.services.database.entities.DatabaseEntity;
 import fr.atlasworld.network.services.database.exceptions.DatabaseException;
 import fr.atlasworld.network.services.database.exceptions.unchecked.DatabaseConnectionClosedException;
 

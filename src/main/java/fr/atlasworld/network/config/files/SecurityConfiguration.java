@@ -3,7 +3,7 @@ package fr.atlasworld.network.config.files;
 import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 import fr.atlasworld.network.config.Configuration;
-import fr.atlasworld.network.config.IConfigurationSchema;
+import fr.atlasworld.network.config.ConfigurationSchema;
 import fr.atlasworld.network.config.exceptions.unchecked.UnsupportedConfigurationVersionException;
 import fr.atlasworld.network.security.SecurityUtilities;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Base64;
 
 public record SecurityConfiguration(@SerializedName("hashing_salt") String hashSalt) implements Configuration {
-    public static class SecurityConfigurationSchema implements IConfigurationSchema<SecurityConfiguration> {
+    public static class SecurityConfigurationSchema implements ConfigurationSchema<SecurityConfiguration> {
 
         @Override
         public @NotNull String filename() {

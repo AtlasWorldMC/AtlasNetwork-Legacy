@@ -6,7 +6,7 @@ import com.mongodb.client.MongoClients;
 import fr.atlasworld.network.config.files.DatabaseConfiguration;
 import fr.atlasworld.network.services.database.Database;
 import fr.atlasworld.network.services.database.DatabaseEntityFactory;
-import fr.atlasworld.network.services.database.DatabaseEntity;
+import fr.atlasworld.network.services.database.entities.DatabaseEntity;
 import fr.atlasworld.network.services.database.DatabaseService;
 import fr.atlasworld.network.services.database.exceptions.DatabaseException;
 import fr.atlasworld.network.services.database.exceptions.DatabaseIOException;

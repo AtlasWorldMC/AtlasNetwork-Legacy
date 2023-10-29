@@ -10,7 +10,7 @@
         <file>logs/latest.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>logs/%d{yyyy-MM-dd}_%d{HH-mm-ss,aux}.log.gz</fileNamePattern>
-            <TimeBasedFileNamingAndTriggeringPolicy class="fr.atlasworld.network.logging.StartupTimeBasedTriggeringPolicy" />
+            <TimeBasedFileNamingAndTriggeringPolicy class="fr.atlasworld.network.logging.StartupTimeBasedTriggeringPolicy"/>
         </rollingPolicy>
         <encoder>
             <pattern>[%d{HH:mm:ss}] [%thread] [%logger{36}/%level] %msg%n</pattern>
@@ -18,7 +18,7 @@
     </appender>
 
     <root level="info">
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="File" />
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="File"/>
     </root>
 </configuration>

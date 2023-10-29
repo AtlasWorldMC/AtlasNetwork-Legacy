@@ -40,16 +40,8 @@ public class FileManager {
      * Gets the server configurations directory
      * @return server configurations directory
      */
-    public static File getServerConfigDirectory() {
+    public static File getServerSchemaDirectory() {
         return getWorkingDirectoryFile("servers");
-    }
-
-    /**
-     * Gets the upload file index
-     * @return upload file index
-     */
-    public static File getServerFileIndex() {
-        return getWorkingDirectoryFile("hub/index.json");
     }
 
     /**

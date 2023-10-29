@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * Defines the properties of the configuration file
  * @param <T> the configuration file
  */
-public interface IConfigurationSchema<T extends Configuration> {
+public interface ConfigurationSchema<T extends Configuration> {
     /**
      * Retrieve the FULL configuration file name.
      */

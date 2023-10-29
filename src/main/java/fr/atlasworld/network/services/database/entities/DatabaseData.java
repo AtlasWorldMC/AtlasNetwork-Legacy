@@ -1,4 +1,4 @@
-package fr.atlasworld.network.services.database;
+package fr.atlasworld.network.services.database.entities;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

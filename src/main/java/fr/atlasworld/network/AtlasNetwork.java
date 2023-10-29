@@ -1,12 +1,14 @@
 package fr.atlasworld.network;
 
+import com.mattmalec.pterodactyl4j.exceptions.HttpException;
+import fr.atlasworld.network.boot.NetworkBootstrap;
 import fr.atlasworld.network.config.ConfigurationManager;
 import fr.atlasworld.network.logging.LogUtils;
 import fr.atlasworld.network.networking.packet.PacketManager;
 import fr.atlasworld.network.networking.socket.SocketManager;
 import fr.atlasworld.network.security.SecurityManager;
+import fr.atlasworld.network.services.panel.PanelService;
 import io.netty.channel.ChannelFuture;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 
 public class AtlasNetwork {
@@ -17,10 +19,12 @@ public class AtlasNetwork {
     private final SocketManager socketManager;
     private final SecurityManager securityManager;
     private final PacketManager packetManager;
+    private final PanelService panelService;
 
     private boolean started = false;
 
-    public AtlasNetwork(ConfigurationManager configurationManager, SocketManager socketManager, SecurityManager securityManager, PacketManager packetManager) {
+    public AtlasNetwork(ConfigurationManager configurationManager, SocketManager socketManager, SecurityManager securityManager, PacketManager packetManager, PanelService panelService) {
+        this.panelService = panelService;
         if (instance != null) {
             throw new UnsupportedOperationException("Only on AtlasNetwork Server instance can be created!");
         }
@@ -45,6 +49,18 @@ public class AtlasNetwork {
             throw futureResults.cause();
         } else {
             AtlasNetwork.logger.info("Socket started.");
+        }
+
+        // Services
+        AtlasNetwork.logger.info("Starting services..");
+
+        try {
+            this.panelService.start();
+
+            this.panelService.createServer("Test", "build_server");
+        } catch (HttpException e) {
+            AtlasNetwork.logger.error("Unable to make requests to the panel, please verify your configuration.");
+            NetworkBootstrap.crash(e);
         }
 
         this.started = true;

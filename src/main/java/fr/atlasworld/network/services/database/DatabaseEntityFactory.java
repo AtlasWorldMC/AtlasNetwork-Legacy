@@ -1,5 +1,7 @@
 package fr.atlasworld.network.services.database;
 
+import fr.atlasworld.network.services.database.entities.DatabaseData;
+import fr.atlasworld.network.services.database.entities.DatabaseEntity;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
